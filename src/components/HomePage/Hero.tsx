@@ -11,11 +11,11 @@ export default function Hero() {
     const swiperRef = useRef<SwiperType | null>(null)
 
     const heroImages = [
-        '/dummy.jpg',
-        '/dummy.jpg',
-        '/dummy.jpg',
-        '/dummy.jpg',
-        '/dummy.jpg'
+        '/banner1.png',
+        '/banner2.png',
+        '/banner3.png',
+        '/banner4.png',
+        '/banner5.png',
     ]
 
     return (
@@ -41,15 +41,15 @@ export default function Hero() {
                     onSwiper={(swiper) => {
                         swiperRef.current = swiper
                     }}
-                    className="hero-swiper"
+                    className="hero-swiper overflow-hidden"
                 >
                     {heroImages.map((image, index) => (
                         <SwiperSlide key={index}>
-                            <div className="relative w-full h-[450px] overflow-hidden rounded-lg">
+                            <div className="relative w-full h-[450px] overflow-hidden rounded-lg cursor-pointer">
                                 <img
                                     src={image}
                                     alt={`Hero slide ${index + 1}`}
-                                    className="w-full h-full object-fill"
+                                    className="w-full h-full object-cover"
                                 />
                                 <div className="absolute inset-0 bg-black/20"></div>
                             </div>
