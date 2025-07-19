@@ -1,15 +1,25 @@
 'use client'
 import React, { useState } from 'react'
-import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown } from 'lucide-react'
+import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown, Menu, X, Package } from 'lucide-react'
 
 export default function Navbar() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     const handleMouseEnter = (item: string) => {
         setActiveDropdown(item)
     }
 
     const handleMouseLeave = () => {
+        setActiveDropdown(null)
+    }
+
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen(!isMobileMenuOpen)
+    }
+
+    const closeMobileMenu = () => {
+        setIsMobileMenuOpen(false)
         setActiveDropdown(null)
     }
 
@@ -43,9 +53,10 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* 2nd Level - Gray Top Bar with Icons */}
-            <div className="bg-[#252525] text-white py-2">
+            {/* 2nd Level - Gray Top Bar with Icons - Desktop Only */}
+            <div className="hidden md:block bg-[#252525] text-white py-2">
                 <div className="max-w-7xl mx-auto px-4 flex justify-end items-center">
+                    {/* Desktop View */}
                     <div className="flex items-center space-x-7">
                         <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
                             <Store size={18} />
@@ -77,7 +88,15 @@ export default function Navbar() {
             <div className="bg-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-16">
-                        {/* Logo + Name Group */}
+                        {/* Mobile Burger Menu */}
+                        <button
+                            className="md:hidden text-black hover:text-gray-600 transition-colors"
+                            onClick={toggleMobileMenu}
+                        >
+                            <Menu size={24} />
+                        </button>
+
+                        {/* Logo */}
                         <div className="flex items-center space-x-3">
                             <img
                                 src="/logo.png"
@@ -86,24 +105,27 @@ export default function Navbar() {
                             />
                         </div>
 
-                        {menuItems.map((item) => (
-                            <div
-                                key={item.name}
-                                className="relative h-full flex items-center"
-                                onMouseEnter={() => handleMouseEnter(item.name)}
-                                onMouseLeave={handleMouseLeave}
-                            >
-                                <button className={`text-black transition-all duration-300 h-full px-4 font-thin border-b-3 flex items-center ${activeDropdown === item.name
-                                    ? 'border-black bg-gray-50 text-black'
-                                    : 'border-transparent hover:border-black hover:bg-gray-50 hover:text-black'
-                                    }`}>
-                                    {item.name}
-                                </button>
-                            </div>
-                        ))}
+                        {/* Desktop Menu Items */}
+                        <div className="hidden md:flex items-center">
+                            {menuItems.map((item) => (
+                                <div
+                                    key={item.name}
+                                    className="relative h-full flex items-center"
+                                    onMouseEnter={() => handleMouseEnter(item.name)}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    <button className={`text-black transition-all duration-300 h-full px-4 font-thin border-b-3 flex items-center ${activeDropdown === item.name
+                                        ? 'border-black bg-gray-50 text-black'
+                                        : 'border-transparent hover:border-black hover:bg-gray-50 hover:text-black'
+                                        }`}>
+                                        {item.name}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
 
-                        {/* Search Input */}
-                        <div className="relative">
+                        {/* Search Input - Desktop */}
+                        <div className="hidden md:block relative">
                             <input
                                 type="text"
                                 placeholder="Search..."
@@ -114,7 +136,21 @@ export default function Navbar() {
                             </button>
                         </div>
 
-                        <button className="bg-black text-[#D4AF37] px-4 py-2 rounded-md border border-[#D4AF37] hover:bg-[#111] hover:scale-105 transition-all shadow-lg flex items-center space-x-2 font-lato-light cursor-pointer">
+                        {/* Mobile Icons */}
+                        <div className="flex md:hidden items-center space-x-4">
+                            <button className="text-black hover:text-gray-600 transition-colors">
+                                <Search size={20} />
+                            </button>
+                            <button className="text-black hover:text-gray-600 transition-colors">
+                                <Heart size={20} />
+                            </button>
+                            <button className="text-black hover:text-gray-600 transition-colors">
+                                <ShoppingBag size={20} />
+                            </button>
+                        </div>
+
+                        {/* Desktop Explore Luxury Button */}
+                        <button className="hidden md:flex bg-black text-[#D4AF37] px-4 py-2 rounded-md border border-[#D4AF37] hover:bg-[#111] hover:scale-105 transition-all shadow-lg items-center space-x-2 font-lato-light cursor-pointer">
                             <Crown className="text-[#D4AF37]" />
                             <span className="tracking-wider">Explore Luxury</span>
                         </button>
@@ -122,10 +158,10 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* 4th Level - Dropdown Menu */}
+            {/* 4th Level - Dropdown Menu - Desktop Only */}
             {activeDropdown && (
                 <div
-                    className="w-full bg-white border-b border-gray-200 shadow-lg"
+                    className="hidden md:block w-full bg-white border-b border-gray-200 shadow-lg"
                     onMouseEnter={() => setActiveDropdown(activeDropdown)}
                     onMouseLeave={handleMouseLeave}
                 >
@@ -144,6 +180,105 @@ export default function Navbar() {
                     </div>
                 </div>
             )}
+
+            {/* Mobile Side Menu */}
+            <div className={`fixed w-full inset-0 z-50 md:hidden transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+                }`}>
+                {/* Backdrop */}
+                <div
+                    className="absolute inset-0 bg-black/50"
+                    onClick={closeMobileMenu}
+                ></div>
+
+                {/* Side Menu */}
+                <div className={`absolute left-0 top-0 h-full w-full bg-white shadow-xl transform transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                    }`}>
+                    <div className="h-full overflow-y-auto">
+                        {/* Header */}
+                        <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                            <img
+                                src="/logo.png"
+                                alt="Venoire Logo"
+                                className="h-8 w-auto"
+                            />
+                            <button
+                                onClick={closeMobileMenu}
+                                className="text-gray-500 hover:text-gray-700 transition-colors"
+                            >
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        {/* Menu Content */}
+                        <div className="p-4 space-y-6">
+                            {/* Login Button */}
+                            <button className="w-full bg-black text-white py-3 px-4 rounded-md flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors">
+                                <LogIn size={18} />
+                                <span>LOG IN</span>
+                            </button>
+
+                            {/* Explore Luxury Button */}
+                            <button className="w-full bg-black text-[#D4AF37] py-3 px-4 rounded-md border border-[#D4AF37] hover:bg-[#111] transition-colors flex items-center justify-center space-x-2">
+                                <Crown className="text-[#D4AF37]" />
+                                <span className="tracking-wider">Explore Luxury</span>
+                            </button>
+
+                            {/* Horizontal Line */}
+                            <div className="w-full h-px bg-gray-300"></div>
+
+                            {/* Mobile Menu Items */}
+                            <div className="space-y-4">
+                                {menuItems.map((item) => (
+                                    <div key={item.name} className="space-y-2">
+                                        <button
+                                            className="w-full text-left text-lg font-medium text-black hover:text-gray-600 transition-colors"
+                                            onClick={() => setActiveDropdown(activeDropdown === item.name ? null : item.name)}
+                                        >
+                                            {item.name}
+                                        </button>
+                                        {activeDropdown === item.name && (
+                                            <div className="pl-4 space-y-2">
+                                                {item.categories.map((category) => (
+                                                    <button
+                                                        key={category}
+                                                        className="block w-full text-left text-sm text-gray-600 hover:text-black transition-colors py-1"
+                                                    >
+                                                        {category}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Additional Mobile Options */}
+                            <div className="pt-4 border-t border-gray-200 space-y-4">
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                    <Phone size={18} />
+                                    <span>Contact Us</span>
+                                </button>
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                    <Store size={18} />
+                                    <span>Stores</span>
+                                </button>
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                    <Heart size={18} />
+                                    <span>Wishlist</span>
+                                </button>
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                    <ShoppingBag size={18} />
+                                    <span>Cart</span>
+                                </button>
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                    <Package size={18} />
+                                    <span>Track Your Order</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             {/* Add Custom CSS for Marquee Animation */}
             <style jsx>{`
