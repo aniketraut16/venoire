@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
+import "./fonts.css";
 import "./globals.css";
+import Navbar from "@/components/common/Navbar";
 
 export const metadata: Metadata = {
   title: "Venoire",
@@ -14,7 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Navbar />
+        {children}
+      </body>
     </html>
   );
 }
