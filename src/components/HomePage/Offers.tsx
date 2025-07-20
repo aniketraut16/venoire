@@ -10,8 +10,8 @@ export function Offers() {
 
     return (
         <div className="w-full h-full py-20">
-            <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl font-bold text-neutral-800">
-                Our Best Sellers
+            <h2 className="max-w-7xl pl-4 mx-auto text-xl md:text-5xl font-light text-gray-900 tracking-wide">
+                Our Best Sellers on Offer
             </h2>
             <Carousel items={cards} />
         </div>
