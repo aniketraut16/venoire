@@ -162,7 +162,6 @@ export const Card = ({
             <BlurImage
                 src={card.src}
                 alt={card.title}
-                fill
                 className="absolute inset-0 z-10 object-cover"
             />
         </div>
@@ -184,15 +183,12 @@ export const BlurImage = ({
     alt?: string;
     [key: string]: any;
 }) => {
-    const [isLoading, setLoading] = useState(true);
     return (
         <img
             className={cn(
                 "h-full w-full transition duration-300 hover:scale-110",
-                isLoading ? "blur-sm" : "blur-0",
                 className,
             )}
-            onLoad={() => setLoading(false)}
             src={src}
             width={width}
             height={height}

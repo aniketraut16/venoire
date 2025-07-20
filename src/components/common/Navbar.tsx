@@ -1,10 +1,21 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown, Menu, X, Package } from 'lucide-react'
 
 export default function Navbar() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+    const [isScrolled, setIsScrolled] = useState(false)
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const scrollTop = window.scrollY
+            setIsScrolled(scrollTop > 500)
+        }
+
+        window.addEventListener('scroll', handleScroll)
+        return () => window.removeEventListener('scroll', handleScroll)
+    }, [])
 
     const handleMouseEnter = (item: string) => {
         setActiveDropdown(item)
@@ -45,7 +56,7 @@ export default function Navbar() {
     return (
         <div className="w-full fixed top-0 z-50">
             {/* 1st Level - Black Promo Strip with Golden Text */}
-            <div className="bg-black text-yellow-400 py-2 overflow-hidden">
+            <div className={`bg-black text-yellow-400 py-2 overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0 hidden' : 'h-auto py-2 opacity-100'}`}>
                 <div className="animate-marquee whitespace-nowrap">
                     <span className="text-sm font-medium">
                         Get additional 15% discount on your first purchase. Use code: LPAPPORDER *T&C Apply
