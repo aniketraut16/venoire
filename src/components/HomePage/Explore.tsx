@@ -1,9 +1,8 @@
 import React from 'react'
-import Image from 'next/image'
 
 export default function Explore() {
     return (
-        <div className="flex justify-between min-h-screen max-w-7xl mx-auto">
+        <div className="flex justify-between min-h-screen max-w-7xl mx-auto mb-10">
             {/* Left Column - Text Content (2 parts) */}
             <div className="w-[45%] bg-white flex items-center px-8 py-12">
                 <div className="max-w-md space-y-6">
@@ -21,12 +20,10 @@ export default function Explore() {
 
             {/* Right Column - Image (3 parts) */}
             <div className="w-[55%] relative">
-                <Image
+                <img
                     src="/model.jpg"
                     alt="Man in summer attire on a boat"
-                    fill
-                    className="object-cover"
-                    priority
+                    className="object-cover w-full h-full"
                 />
             </div>
         </div>

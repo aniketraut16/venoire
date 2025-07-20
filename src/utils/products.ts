@@ -11,7 +11,8 @@ const Products: Product[] = [
     originalPrice: 150,
     discount: 30,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
   },
   {
     id: "2",
@@ -23,7 +24,8 @@ const Products: Product[] = [
     originalPrice: 180,
     discount: 33,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
   },
   {
     id: "3",
@@ -35,7 +37,8 @@ const Products: Product[] = [
     originalPrice: 130,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&h=500&fit=crop",
   },
   {
     id: "4",
@@ -47,7 +50,8 @@ const Products: Product[] = [
     originalPrice: 160,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
   },
   {
     id: "5",
@@ -59,7 +63,8 @@ const Products: Product[] = [
     originalPrice: 120,
     discount: 29,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=500&fit=crop",
   },
   {
     id: "6",
@@ -71,7 +76,8 @@ const Products: Product[] = [
     originalPrice: 190,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop",
   },
   {
     id: "7",
@@ -83,7 +89,8 @@ const Products: Product[] = [
     originalPrice: 140,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=500&fit=crop",
   },
   {
     id: "8",
@@ -95,7 +102,8 @@ const Products: Product[] = [
     originalPrice: 170,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop",
   },
   {
     id: "9",
@@ -107,7 +115,8 @@ const Products: Product[] = [
     originalPrice: 120,
     discount: 33,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1586790170083-2f9ceadc732d?w=400&h=500&fit=crop",
   },
   {
     id: "10",
@@ -119,7 +128,8 @@ const Products: Product[] = [
     originalPrice: 180,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
   },
   {
     id: "11",
@@ -131,7 +141,8 @@ const Products: Product[] = [
     originalPrice: 135,
     discount: 33,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=500&fit=crop",
   },
   {
     id: "12",
@@ -143,7 +154,8 @@ const Products: Product[] = [
     originalPrice: 155,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
   },
   {
     id: "13",
@@ -155,7 +167,8 @@ const Products: Product[] = [
     originalPrice: 140,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=500&fit=crop",
   },
   {
     id: "14",
@@ -167,7 +180,8 @@ const Products: Product[] = [
     originalPrice: 175,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop",
   },
   {
     id: "15",
@@ -179,7 +193,8 @@ const Products: Product[] = [
     originalPrice: 125,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
   },
   {
     id: "16",
@@ -191,7 +206,8 @@ const Products: Product[] = [
     originalPrice: 165,
     discount: 33,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
   },
   {
     id: "17",
@@ -203,7 +219,8 @@ const Products: Product[] = [
     originalPrice: 130,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&h=500&fit=crop",
   },
   {
     id: "18",
@@ -215,7 +232,8 @@ const Products: Product[] = [
     originalPrice: 170,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
   },
   {
     id: "19",
@@ -227,7 +245,8 @@ const Products: Product[] = [
     originalPrice: 145,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
   },
   {
     id: "20",
@@ -239,7 +258,8 @@ const Products: Product[] = [
     originalPrice: 190,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop",
   },
   {
     id: "21",
@@ -251,7 +271,8 @@ const Products: Product[] = [
     originalPrice: 140,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=400&h=500&fit=crop",
   },
   {
     id: "22",
@@ -263,7 +284,8 @@ const Products: Product[] = [
     originalPrice: 175,
     discount: 31,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
   },
   {
     id: "23",
@@ -275,7 +297,8 @@ const Products: Product[] = [
     originalPrice: 135,
     discount: 33,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=500&fit=crop",
   },
   {
     id: "24",
@@ -287,7 +310,8 @@ const Products: Product[] = [
     originalPrice: 155,
     discount: 32,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
   },
   {
     id: "25",
@@ -299,7 +323,8 @@ const Products: Product[] = [
     originalPrice: 120,
     discount: 38,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
   },
   {
     id: "26",
@@ -311,7 +336,8 @@ const Products: Product[] = [
     originalPrice: 160,
     discount: 41,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop",
   },
   {
     id: "27",
@@ -323,7 +349,8 @@ const Products: Product[] = [
     originalPrice: 115,
     discount: 39,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=500&fit=crop",
   },
   {
     id: "28",
@@ -335,7 +362,8 @@ const Products: Product[] = [
     originalPrice: 150,
     discount: 40,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=500&fit=crop",
   },
   {
     id: "29",
@@ -347,7 +375,8 @@ const Products: Product[] = [
     originalPrice: 110,
     discount: 41,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=400&h=500&fit=crop",
   },
   {
     id: "30",
@@ -359,7 +388,8 @@ const Products: Product[] = [
     originalPrice: 140,
     discount: 39,
     size: ["42", "40", "38", "36"],
-    thumbnail: "/dummy.jpg",
+    thumbnail:
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=400&h=500&fit=crop",
   },
 ];
 

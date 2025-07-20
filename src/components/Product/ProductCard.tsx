@@ -1,5 +1,4 @@
 import { Product } from '@/types/product'
-import Image from 'next/image'
 import React, { useState } from 'react'
 import { Heart } from 'lucide-react'
 
@@ -15,10 +14,9 @@ export default function ProductCard(product: Product) {
         >
             {/* Image Container */}
             <div className="relative aspect-[4/5] overflow-hidden">
-                <Image
+                <img
                     src={product.thumbnail}
                     alt={product.name}
-                    fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold border border-black`}>

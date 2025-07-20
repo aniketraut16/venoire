@@ -37,7 +37,7 @@ export default function CategorizedProducts(
 
                 {/* Explore Catalog Button */}
                 <div className="text-center">
-                    <button className="px-8 py-3 border border-gray-900 text-gray-900 uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors duration-300">
+                    <button className="px-8 py-3 border border-gray-900 text-gray-900 uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors duration-300 cursor-pointer">
                         Explore {catalog}
                     </button>
                 </div>
