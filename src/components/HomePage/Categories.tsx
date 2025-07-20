@@ -21,10 +21,10 @@ export default function Categories() {
             description: 'Stylish kids clothing'
         },
         {
-            id: 'watches',
-            name: 'Watches',
-            image: '/category/watches.webp',
-            description: 'Luxury timepieces'
+            id: 'perfumes',
+            name: 'Perfumes',
+            image: '/category/perfumes.jpg',
+            description: 'Luxury perfumes'
         },
         {
             id: 'gifts',
