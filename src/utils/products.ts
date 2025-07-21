@@ -422,7 +422,7 @@ const DetailProducts: DetailProduct[] = [
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=800&h=1000&fit=crop",
     ],
     description:
-      "A classic crewneck t-shirt made from premium cotton for all-day comfort. Perfect for layering or wearing on its own.",
+      "Experience the ultimate in comfort and timeless style with our Classic Crewneck T-Shirt. Crafted from premium, ultra-soft cotton, this tee is designed for all-day wear, whether you're layering it under a jacket or wearing it solo. The regular fit ensures a flattering silhouette for every body type, while the reinforced neckline and double-stitched hems provide lasting durability. Breathable and lightweight, it's perfect for any season. The solid color and minimalist design make it a versatile wardrobe staple, easily paired with jeans, shorts, or joggers. Whether you're heading to a casual outing, relaxing at home, or running errands, this t-shirt delivers unmatched comfort and effortless style. Elevate your basics collection with a tee that stands the test of time and never goes out of fashion.",
     material: "100% Cotton",
     fit: "Regular Fit",
     pattern: "Solid",
@@ -451,7 +451,7 @@ const DetailProducts: DetailProduct[] = [
       "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800&h=1000&fit=crop",
     ],
     description:
-      "A premium oxford shirt made from high-quality fabric for a sophisticated look. Ideal for formal occasions.",
+      "Elevate your formal wardrobe with our Premium Oxford Shirt, meticulously tailored from high-quality, breathable cotton for a sophisticated look and feel. The slim fit contours to your body, offering a modern silhouette that transitions seamlessly from office meetings to evening events. Featuring a classic button-down collar, crisp cuffs, and a smooth finish, this shirt exudes professionalism and style. The durable fabric resists wrinkles and maintains its shape wash after wash, ensuring you always look sharp. Ideal for pairing with tailored trousers or under a blazer, it's the perfect choice for business professionals and style-conscious individuals alike. Make a lasting impression with a shirt that combines comfort, durability, and timeless elegance in every detail.",
     material: "100% Cotton",
     fit: "Slim Fit",
     pattern: "Solid",
