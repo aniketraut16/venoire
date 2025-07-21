@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { useParams } from 'next/navigation';
 import { getDetailProduct } from '@/utils/products';
 import { Heart, ShoppingCart, Truck, RotateCcw, Shield, Tag, Star, ChevronDown, MapPin, User, Package, Calendar } from 'lucide-react';
+import { Lens } from '@/components/ui/lens';
 
 export default function OneProductPage() {
     const params = useParams();
@@ -13,7 +14,6 @@ export default function OneProductPage() {
 
     // State management
     const [selectedSize, setSelectedSize] = useState<string>('');
-    const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
     const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
     const [couponCode, setCouponCode] = useState<string>('');
     const [selectedLocation, setSelectedLocation] = useState<string>('');
@@ -33,10 +33,6 @@ export default function OneProductPage() {
 
     const handleSizeSelect = (size: string) => {
         setSelectedSize(size);
-    };
-
-    const handleImageSelect = (index: number) => {
-        setSelectedImageIndex(index);
     };
 
     const toggleWishlist = () => {
@@ -62,11 +58,18 @@ export default function OneProductPage() {
                                     key={index}
                                     className="aspect-square bg-gray-50 overflow-hidden relative group cursor-pointer"
                                 >
-                                    <img
+                                    <Lens>
+                                        <img
+                                            src={image}
+                                            alt={`${product.name} view ${index + 1}`}
+                                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                        />
+                                    </Lens>
+                                    {/* <img
                                         src={image}
                                         alt={`${product.name} view ${index + 1}`}
                                         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    />
+                                    /> */}
                                 </div>
                             ))}
                         </div>

@@ -821,14 +821,14 @@ const DetailProducts: DetailProduct[] = [
     discount: 32,
     size: ["42", "40", "38", "36"],
     thumbnail:
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=500&fit=crop",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g0_20.jpg?v=1745342410&width=1000",
     images: [
-      "/dummy.jpg",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=1000&fit=crop",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=1000&fit=crop",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=1000&fit=crop",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=1000&fit=crop",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&h=1000&fit=crop",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g0_20.jpg?v=1745342410&width=1000",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g1_20.jpg?v=1745342411&width=1000",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g2_20.jpg?v=1745342410&width=1000",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g3_20.jpg?v=1745342410&width=1000",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g4_20.jpg?v=1745342410&width=1000",
+      "https://www.jackjones.in/cdn/shop/files/900771501_g6_20.jpg?v=1745342410&width=1000",
     ],
     description:
       "A pocket detail tee with a casual look. Made from soft cotton for everyday wear.",
