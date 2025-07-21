@@ -37,19 +37,87 @@ export default function Navbar() {
     const menuItems = [
         {
             name: 'ALL',
-            categories: ['Featured', 'New Arrivals', 'Best Sellers', 'Sale Items', 'Accessories', 'Gift Cards']
+            sections: [
+                {
+                    title: 'Featured Collections',
+                    subsections: ['New Arrivals', 'Best Sellers', 'Editor\'s Choice', 'Limited Edition', 'Trending Now']
+                },
+                {
+                    title: 'Shop by Category',
+                    subsections: ['Men\'s Fashion', 'Women\'s Fashion', 'Kids Fashion', 'Accessories', 'Footwear', 'Beauty & Personal Care']
+                },
+                {
+                    title: 'Special Offers',
+                    subsections: ['Sale Items', 'Bundle Deals', 'Clearance', 'Gift Cards', 'Student Discounts']
+                },
+                {
+                    title: 'Brand Collections',
+                    subsections: ['Premium Brands', 'Designer Labels', 'Exclusive Collaborations', 'Sustainable Fashion']
+                }
+            ]
         },
         {
             name: 'MENS',
-            categories: ['Shirts', 'T-Shirts', 'Trousers', 'Jeans', 'Suits', 'Blazers', 'Accessories', 'Footwear']
+            sections: [
+                {
+                    title: 'Clothing',
+                    subsections: ['Shirts', 'T-Shirts & Polo', 'Trousers & Chinos', 'Jeans & Denim', 'Suits & Blazers', 'Jackets & Coats', 'Sweaters & Hoodies', 'Shorts & Casual Wear']
+                },
+                {
+                    title: 'Footwear',
+                    subsections: ['Dress Shoes', 'Casual Sneakers', 'Boots & Ankle Boots', 'Loafers & Slip-ons', 'Sports & Athletic', 'Sandals & Slides']
+                },
+                {
+                    title: 'Accessories',
+                    subsections: ['Watches', 'Belts & Wallets', 'Bags & Backpacks', 'Ties & Bow Ties', 'Sunglasses', 'Jewelry', 'Hats & Caps']
+                },
+                {
+                    title: 'Special Collections',
+                    subsections: ['Formal Wear', 'Casual Weekend', 'Office Essentials', 'Party & Events', 'Travel Essentials']
+                }
+            ]
         },
         {
             name: 'WOMENS',
-            categories: ['Tops', 'Dresses', 'Bottoms', 'Ethnic Wear', 'Western Wear', 'Accessories', 'Footwear']
+            sections: [
+                {
+                    title: 'Clothing',
+                    subsections: ['Tops & Blouses', 'Dresses & Jumpsuits', 'Bottoms & Skirts', 'Jeans & Denim', 'Jackets & Blazers', 'Coats & Outerwear', 'Sweaters & Cardigans', 'Activewear & Athleisure']
+                },
+                {
+                    title: 'Ethnic Wear',
+                    subsections: ['Sarees & Lehengas', 'Salwar Suits', 'Kurtis & Tunics', 'Indo-Western', 'Traditional Jewelry', 'Ethnic Footwear']
+                },
+                {
+                    title: 'Footwear',
+                    subsections: ['Heels & Pumps', 'Flats & Ballerinas', 'Boots & Booties', 'Sneakers & Casual', 'Sandals & Wedges', 'Ethnic Footwear']
+                },
+                {
+                    title: 'Accessories & Beauty',
+                    subsections: ['Handbags & Clutches', 'Jewelry & Watches', 'Scarves & Stoles', 'Sunglasses', 'Beauty & Makeup', 'Hair Accessories']
+                }
+            ]
         },
         {
             name: 'KIDS',
-            categories: ['Boys', 'Girls', 'Infants', 'Casual Wear', 'Formal Wear', 'Accessories', 'Footwear']
+            sections: [
+                {
+                    title: 'Boys (2-16 Years)',
+                    subsections: ['T-Shirts & Shirts', 'Jeans & Trousers', 'Shorts & Casual Wear', 'Ethnic Wear', 'Jackets & Hoodies', 'Sports & Activewear', 'School Uniforms']
+                },
+                {
+                    title: 'Girls (2-16 Years)',
+                    subsections: ['Dresses & Frocks', 'Tops & Tees', 'Bottoms & Leggings', 'Ethnic & Traditional', 'Jackets & Cardigans', 'Party Wear', 'School Uniforms']
+                },
+                {
+                    title: 'Baby & Toddlers (0-2 Years)',
+                    subsections: ['Bodysuits & Rompers', 'Sleep & Loungewear', 'Bibs & Feeding', 'Baby Shoes', 'Blankets & Accessories']
+                },
+                {
+                    title: 'Kids Accessories',
+                    subsections: ['Footwear & Sneakers', 'Bags & Backpacks', 'Hats & Caps', 'Socks & Underwear', 'Toys & Games', 'Birthday Gifts']
+                }
+            ]
         }
     ]
 
@@ -117,7 +185,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Desktop Menu Items */}
-                        <div className="hidden md:flex items-center">
+                        <div className="hidden md:flex items-center h-full">
                             {menuItems.map((item) => (
                                 <div
                                     key={item.name}
@@ -125,7 +193,7 @@ export default function Navbar() {
                                     onMouseEnter={() => handleMouseEnter(item.name)}
                                     onMouseLeave={handleMouseLeave}
                                 >
-                                    <button className={`text-black transition-all duration-300 h-full px-4 font-thin border-b-3 flex items-center ${activeDropdown === item.name
+                                    <button className={`text-black transition-all duration-300 h-full px-6 font-thin border-b-3 flex items-center ${activeDropdown === item.name
                                         ? 'border-black bg-gray-50 text-black'
                                         : 'border-transparent hover:border-black hover:bg-gray-50 hover:text-black'
                                         }`}>
@@ -177,14 +245,24 @@ export default function Navbar() {
                     onMouseLeave={handleMouseLeave}
                 >
                     <div className="max-w-7xl mx-auto px-4 py-8">
-                        <div className="grid grid-cols-6 gap-8">
+                        <div className="grid grid-cols-4 gap-8">
                             {menuItems
                                 .find(item => item.name === activeDropdown)
-                                ?.categories.map((category) => (
-                                    <div key={category} className="space-y-2">
-                                        <button className="text-black font-medium hover:text-gray-600 transition-colors text-left">
-                                            {category}
-                                        </button>
+                                ?.sections.map((section) => (
+                                    <div key={section.title} className="space-y-4">
+                                        <h3 className="text-black font-semibold text-sm uppercase tracking-wider border-b border-gray-200 pb-2">
+                                            {section.title}
+                                        </h3>
+                                        <div className="space-y-2">
+                                            {section.subsections.map((subsection) => (
+                                                <button
+                                                    key={subsection}
+                                                    className="block text-gray-600 hover:text-black transition-colors text-left text-sm leading-relaxed hover:font-medium"
+                                                >
+                                                    {subsection}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
                                 ))}
                         </div>
@@ -248,14 +326,23 @@ export default function Navbar() {
                                             {item.name}
                                         </button>
                                         {activeDropdown === item.name && (
-                                            <div className="pl-4 space-y-2">
-                                                {item.categories.map((category) => (
-                                                    <button
-                                                        key={category}
-                                                        className="block w-full text-left text-sm text-gray-600 hover:text-black transition-colors py-1"
-                                                    >
-                                                        {category}
-                                                    </button>
+                                            <div className="pl-4 space-y-3">
+                                                {item.sections.map((section) => (
+                                                    <div key={section.title} className="space-y-2">
+                                                        <h4 className="text-sm font-semibold text-black uppercase tracking-wide">
+                                                            {section.title}
+                                                        </h4>
+                                                        <div className="pl-2 space-y-1">
+                                                            {section.subsections.map((subsection) => (
+                                                                <button
+                                                                    key={subsection}
+                                                                    className="block w-full text-left text-xs text-gray-600 hover:text-black transition-colors py-1"
+                                                                >
+                                                                    {subsection}
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    </div>
                                                 ))}
                                             </div>
                                         )}
