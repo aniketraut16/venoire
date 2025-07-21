@@ -7,7 +7,7 @@ import CategorizedProducts from "@/components/HomePage/CategorizedProducts";
 
 export default function HomePage() {
     return (
-        <div>
+        <div className="mt-45">
             <Hero />
             <Categories />
             <Offers />

@@ -19,7 +19,7 @@ export default function Hero() {
     ]
 
     return (
-        <div className="relative max-w-7xl mx-auto mt-45">
+        <div className="relative max-w-7xl mx-auto">
             {/* Hero Carousel */}
             <div className="w-full">
                 <Swiper
