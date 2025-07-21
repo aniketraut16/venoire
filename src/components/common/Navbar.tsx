@@ -1,12 +1,13 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown, Menu, X, Package } from 'lucide-react'
+import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
-
+    const router = useRouter();
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY
@@ -176,7 +177,9 @@ export default function Navbar() {
                         </button>
 
                         {/* Logo */}
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-3 cursor-pointer"
+                            onClick={() => router.push('/')}
+                        >
                             <img
                                 src="/logo.png"
                                 alt="Venoire Logo"

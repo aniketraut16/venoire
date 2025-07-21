@@ -1,16 +1,19 @@
 import { Product } from '@/types/product'
 import React, { useState } from 'react'
 import { Heart } from 'lucide-react'
+import { useRouter } from 'next/navigation';
 
 export default function ProductCard(product: Product) {
     const [isHovered, setIsHovered] = useState(false)
     const sizes = product.size;
+    const router = useRouter();
 
     return (
         <div
             className="group relative overflow-hidden  transition-all duration-300 cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
+            onClick={() => router.push(`/product/${product.slug}`)}
         >
             {/* Image Container */}
             <div className="relative aspect-[4/5] overflow-hidden">
