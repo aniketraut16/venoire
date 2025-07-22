@@ -394,13 +394,22 @@ const Products: Product[] = [
 ];
 
 export const getProducts = (
-  catalog: "Best Seller" | "New Arrival" | "Trending" | "Featured" | "Sale",
+  catalog:
+    | "Best Seller"
+    | "New Arrival"
+    | "Trending"
+    | "Featured"
+    | "Sale"
+    | null,
   limit: number = 5
 ): Product[] => {
-  return Products.filter((product) => product.catalog === catalog).slice(
-    0,
-    limit
-  );
+  if (catalog) {
+    return Products.filter((product) => product.catalog === catalog).slice(
+      0,
+      limit
+    );
+  }
+  return Products.slice(0, limit);
 };
 const DetailProducts: DetailProduct[] = [
   {
