@@ -19,7 +19,7 @@ export default function Hero() {
     ]
 
     return (
-        <div className="relative max-w-7xl mx-auto">
+        <div className="relative w-full mx-auto">
             {/* Hero Carousel */}
             <div className="w-full">
                 <Swiper
@@ -45,7 +45,7 @@ export default function Hero() {
                 >
                     {heroImages.map((image, index) => (
                         <SwiperSlide key={index}>
-                            <div className="relative w-full h-[450px] overflow-hidden rounded-lg cursor-pointer">
+                            <div className="relative w-full overflow-hidden cursor-pointer">
                                 <img
                                     src={image}
                                     alt={`Hero slide ${index + 1}`}
@@ -79,7 +79,7 @@ export default function Hero() {
             <style jsx global>{`
                 .hero-swiper {
                     width: 100%;
-                    height: 450px;
+                    height: 78vh;
                 }
 
                 .hero-swiper .swiper-slide {

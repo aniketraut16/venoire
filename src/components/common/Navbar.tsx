@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown, Menu, X, Package } from 'lucide-react'
+import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown, Menu, X, Package, MapPin, MessageSquareQuote, User } from 'lucide-react'
 import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
@@ -135,21 +135,26 @@ export default function Navbar() {
 
             {/* 2nd Level - Gray Top Bar with Icons - Desktop Only */}
             <div className="hidden md:block bg-[#252525] text-white py-2">
-                <div className="max-w-7xl mx-auto px-4 flex justify-end items-center">
-                    {/* Desktop View */}
-                    <div className="flex items-center space-x-7">
+                <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
+                    {/* Left Side: Delivery Location */}
+                    <div className="flex flex-col items-start">
+                        <span className="text-xs leading-tight">Delivering to</span>
+                        <a href="#" className="text-xs underline leading-tight hover:text-[#D4AF37] transition-colors">Add delivery location</a>
+                    </div>
+                    {/* Right Side: Desktop View Icons */}
+                    <div className="flex items-center space-x-5">
                         <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
-                            <Store size={18} />
+                            <MapPin size={18} />
                             <span>STORES</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
                         <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
-                            <Phone size={18} />
+                            <MessageSquareQuote size={18} />
                             <span>CONTACT US</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
                         <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
-                            <LogIn size={18} />
+                            <User size={18} />
                             <span>LOG IN</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
@@ -196,7 +201,7 @@ export default function Navbar() {
                                     onMouseEnter={() => handleMouseEnter(item.name)}
                                     onMouseLeave={handleMouseLeave}
                                 >
-                                    <button className={`text-black transition-all duration-300 h-full px-6 font-thin border-b-3 flex items-center ${activeDropdown === item.name
+                                    <button className={`text-black transition-all duration-300 h-full px-6 font-normal border-b-3 flex items-center ${activeDropdown === item.name
                                         ? 'border-black bg-gray-50 text-black'
                                         : 'border-transparent hover:border-black hover:bg-gray-50 hover:text-black'
                                         }`}>
