@@ -7,6 +7,13 @@ export default function AllProductPage() {
             department: false,
             category: false,
             subCategory: false,
-        }} slug={null} />
+        }} slug={null}
+            headers={
+                {
+                    title: 'All Products',
+                    description: 'Browse and filter our complete collection to find your perfect product. ',
+                }
+            }
+        />
     )
 }

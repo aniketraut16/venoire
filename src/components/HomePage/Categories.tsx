@@ -1,33 +1,35 @@
+import { useRouter } from 'next/navigation'
 import React from 'react'
 
 export default function Categories() {
+    const router = useRouter()
     const categories = [
         {
-            id: 'mens',
+            slug: 'mens',
             name: 'Mens',
             image: '/category/mens.jpg',
             description: 'Premium menswear collection'
         },
         {
-            id: 'womens',
+            slug: 'womens',
             name: 'Womens',
             image: '/category/womens.png',
             description: 'Elegant womens fashion'
         },
         {
-            id: 'kids',
+            slug: 'kids',
             name: 'Kids',
             image: '/category/kids.jpeg',
             description: 'Stylish kids clothing'
         },
         {
-            id: 'perfumes',
+            slug: 'perfumes',
             name: 'Perfumes',
             image: '/category/perfumes.jpg',
             description: 'Luxury perfumes'
         },
         {
-            id: 'gifts',
+            slug: 'gifts',
             name: 'Gifts',
             image: '/category/gifts.jpg',
             description: 'Luxury gifts'
@@ -35,8 +37,7 @@ export default function Categories() {
     ]
 
     const handleCategoryClick = (categoryId: string) => {
-        console.log(`Clicked on ${categoryId} category`)
-        // Add navigation logic here
+        router.push(`/d/${categoryId}`)
     }
 
     return (
@@ -55,9 +56,9 @@ export default function Categories() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-7xl mx-auto">
                 {categories.map((category) => (
                     <div
-                        key={category.id}
+                        key={category.slug}
                         className="text-center cursor-pointer group transition-transform duration-300 hover:-translate-y-2"
-                        onClick={() => handleCategoryClick(category.id)}
+                        onClick={() => handleCategoryClick(category.slug)}
                     >
                         <div className="relative w-24 h-24 md:w-44 md:h-44 mx-auto mb-4 rounded-full overflow-hidden border-3 border-gray-200 group-hover:border-black group-hover:shadow-lg group-hover:shadow-[#D4AF37]/30 transition-all duration-300">
                             <img

@@ -140,8 +140,12 @@ export default function AllProductTemplate(props: {
         subCategory: boolean,
     },
     slug: string | null,
+    headers: {
+        title: string,
+        description: string,
+    }
 }) {
-    const { filters, slug } = props;
+    const { filters, slug, headers } = props;
     const [products, setProducts] = useState<Product[]>(getProducts(null, 20));
 
     // Single-select for top bar filters
@@ -307,8 +311,8 @@ export default function AllProductTemplate(props: {
         <div className="max-w-7xl mx-auto min-h-screen bg-white mt-45 flex flex-col">
             {/* Header */}
             <div className="w-full px-8 py-8 bg-white border-b border-gray-300">
-                <h1 className="text-3xl font-bold text-black tracking-tight">All Products</h1>
-                <p className="text-gray-600 mt-2 text-base">Browse and filter our complete collection to find your perfect product.</p>
+                <h1 className="text-3xl font-bold text-black tracking-tight">{headers.title}</h1>
+                <p className="text-gray-600 mt-2 text-base">{headers.description}</p>
             </div>
             {/* Top Bar */}
             {renderTopBar()}
