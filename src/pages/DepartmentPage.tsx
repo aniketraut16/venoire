@@ -2,7 +2,7 @@
 import { getDepartmentBySlug } from '@/utils/departments';
 import { useParams } from 'next/navigation';
 import React from 'react'
-import AllProductTemplate from './AllProductsTemplate';
+import AllProductTemplate from '../components/Product/AllProductsTemplate';
 
 export default function DepartmentPageContent() {
     const params = useParams();

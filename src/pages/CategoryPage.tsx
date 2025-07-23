@@ -1,6 +1,6 @@
-
+'use client'
 import React from 'react'
-import AllProductTemplate from './AllProductsTemplate';
+import AllProductTemplate from '../components/Product/AllProductsTemplate';
 import { useParams } from 'next/navigation';
 import { getCategoryBySlug } from '@/utils/category';
 

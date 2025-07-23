@@ -1,4 +1,4 @@
-import AllProductTemplate from '@/pages/AllProductsTemplate'
+import AllProductTemplate from '@/components/Product/AllProductsTemplate'
 import React from 'react'
 
 export default function AllProductPage() {
