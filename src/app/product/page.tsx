@@ -4,9 +4,9 @@ import React from 'react'
 export default function AllProductPage() {
     return (
         <AllProductTemplate filters={{
-            department: true,
-            category: true,
-            subCategory: true,
+            department: false,
+            category: false,
+            subCategory: false,
         }} slug={null} />
     )
 }

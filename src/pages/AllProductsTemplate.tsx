@@ -28,27 +28,25 @@ const FILTERS = [
         key: 'category', label: 'Category', options: [
             { value: 'T-Shirts', count: 100 },
             { value: 'Shirts', count: 90 },
-            { value: 'Polo Shirts', count: 60 },
-            { value: 'Flannel Shirts', count: 40 },
+            { value: 'Blazers', count: 50 },
             { value: 'Dresses', count: 30 },
             { value: 'Tops', count: 25 },
             { value: 'Handbags', count: 15 },
             { value: 'Shoes', count: 20 },
             { value: 'Jeans', count: 35 },
-            { value: 'Belts', count: 10 },
-            { value: 'Casual Trousers', count: 50 },
-            { value: 'Casual Blazers', count: 12 },
-            { value: 'Casual Shirts', count: 60 },
-            { value: 'Casual Shoes', count: 18 },
-            { value: 'Ceremonial Shirts', count: 9 },
-            { value: 'Combo Boxes', count: 16 },
-            { value: 'Crew Neck T-Shirts', count: 22 },
-            { value: 'Bandhgala', count: 9 },
-            { value: 'Ath Fit Jeans', count: 7 },
+            { value: 'Trousers', count: 50 },
         ]
     },
     {
         key: 'subCategory', label: 'Subcategory', options: [
+            { value: 'Polo Shirts', count: 60 },
+            { value: 'Flannel Shirts', count: 40 },
+            { value: 'Casual Shirts', count: 60 },
+            { value: 'Ceremonial Shirts', count: 9 },
+            { value: 'Crew Neck T-Shirts', count: 22 },
+            { value: 'Casual Blazers', count: 12 },
+            { value: 'Casual Shoes', count: 18 },
+            { value: 'Ath Fit Jeans', count: 7 },
             { value: 'Casual', count: 80 },
             { value: 'Formal', count: 60 },
             { value: 'Party', count: 40 },
@@ -114,6 +112,27 @@ const FILTERS = [
 
 const MAX_VISIBLE_OPTIONS = 8;
 
+// 1. Separate filter definitions for top bar and sidebar
+const BASE_TOPBAR_FILTERS = [
+    { key: 'discount', label: 'Discount' },
+    { key: 'size', label: 'Size' },
+    { key: 'price', label: 'Price' },
+];
+const SIDEBAR_FILTERS = [
+    { key: 'category', label: 'Clothing Type' },
+    { key: 'subCategory', label: 'Style' },
+    { key: 'occasion', label: 'Occasion' },
+    { key: 'color', label: 'Color' },
+    { key: 'fit', label: 'Fit' },
+    { key: 'sleeves', label: 'Sleeves' },
+];
+const SORT_OPTIONS = [
+    { value: 'relevance', label: 'Relevance' },
+    { value: 'priceLowHigh', label: 'Price: Low to High' },
+    { value: 'priceHighLow', label: 'Price: High to Low' },
+    { value: 'newest', label: 'Newest First' },
+];
+
 export default function AllProductTemplate(props: {
     filters: {
         department: boolean,
@@ -125,19 +144,26 @@ export default function AllProductTemplate(props: {
     const { filters, slug } = props;
     const [products, setProducts] = useState<Product[]>(getProducts(null, 20));
 
-    // Multi-select for each filter
+    // Single-select for top bar filters
+    const [topbarSelected, setTopbarSelected] = useState<{ [key: string]: string | null }>({});
+    // Multi-select for sidebar filters
     const [selected, setSelected] = useState<{ [key: string]: string[] }>({});
-    const [openFilter, setOpenFilter] = useState<string | null>(null);
     const [showAll, setShowAll] = useState<{ [key: string]: boolean }>({});
+    const [sortBy, setSortBy] = useState<string>('relevance');
 
-    // Hierarchical logic for disabling
-    const departmentSelected = selected['department'] && selected['department'].length > 0;
-    const categorySelected = selected['category'] && selected['category'].length > 0;
-    const isFilterDisabled = (key: string) => {
-        if (key === 'category') return !filters.category || !departmentSelected;
-        if (key === 'subCategory') return !filters.subCategory || !departmentSelected || !categorySelected;
-        if (key === 'department') return !filters.department;
-        return false;
+    // Dynamically add department to topbar filters if not true
+    const TOPBAR_FILTERS = !filters.department
+        ? [
+            { key: 'department', label: 'Category' },
+            ...BASE_TOPBAR_FILTERS
+        ]
+        : BASE_TOPBAR_FILTERS;
+
+    // Helper for sidebar filter visibility
+    const shouldShowSidebarFilter = (key: string) => {
+        if (key === 'category' && filters.category) return false;
+        if (key === 'subCategory' && filters.subCategory) return false;
+        return true;
     };
 
     // Count selected for badge
@@ -154,59 +180,103 @@ export default function AllProductTemplate(props: {
     // Clear all selected
     const clearAll = () => setSelected({});
 
-    // Render filter options panel
-    const renderOptionsPanel = () => {
-        if (!openFilter) return null;
-        const filter = FILTERS.find(f => f.key === openFilter);
-        if (!filter) return null;
-        const disabled = isFilterDisabled(filter.key);
-        const visibleOptions = showAll[filter.key] ? filter.options : filter.options.slice(0, MAX_VISIBLE_OPTIONS);
-        return (
-            <div className="w-full bg-white border-b border-gray-200 py-6 flex flex-wrap gap-6 items-center" style={{ borderRadius: 0 }}>
-                {visibleOptions.map(option => {
-                    const checked = selected[filter.key]?.includes(option.value);
-                    return (
-                        <button
-                            key={option.value}
-                            className={`flex items-center gap-2 px-4 py-2 border border-black bg-white text-black text-sm font-medium min-w-[180px] h-12 transition-colors duration-150 ${checked ? 'bg-black text-white' : ''} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+    // Render top bar dropdowns
+    const renderTopBar = () => (
+        <div className="w-full flex flex-row items-center gap-8 px-8 py-6 bg-white border-b border-gray-200">
+            {TOPBAR_FILTERS.map(filter => {
+                const filterDef = FILTERS.find(f => f.key === filter.key);
+                if (!filterDef) return null;
+                return (
+                    <div key={filter.key} className="flex flex-col min-w-[180px]">
+                        <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor={`topbar-${filter.key}`}>{filter.label}</label>
+                        <select
+                            id={`topbar-${filter.key}`}
+                            className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
                             style={{ borderRadius: 0 }}
-                            disabled={disabled}
-                            onClick={() => {
-                                if (disabled) return;
-                                setSelected(sel => {
-                                    const arr = sel[filter.key] || [];
-                                    if (arr.includes(option.value)) {
-                                        return { ...sel, [filter.key]: arr.filter((v: string) => v !== option.value) };
-                                    } else {
-                                        return { ...sel, [filter.key]: [...arr, option.value] };
-                                    }
-                                });
-                            }}
+                            value={topbarSelected[filter.key] || ''}
+                            onChange={e => setTopbarSelected(sel => ({ ...sel, [filter.key]: e.target.value }))}
                         >
-                            <span className={`w-5 h-5 border border-black flex items-center justify-center mr-2 ${checked ? 'bg-black' : 'bg-white'}`} style={{ borderRadius: 0 }}>
-                                {checked && <span className="w-3 h-3 bg-white block" style={{ borderRadius: 0 }} />}
-                            </span>
-                            <span className="flex-1 text-left">{option.value} <span className="text-gray-600">({option.count})</span></span>
-                        </button>
-                    );
-                })}
-                {filter.options.length > MAX_VISIBLE_OPTIONS && (
-                    <button
-                        className="underline text-black text-sm ml-4 bg-transparent border-none px-2 py-1"
-                        style={{ borderRadius: 0 }}
-                        onClick={() => setShowAll(s => ({ ...s, [filter.key]: !s[filter.key] }))}
-                    >
-                        {showAll[filter.key] ? 'Show Less' : 'Show More'}
-                    </button>
-                )}
+                            <option value="">Select {filter.label}</option>
+                            {filterDef.options.map(option => (
+                                <option key={option.value} value={option.value}>{option.value} ({option.count})</option>
+                            ))}
+                        </select>
+                    </div>
+                );
+            })}
+            <div className="flex-1" />
+            <div className="flex flex-col min-w-[180px]">
+                <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="sort-by">Sort By</label>
+                <select
+                    id="sort-by"
+                    className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+                    style={{ borderRadius: 0 }}
+                    value={sortBy}
+                    onChange={e => setSortBy(e.target.value)}
+                >
+                    {SORT_OPTIONS.map(option => (
+                        <option key={option.value} value={option.value}>{option.label}</option>
+                    ))}
+                </select>
             </div>
-        );
-    };
+        </div>
+    );
+
+    // Render sidebar filters
+    const renderSidebar = () => (
+        <div className="w-72 bg-white border-r border-gray-200 py-6 px-4 flex flex-col gap-6" style={{ borderRadius: 0 }}>
+            {SIDEBAR_FILTERS.filter(f => shouldShowSidebarFilter(f.key)).map(filter => {
+                const filterDef = FILTERS.find(fil => fil.key === filter.key);
+                if (!filterDef) return null;
+                const visibleOptions = showAll[filter.key] ? filterDef.options : filterDef.options.slice(0, MAX_VISIBLE_OPTIONS);
+                return (
+                    <div key={filter.key} className="mb-4">
+                        <div className="font-bold text-base mb-2">{filter.label}</div>
+                        <div className="flex flex-col gap-2">
+                            {visibleOptions.map(option => {
+                                const checked = selected[filter.key]?.includes(option.value);
+                                return (
+                                    <label key={option.value} className={`flex items-center gap-2 text-sm font-medium ${checked ? 'font-bold' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            className="accent-black w-4 h-4"
+                                            checked={checked}
+                                            onChange={() => {
+                                                setSelected(sel => {
+                                                    const arr = sel[filter.key] || [];
+                                                    if (arr.includes(option.value)) {
+                                                        return { ...sel, [filter.key]: arr.filter((v: string) => v !== option.value) };
+                                                    } else {
+                                                        return { ...sel, [filter.key]: [...arr, option.value] };
+                                                    }
+                                                });
+                                            }}
+                                        />
+                                        <span>{option.value} <span className="text-gray-600">({option.count})</span></span>
+                                    </label>
+                                );
+                            })}
+                        </div>
+                        {filterDef.options.length > MAX_VISIBLE_OPTIONS && (
+                            <button
+                                className="underline text-black text-xs mt-2 bg-transparent border-none px-2 py-1"
+                                style={{ borderRadius: 0 }}
+                                onClick={() => setShowAll(s => ({ ...s, [filter.key]: !s[filter.key] }))}
+                            >
+                                {showAll[filter.key] ? 'Show Less' : 'Show More'}
+                            </button>
+                        )}
+                    </div>
+                );
+            })}
+        </div>
+    );
 
     // Render selected chips
     const renderSelectedChips = () => {
         const chips = [];
-        for (const filter of FILTERS) {
+        for (const filter of SIDEBAR_FILTERS) {
+            if (!shouldShowSidebarFilter(filter.key)) continue;
             const arr = selected[filter.key] || [];
             for (const value of arr) {
                 chips.push(
@@ -232,40 +302,31 @@ export default function AllProductTemplate(props: {
         );
     };
 
+    // Layout: sidebar left, main content right
     return (
-        <div className="max-w-7xl mx-auto min-h-screen bg-white mt-45">
-            {/* Filter Names Bar */}
-            <div className="w-full bg-white border-b border-gray-200 flex flex-row flex-wrap gap-0 px-2">
-                {FILTERS.map(filter => (
-                    <button
-                        key={filter.key}
-                        className={`flex items-center gap-2 px-6 py-4 text-center text-base font-medium uppercase text-black border border-black rounded-sm border-none bg-white transition-colors duration-150 relative ${openFilter === filter.key ? 'bg-gray-100' : ''} ${isFilterDisabled(filter.key) ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        style={{ borderRadius: 0 }}
-                        disabled={isFilterDisabled(filter.key)}
-                        onClick={() => {
-                            if (!isFilterDisabled(filter.key)) {
-                                setOpenFilter(openFilter === filter.key ? null : filter.key);
-                            }
-                        }}
-                    >
-                        {filter.label}
-                        <span className="ml-1">▾</span>
-                        {getSelectedCount(filter.key) > 0 && (
-                            <span className="ml-2 px-2 py-1 bg-black text-white text-xs font-bold" style={{ borderRadius: 16 }}>{getSelectedCount(filter.key)}</span>
-                        )}
-                    </button>
-                ))}
+        <div className="max-w-7xl mx-auto min-h-screen bg-white mt-45 flex flex-col">
+            {/* Header */}
+            <div className="w-full px-8 py-8 bg-white border-b border-gray-300">
+                <h1 className="text-3xl font-bold text-black tracking-tight">All Products</h1>
+                <p className="text-gray-600 mt-2 text-base">Browse and filter our complete collection to find your perfect product.</p>
             </div>
-            {/* Filter Options Panel */}
-            {renderOptionsPanel()}
-            {/* Selected Chips */}
-            {renderSelectedChips()}
-            {/* Products Grid */}
-            <div className="max-w-7xl mx-auto px-4 py-12">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {products.map(product => (
-                        <ProductCard key={product.id} {...product} />
-                    ))}
+            {/* Top Bar */}
+            {renderTopBar()}
+            <div className="flex flex-row flex-1">
+                {/* Sidebar */}
+                {renderSidebar()}
+                {/* Main Area */}
+                <div className="flex-1 flex flex-col">
+                    {/* Selected Chips */}
+                    {renderSelectedChips()}
+                    {/* Products Grid */}
+                    <div className="max-w-7xl mx-auto px-4 py-12">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {products.map(product => (
+                                <ProductCard key={product.id} {...product} />
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
