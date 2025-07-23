@@ -1,24 +1,23 @@
-
 import React from 'react'
 import AllProductTemplate from './AllProductsTemplate';
 import { useParams } from 'next/navigation';
-import { getCategoryBySlug } from '@/utils/category';
+import { getSubcategoryBySlug } from '@/utils/subcategory';
 
-export default function CategoryPageContent() {
+export default function SubCategoryPageContent() {
     const params = useParams();
     const slug = params?.slug as string;
-    const category = getCategoryBySlug(slug);
+    const subcategory = getSubcategoryBySlug(slug);
     return (
         <AllProductTemplate
             filters={{
                 department: true,
                 category: true,
-                subCategory: false,
+                subCategory: true,
             }}
             slug={slug}
             headers={{
-                title: category?.title || '',
-                description: category?.description || '',
+                title: subcategory?.title || '',
+                description: subcategory?.description || '',
             }}
         />
     )
