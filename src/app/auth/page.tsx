@@ -4,7 +4,10 @@ import { useState, useEffect } from "react";
 import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 // import { useAuth } from "@/context/AuthContext";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+    useRouter,
+    // useSearchParams
+} from "next/navigation";
 
 export default function Login() {
     const [isLogin, setIsLogin] = useState(true);
@@ -18,7 +21,7 @@ export default function Login() {
 
     // const { login, register, loginWithGoogle, resetPassword, needsProfileCompletion } = useAuth();
     const router = useRouter();
-    const searchParams = useSearchParams();
+    // const searchParams = useSearchParams();
     // const redirectUrl = searchParams.get('redirect');
 
     const togglePasswordVisibility = () => {

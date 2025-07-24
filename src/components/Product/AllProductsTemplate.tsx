@@ -235,7 +235,7 @@ export default function AllProductTemplate(props: {
                 const visibleOptions = showAll[filter.key] ? filterDef.options : filterDef.options.slice(0, MAX_VISIBLE_OPTIONS);
                 return (
                     <div key={filter.key} className="mb-4">
-                        <div className="font-bold text-base mb-2">{filter.label}</div>
+                        <div className=" text-base mb-2 text-black">{filter.label}</div>
                         <div className="flex flex-col gap-2">
                             {visibleOptions.map(option => {
                                 const checked = selected[filter.key]?.includes(option.value);
@@ -311,7 +311,7 @@ export default function AllProductTemplate(props: {
         <div className="max-w-7xl mx-auto min-h-screen bg-white mt-45 flex flex-col">
             {/* Header */}
             <div className="w-full px-8 py-8 bg-white border-b border-gray-300">
-                <h1 className="text-3xl font-bold text-black tracking-tight">{headers.title}</h1>
+                <h1 className="text-3xl font-serif text-black tracking-tight">{headers.title}</h1>
                 <p className="text-gray-600 mt-2 text-base">{headers.description}</p>
             </div>
             {/* Top Bar */}
