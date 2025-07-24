@@ -148,7 +148,7 @@ export default function Navbar() {
                             <span>STORES</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
-                        <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
+                        <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors" onClick={() => router.push('/contact')}>
                             <MessageSquareQuote size={18} />
                             <span>CONTACT US</span>
                         </button>
@@ -360,7 +360,7 @@ export default function Navbar() {
 
                             {/* Additional Mobile Options */}
                             <div className="pt-4 border-t border-gray-200 space-y-4">
-                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2" onClick={() => router.push('/contact')}>
                                     <Phone size={18} />
                                     <span>Contact Us</span>
                                 </button>
