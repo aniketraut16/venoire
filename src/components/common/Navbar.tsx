@@ -309,7 +309,7 @@ export default function Navbar() {
                         {/* Menu Content */}
                         <div className="p-4 space-y-6">
                             {/* Login Button */}
-                            <button className="w-full bg-black text-white py-3 px-4 rounded-md flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors">
+                            <button className="w-full bg-black text-white py-3 px-4 rounded-sm flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors">
                                 <LogIn size={18} />
                                 <span>LOG IN</span>
                             </button>
