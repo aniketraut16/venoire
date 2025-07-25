@@ -125,9 +125,9 @@ export default function Navbar() {
     return (
         <div className="w-full fixed top-0 z-50">
             {/* 1st Level - Black Promo Strip with Golden Text */}
-            <div className={`bg-black text-yellow-400 py-1 overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0 hidden' : 'h-auto py-2 opacity-100'}`}>
-                <div className="animate-marquee whitespace-nowrap">
-                    <span className="text-sm font-medium">
+            <div className={`bg-black text-yellow-400 py-1 overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0 hidden' : 'h-auto py-1 opacity-100'}`}>
+                <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '13s' }}>
+                    <span className="text-sm ">
                         Get additional 15% discount on your first purchase. Use code: LPAPPORDER *T&C Apply
                     </span>
                 </div>
@@ -216,6 +216,12 @@ export default function Navbar() {
                             <input
                                 type="text"
                                 placeholder="Search..."
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                        const value = (e.target as HTMLInputElement).value;
+                                        router.push(`/search?query=${value}`);
+                                    }
+                                }}
                                 className="border border-gray-300 rounded-md px-4 py-2 w-78 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                             />
                             <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">

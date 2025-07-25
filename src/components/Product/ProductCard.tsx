@@ -1,19 +1,21 @@
 import { Product } from '@/types/product'
 import React, { useState } from 'react'
 import { Heart } from 'lucide-react'
-import { useRouter } from 'next/navigation';
 
 export default function ProductCard(product: Product) {
     const [isHovered, setIsHovered] = useState(false)
     const sizes = product.size;
-    const router = useRouter();
+
+    const handleProductClick = () => {
+        window.open(`/product/${product.slug}`, '_blank');
+    };
 
     return (
         <div
             className="group relative overflow-hidden  transition-all duration-300 cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
-            onClick={() => router.push(`/product/${product.slug}`)}
+            onClick={handleProductClick}
         >
             {/* Image Container */}
             <div

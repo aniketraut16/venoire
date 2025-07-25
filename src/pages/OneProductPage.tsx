@@ -10,11 +10,10 @@ import OnproductImageView from '@/components/Product/OnproductImageView';
 export default function OneProductPage() {
     const params = useParams();
     const slug = params?.slug as string;
-    console.log(slug);
     const product = getDetailProduct(slug);
 
     // State management
-    const [selectedSize, setSelectedSize] = useState<string>('');
+    const [selectedSize, setSelectedSize] = useState<string>(product?.size[0] || '');
     const [isWishlisted, setIsWishlisted] = useState<boolean>(false);
     const [couponCode, setCouponCode] = useState<string>('');
     const [selectedLocation, setSelectedLocation] = useState<string>('');
@@ -74,11 +73,7 @@ export default function OneProductPage() {
                                                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                                             />
                                         </Lens>
-                                        {/* <img
-                                        src={image}
-                                        alt={`${product.name} view ${index + 1}`}
-                                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                                    /> */}
+
                                     </div>
                                 ))}
                             </div>
@@ -89,18 +84,19 @@ export default function OneProductPage() {
                             {/* Header - More Compact */}
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="bg-gray-100 text-gray-800 px-2 py-1 text-xs lato-bold uppercase tracking-wide">
+                                    <span className="bg-blue-50 text-blue-900 px-2 py-1 text-xs lato-bold uppercase tracking-wide">
                                         {product.catalog}
                                     </span>
                                     <span className="text-gray-500 text-sm lato-regular">{product.category}</span>
                                 </div>
-                                <h1 className="text-2xl pt-serif-bold text-gray-900 mb-2 leading-tight">{product.name}</h1>
+                                <h1 className="text-2xl pt-serif-regular text-gray-900 mb-2 leading-tight">{product.name}</h1>
 
                                 {/* Rating - Compact */}
                                 <div className="flex items-center gap-2 mb-3">
                                     <div className="flex items-center">
                                         {[...Array(5)].map((_, i) => (
-                                            <Star key={i} className="h-3 w-3 fill-gray-900 text-gray-900" />
+
+                                            <Star key={i} className="h-3 w-3 fill-yellow-500 text-yellow-500" />
                                         ))}
                                     </div>
                                     <span className="text-xs text-gray-600 lato-regular">(4.8) • 127 reviews</span>
@@ -112,7 +108,7 @@ export default function OneProductPage() {
                                         ${calculateDiscountedPrice()}
                                     </span>
                                     {product.discount > 0 && (
-                                        <span className="text-lg text-gray-400 line-through lato-regular">
+                                        <span className="text-lg text-red-700 line-through lato-regular">
                                             ${product.originalPrice}
                                         </span>
                                     )}
@@ -121,14 +117,6 @@ export default function OneProductPage() {
                                             Save ${product.originalPrice - calculateDiscountedPrice()}
                                         </span>
                                     )}
-                                </div>
-
-                                {/* Stock Status */}
-                                <div className="flex items-center gap-2">
-                                    <div className={`w-2 h-2 ${product.itemsRemaining > 5 ? 'bg-green-500' : 'bg-orange-500'}`}></div>
-                                    <span className={`text-xs lato-regular ${product.itemsRemaining > 5 ? 'text-green-600' : 'text-orange-600'}`}>
-                                        {product.itemsRemaining} items remaining
-                                    </span>
                                 </div>
                             </div>
 
@@ -156,7 +144,7 @@ export default function OneProductPage() {
                                 {/* Buy Now - Full Width */}
                                 <button
                                     disabled={!selectedSize}
-                                    className="w-full bg-gray-900 text-white py-3 px-6 lato-bold uppercase tracking-wide hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                                    className="w-full bg-gradient-to-r from-[#d4b500] to-[#af7834] text-white py-3 px-6 lato-bold uppercase tracking-wide disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                                 >
                                     Buy Now
                                 </button>

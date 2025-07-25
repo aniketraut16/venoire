@@ -143,9 +143,10 @@ export default function AllProductTemplate(props: {
     headers: {
         title: string,
         description: string,
-    }
+    },
+    searchQuery?: string | null,
 }) {
-    const { filters, slug, headers } = props;
+    const { filters, slug, headers, searchQuery } = props;
     const [products, setProducts] = useState<Product[]>(getProducts(null, 20));
 
     // Single-select for top bar filters
