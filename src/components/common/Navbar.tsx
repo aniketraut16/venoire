@@ -160,16 +160,22 @@ export default function Navbar() {
                             <span>LOG IN</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
-                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors"
+                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors relative"
                             onClick={() => router.push('/wishlist')}
                         >
                             <Heart size={18} />
+                            <span className="absolute -top-2 -right-3 bg-[#D4AF37] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                                3
+                            </span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
-                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors"
+                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors relative"
                             onClick={() => router.push('/cart')}
                         >
                             <ShoppingBag size={20} />
+                            <span className="absolute -top-2 -right-3 bg-[#D4AF37] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                                3
+                            </span>
                         </button>
                     </div>
                 </div>
