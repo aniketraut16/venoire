@@ -1,6 +1,7 @@
 import React from 'react'
 import { Shield, Truck, RefreshCw, Instagram, X } from 'lucide-react'
 import { FaFacebook, FaXTwitter, FaYoutube } from 'react-icons/fa6'
+import Link from 'next/link';
 
 export default function Footer() {
     return (
@@ -98,14 +99,14 @@ export default function Footer() {
                     <div>
                         <h3 className="font-medium mb-6">USEFUL LINKS</h3>
                         <ul className="space-y-3 text-sm text-gray-300">
-                            <li><a href="#" className="hover:text-white transition-colors">Contact Us</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+                            <li><Link href="/contact#message" className="hover:text-white transition-colors">Contact Us</Link></li>
+                            <li><Link href="/contact#faqs" className="hover:text-white transition-colors">FAQ</Link></li>
+                            <li><Link href="#" className="hover:text-white transition-colors">About Us</Link></li>
 
                         </ul>
                     </div>
 
-                    {/* Follow Us */}
+
                     <div>
                         <h3 className="font-medium mb-6">FOLLOW US</h3>
                         <div className="flex space-x-4">

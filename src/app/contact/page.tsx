@@ -1,6 +1,6 @@
 'use client'
 import { HelpCircle, MailIcon, MessageCircle, Package } from 'lucide-react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 interface AccordionProps {
     title: string;
@@ -35,11 +35,32 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
 };
 
 export default function ContactPage() {
-    const [activeTab, setActiveTab] = useState('Message Us');
+    const [activeTab, setActiveTab] = useState('message');
+
+    useEffect(() => {
+        // Get the hash from URL on initial load
+        const hash = window.location.hash.replace('#', '');
+        if (hash) {
+            const validTabs = ['message', 'faqs', 'order-related-queries', 'other-queries'];
+            if (validTabs.includes(hash)) {
+                setActiveTab(hash);
+            }
+        }
+
+        // Set initial hash if none exists
+        if (!window.location.hash) {
+            window.history.replaceState(null, '', `#${activeTab}`);
+        }
+    }, []);
+
+    const handleTabChange = (tabKey: string) => {
+        setActiveTab(tabKey);
+        window.history.replaceState(null, '', `#${tabKey}`);
+    };
 
     const renderContent = () => {
         switch (activeTab) {
-            case 'Message Us':
+            case 'message':
                 return (
                     <div className="bg-white border border-gray-200 p-8">
                         <div className="max-w-2xl">
@@ -137,7 +158,7 @@ export default function ContactPage() {
                     </div>
                 );
 
-            case 'FAQs':
+            case 'faqs':
                 return (
                     <div className="bg-white border border-gray-200 p-8">
                         <h2 className="text-2xl font-light tracking-wide mb-8 uppercase">Frequently Asked Questions</h2>
@@ -161,7 +182,7 @@ export default function ContactPage() {
                     </div>
                 );
 
-            case 'Order Related Queries':
+            case 'order-related-queries':
                 return (
                     <div className="bg-white border border-gray-200 p-8">
                         <h2 className="text-2xl font-light tracking-wide mb-8 uppercase">Order Support</h2>
@@ -185,7 +206,7 @@ export default function ContactPage() {
                     </div>
                 );
 
-            case 'Other Queries':
+            case 'other-queries':
                 return (
                     <div className="bg-white border border-gray-200 p-8">
                         <h2 className="text-2xl font-light tracking-wide mb-8 uppercase">General Inquiries</h2>
@@ -227,10 +248,10 @@ export default function ContactPage() {
 
                         <nav className="p-4">
                             {[
-                                { key: 'Message Us', label: 'Message Us', icon: <MailIcon /> },
-                                { key: 'FAQs', label: 'FAQs', icon: <HelpCircle /> },
-                                { key: 'Order Related Queries', label: 'Order Support', icon: <Package /> },
-                                { key: 'Other Queries', label: 'General Inquiries', icon: <MessageCircle /> }
+                                { key: 'message', label: 'Message Us', icon: <MailIcon /> },
+                                { key: 'faqs', label: 'FAQs', icon: <HelpCircle /> },
+                                { key: 'order-related-queries', label: 'Order Support', icon: <Package /> },
+                                { key: 'other-queries', label: 'General Inquiries', icon: <MessageCircle /> }
                             ].map((tab) => (
                                 <button
                                     key={tab.key}
@@ -238,7 +259,7 @@ export default function ContactPage() {
                                         ? 'bg-black text-white border-black'
                                         : 'text-gray-700 hover:bg-gray-100 hover:border-gray-200'
                                         }`}
-                                    onClick={() => setActiveTab(tab.key)}
+                                    onClick={() => handleTabChange(tab.key)}
                                 >
                                     <div className="flex items-center space-x-3">
                                         <span className="text-lg">{tab.icon}</span>
