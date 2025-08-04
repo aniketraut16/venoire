@@ -153,16 +153,22 @@ export default function Navbar() {
                             <span>CONTACT US</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
-                        <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
+                        <button className="flex items-center space-x-2 text-sm hover:text-[#D4AF37] cursor-pointer transition-colors"
+                            onClick={() => router.push('/auth')}
+                        >
                             <User size={18} />
                             <span>LOG IN</span>
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
-                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
+                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors"
+                            onClick={() => router.push('/wishlist')}
+                        >
                             <Heart size={18} />
                         </button>
                         <div className="w-px h-4 bg-gray-600"></div>
-                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors">
+                        <button className="text-sm hover:text-[#D4AF37] cursor-pointer transition-colors"
+                            onClick={() => router.push('/cart')}
+                        >
                             <ShoppingBag size={20} />
                         </button>
                     </div>
@@ -315,7 +321,9 @@ export default function Navbar() {
                         {/* Menu Content */}
                         <div className="p-4 space-y-6">
                             {/* Login Button */}
-                            <button className="w-full bg-black text-white py-3 px-4 rounded-sm flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors">
+                            <button className="w-full bg-black text-white py-3 px-4 rounded-sm flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors"
+                                onClick={() => router.push('/auth')}
+                            >
                                 <LogIn size={18} />
                                 <span>LOG IN</span>
                             </button>
@@ -370,22 +378,22 @@ export default function Navbar() {
                                     <Phone size={18} />
                                     <span>Contact Us</span>
                                 </button>
-                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2" onClick={() => router.push('/stores')}>
                                     <Store size={18} />
                                     <span>Stores</span>
                                 </button>
-                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2" onClick={() => router.push('/wishlist')}>
                                     <Heart size={18} />
                                     <span>Wishlist</span>
                                 </button>
-                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2" onClick={() => router.push('/cart')}>
                                     <ShoppingBag size={18} />
                                     <span>Cart</span>
                                 </button>
-                                <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2">
+                                {/* <button className="w-full flex items-center space-x-3 text-black hover:text-gray-600 transition-colors py-2" onClick={() => router.push('/track-order')}>
                                     <Package size={18} />
                                     <span>Track Your Order</span>
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>

@@ -150,17 +150,17 @@ export default function ShoppingCartPage() {
                                             </div>
 
                                             {/* Action Buttons */}
-                                            <div className="flex gap-6 text-sm">
+                                            <div className="flex gap-4 items-end justify-end text-sm">
                                                 <button
                                                     onClick={() => moveToWishlist(item.id)}
-                                                    className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                                                    className="flex items-center gap-2 px-3 py-2 border border-gray-300 bg-white hover:bg-pink-50 hover:border-pink-300 text-gray-700 hover:text-pink-600 transition-colors cursor-pointer"
                                                 >
                                                     <Heart className="w-4 h-4" />
                                                     MOVE TO WISHLIST
                                                 </button>
                                                 <button
                                                     onClick={() => removeItem(item.id)}
-                                                    className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
+                                                    className="flex items-center gap-2 px-3 py-2 border border-gray-300 bg-white hover:bg-red-50 hover:border-red-300 text-gray-700 hover:text-red-600 transition-colors cursor-pointer"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                     REMOVE
@@ -213,11 +213,11 @@ export default function ShoppingCartPage() {
 
 
                                 {/* Coupon Link */}
-                                <div className="text-center">
+                                {/* <div className="text-center">
                                     <button className="text-orange-500 text-sm font-medium hover:text-orange-600 transition-colors">
                                         LOGIN TO APPLY COUPON
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
