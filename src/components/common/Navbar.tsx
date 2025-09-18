@@ -126,7 +126,7 @@ export default function Navbar() {
         <div className="w-full fixed top-0 z-50">
             {/* 1st Level - Black Promo Strip with Golden Text */}
             <div className={`bg-black text-yellow-400 py-1 overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0 hidden' : 'h-auto py-1 opacity-100'}`}>
-                <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '13s' }}>
+                <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '25s' }}>
                     <span className="text-sm ">
                         Get additional 15% discount on your first purchase. Use code: LPAPPORDER *T&C Apply
                     </span>
@@ -182,12 +182,12 @@ export default function Navbar() {
             </div>
 
             {/* 3rd Level - Main Navbar */}
-            <div className="bg-white border-b border-gray-200">
+            <div className="bg-black text-white border-b border-gray-200">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="flex items-center justify-between h-16">
                         {/* Mobile Burger Menu */}
                         <button
-                            className="md:hidden text-black hover:text-gray-600 transition-colors"
+                            className="md:hidden text-white hover:text-gray-300 transition-colors"
                             onClick={toggleMobileMenu}
                         >
                             <Menu size={24} />
@@ -200,7 +200,7 @@ export default function Navbar() {
                             <img
                                 src="/logo.png"
                                 alt="Venoire Logo"
-                                className="h-10 w-auto"
+                                className="h-10 w-auto filter invert"
                             />
                         </div>
 
@@ -213,9 +213,9 @@ export default function Navbar() {
                                     onMouseEnter={() => handleMouseEnter(item.name)}
                                     onMouseLeave={handleMouseLeave}
                                 >
-                                    <button className={`text-black transition-all duration-300 h-full px-6 font-normal border-b-3 flex items-center ${activeDropdown === item.name
-                                        ? 'border-black bg-gray-50 text-black'
-                                        : 'border-transparent hover:border-black hover:bg-gray-50 hover:text-black'
+                                    <button className={`text-white transition-all duration-300 h-full px-6 font-normal border-b-3 flex items-center ${activeDropdown === item.name
+                                        ? 'border-white bg-gray-800 text-white'
+                                        : 'border-transparent hover:border-white hover:bg-gray-800 hover:text-white'
                                         }`}>
                                         {item.name}
                                     </button>
@@ -234,22 +234,22 @@ export default function Navbar() {
                                         router.push(`/search?query=${value}`);
                                     }
                                 }}
-                                className="border border-gray-300 rounded-md px-4 py-2 w-78 text-sm focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                                className="border border-gray-600 bg-gray-800 text-white rounded-md px-4 py-2 w-78 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent placeholder-gray-400"
                             />
-                            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200">
                                 <Search size={16} />
                             </button>
                         </div>
 
                         {/* Mobile Icons */}
                         <div className="flex md:hidden items-center space-x-4">
-                            <button className="text-black hover:text-gray-600 transition-colors">
+                            <button className="text-white hover:text-gray-300 transition-colors">
                                 <Search size={20} />
                             </button>
-                            <button className="text-black hover:text-gray-600 transition-colors">
+                            <button className="text-white hover:text-gray-300 transition-colors">
                                 <Heart size={20} />
                             </button>
-                            <button className="text-black hover:text-gray-600 transition-colors">
+                            <button className="text-white hover:text-gray-300 transition-colors">
                                 <ShoppingBag size={20} />
                             </button>
                         </div>

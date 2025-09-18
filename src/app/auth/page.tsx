@@ -247,7 +247,7 @@ export default function Login() {
                     ) : (
                         <button
                             onClick={() => setIsResettingPassword(true)}
-                            className="text-amber-500 hover:underline text-sm font-medium"
+                            className="text-gray-800 hover:underline text-sm font-medium"
                         >
                             Forgot password?
                         </button>

@@ -79,7 +79,7 @@ export default function Hero() {
             <style jsx global>{`
                 .hero-swiper {
                     width: 100%;
-                    height: 78vh;
+                    height: 90vh;
                 }
 
                 .hero-swiper .swiper-slide {
