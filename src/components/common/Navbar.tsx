@@ -82,53 +82,73 @@ export default function Navbar() {
             name: 'WOMENS',
             sections: [
                 {
-                    title: 'Clothing',
-                    subsections: ['Tops & Blouses', 'Dresses & Jumpsuits', 'Bottoms & Skirts', 'Jeans & Denim', 'Jackets & Blazers', 'Coats & Outerwear', 'Sweaters & Cardigans', 'Activewear & Athleisure']
+                    title: 'Comming Soon',
+                    subsections: []
                 },
-                {
-                    title: 'Ethnic Wear',
-                    subsections: ['Sarees & Lehengas', 'Salwar Suits', 'Kurtis & Tunics', 'Indo-Western', 'Traditional Jewelry', 'Ethnic Footwear']
-                },
-                {
-                    title: 'Footwear',
-                    subsections: ['Heels & Pumps', 'Flats & Ballerinas', 'Boots & Booties', 'Sneakers & Casual', 'Sandals & Wedges', 'Ethnic Footwear']
-                },
-                {
-                    title: 'Accessories & Beauty',
-                    subsections: ['Handbags & Clutches', 'Jewelry & Watches', 'Scarves & Stoles', 'Sunglasses', 'Beauty & Makeup', 'Hair Accessories']
-                }
+                // {
+                //     title: 'Ethnic Wear',
+                //     subsections: ['Sarees & Lehengas', 'Salwar Suits', 'Kurtis & Tunics', 'Indo-Western', 'Traditional Jewelry', 'Ethnic Footwear']
+                // },
+                // {
+                //     title: 'Footwear',
+                //     subsections: ['Heels & Pumps', 'Flats & Ballerinas', 'Boots & Booties', 'Sneakers & Casual', 'Sandals & Wedges', 'Ethnic Footwear']
+                // },
+                // {
+                //     title: 'Accessories & Beauty',
+                //     subsections: ['Handbags & Clutches', 'Jewelry & Watches', 'Scarves & Stoles', 'Sunglasses', 'Beauty & Makeup', 'Hair Accessories']
+                // }
             ]
         },
-        {
-            name: 'KIDS',
-            sections: [
-                {
-                    title: 'Boys (2-16 Years)',
-                    subsections: ['T-Shirts & Shirts', 'Jeans & Trousers', 'Shorts & Casual Wear', 'Ethnic Wear', 'Jackets & Hoodies', 'Sports & Activewear', 'School Uniforms']
-                },
-                {
-                    title: 'Girls (2-16 Years)',
-                    subsections: ['Dresses & Frocks', 'Tops & Tees', 'Bottoms & Leggings', 'Ethnic & Traditional', 'Jackets & Cardigans', 'Party Wear', 'School Uniforms']
-                },
-                {
-                    title: 'Baby & Toddlers (0-2 Years)',
-                    subsections: ['Bodysuits & Rompers', 'Sleep & Loungewear', 'Bibs & Feeding', 'Baby Shoes', 'Blankets & Accessories']
-                },
-                {
-                    title: 'Kids Accessories',
-                    subsections: ['Footwear & Sneakers', 'Bags & Backpacks', 'Hats & Caps', 'Socks & Underwear', 'Toys & Games', 'Birthday Gifts']
-                }
-            ]
-        }
+        // {
+        //     name: 'KIDS',
+        //     sections: [
+        //         {
+        //             title: 'Boys (2-16 Years)',
+        //             subsections: ['T-Shirts & Shirts', 'Jeans & Trousers', 'Shorts & Casual Wear', 'Ethnic Wear', 'Jackets & Hoodies', 'Sports & Activewear', 'School Uniforms']
+        //         },
+        //         {
+        //             title: 'Girls (2-16 Years)',
+        //             subsections: ['Dresses & Frocks', 'Tops & Tees', 'Bottoms & Leggings', 'Ethnic & Traditional', 'Jackets & Cardigans', 'Party Wear', 'School Uniforms']
+        //         },
+        //         {
+        //             title: 'Baby & Toddlers (0-2 Years)',
+        //             subsections: ['Bodysuits & Rompers', 'Sleep & Loungewear', 'Bibs & Feeding', 'Baby Shoes', 'Blankets & Accessories']
+        //         },
+        //         {
+        //             title: 'Kids Accessories',
+        //             subsections: ['Footwear & Sneakers', 'Bags & Backpacks', 'Hats & Caps', 'Socks & Underwear', 'Toys & Games', 'Birthday Gifts']
+        //         }
+        //     ]
+        // }
     ]
+
+    const promoMessages = [
+        'Get additional 15% discount on your first purchase. Use code: LPAPPORDER *T&C Apply',
+        'Free shipping on orders above Rs. 999',
+        'Same day delivery in Delhi NCR - Order before 3 PM',
+        '24/7 customer support available',
+        'Easy returns within 30 days',
+        'Exclusive luxury collection now available',
+        'New arrivals every week',
+        'Join our VIP club for extra benefits'
+    ];
+    
+    const doubledMessages = [...promoMessages, ...promoMessages];
 
     return (
         <div className="w-full fixed top-0 z-50">
             {/* 1st Level - Black Promo Strip with Golden Text */}
             <div className={`bg-black text-yellow-400 py-1 overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0 hidden' : 'h-auto py-1 opacity-100'}`}>
-                <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '25s' }}>
-                    <span className="text-sm ">
-                        Get additional 15% discount on your first purchase. Use code: LPAPPORDER *T&C Apply
+                <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '40s' }}>
+                    <span className="text-sm">
+                        {(() => {
+                            return doubledMessages.map((message, index) => (
+                                <span key={index}>
+                                    {message}
+                                    {index < doubledMessages.length - 1 && <span className="mx-8">•</span>}
+                                </span>
+                            ));
+                        })()}
                     </span>
                 </div>
             </div>

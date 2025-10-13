@@ -17,22 +17,10 @@ export default function Categories() {
             description: 'Elegant womens fashion'
         },
         {
-            slug: 'kids',
-            name: 'Kids',
-            image: '/category/kids.jpeg',
-            description: 'Stylish kids clothing'
-        },
-        {
             slug: 'perfumes',
             name: 'Perfumes',
             image: '/category/perfumes.jpg',
             description: 'Luxury perfumes'
-        },
-        {
-            slug: 'gifts',
-            name: 'Gifts',
-            image: '/category/gifts.jpg',
-            description: 'Luxury gifts'
         }
     ]
 
