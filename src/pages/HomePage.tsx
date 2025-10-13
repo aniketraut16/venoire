@@ -4,6 +4,7 @@ import Categories from "@/components/HomePage/Categories";
 import { Offers } from "@/components/HomePage/Offers";
 import Explore from "@/components/HomePage/Explore";
 import CategorizedProducts from "@/components/HomePage/CategorizedProducts";
+import FewProducts from "@/components/HomePage/FewProducts";
 
 export default function HomePage() {
     return (
@@ -11,7 +12,9 @@ export default function HomePage() {
             <Hero />
             <Categories />
             <Offers />
+            <FewProducts />
             <Explore />
+
             <CategorizedProducts
                 title="Venoire's Most Loved"
                 description="Discover the favorites our customers can't get enough of. These best sellers are handpicked for their timeless style, premium quality, and exceptional value. "

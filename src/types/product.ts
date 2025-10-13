@@ -11,6 +11,7 @@ export type Product = {
   discount: number;
   size: string[];
   thumbnail: string;
+  mode?: "light" | "dark";
 };
 
 export type DetailProduct = {

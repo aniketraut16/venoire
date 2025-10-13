@@ -4,15 +4,20 @@ import { Heart } from 'lucide-react'
 
 export default function ProductCard(product: Product) {
     const [isHovered, setIsHovered] = useState(false)
-    const sizes = product.size;
+    const sizes = product.size
+    const mode = product.mode || "dark"
+
+    // Utility to switch text color based on mode
+    const getTextColor = (defaultColor: string, lightColor = "text-white") =>
+        mode === "light" ? lightColor : defaultColor
 
     const handleProductClick = () => {
-        window.open(`/product/${product.slug}`, '_blank');
-    };
+        window.open(`/product/${product.slug}`, '_blank')
+    }
 
     return (
         <div
-            className="group relative overflow-hidden  transition-all duration-300 cursor-pointer"
+            className="group relative overflow-hidden transition-all duration-300 cursor-pointer"
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
             onClick={handleProductClick}
@@ -29,7 +34,10 @@ export default function ProductCard(product: Product) {
                     draggable="false" // Prevent drag-and-drop of image
                 />
 
-                <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold border border-black">
+                <div className={
+                    `absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold border border-black
+                    ${getTextColor("text-black")}`
+                }>
                     {product.catalog}
                 </div>
 
@@ -58,24 +66,24 @@ export default function ProductCard(product: Product) {
             <div className="py-4 space-y-2 pt-serif-regular">
 
                 {/* Category */}
-                <p className="text-sm font-medium text-gray-600 uppercase tracking-wide">
+                <p className={`text-sm font-medium uppercase tracking-wide ${getTextColor("text-gray-600")}`}>
                     {product.category}
                 </p>
 
                 {/* Product Name */}
-                <h3 className="text-lg font-medium text-gray-900 line-clamp-2">
+                <h3 className={`text-lg font-medium line-clamp-2 ${getTextColor("text-gray-900")}`}>
                     {product.name}
                 </h3>
 
                 {/* Pricing */}
                 <div className="flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900">
+                    <span className={`text-lg font-bold ${getTextColor("text-gray-900")}`}>
                         ₹{product.price.toLocaleString()}
                     </span>
-                    <span className="text-sm text-gray-500 line-through">
+                    <span className={`text-sm line-through ${getTextColor("text-gray-500")}`}>
                         ₹{product.originalPrice.toLocaleString()}
                     </span>
-                    <span className="text-xs font-medium text-red-600">
+                    <span className={`text-xs font-medium ${mode === "light" ? "text-pink-300" : "text-red-600"}`}>
                         {product.discount}% OFF
                     </span>
                 </div>

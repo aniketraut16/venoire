@@ -29,7 +29,7 @@ export default function Categories() {
     }
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-16">
+        <div className="max-w-7xl mx-auto px-4 pt-16">
 
             {/* Categories Grid */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-7xl mx-auto">
