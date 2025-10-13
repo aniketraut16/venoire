@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 // Import Swiper styles
 import "swiper/css";
-import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 // Import required modules
@@ -37,7 +36,7 @@ export default function Hero() {
         pagination={{
           clickable: true,
         }}
-        mousewheel={true}
+        // mousewheel={true}
         keyboard={true}
         modules={[Navigation, Pagination, Mousewheel, Keyboard, Autoplay]}
         autoplay={{
@@ -92,19 +91,26 @@ export default function Hero() {
         }
         .swiper-button-next,
         .swiper-button-prev {
-          color: #fff;
-          width: 44px;
-          height: 44px;
+          color: #fff !important;
+          width: 44px !important;
+          height: 44px !important;
           border: 1px solid #fff;
-          background: transparent;
+          background: transparent !important;
           border-radius: 50%;
           padding: 12px;
-          top: 50%;
-          transform: translateY(-50%);
+          top: 50% !important;
+          transform: translateY(-50%) !important;
+          margin-top: 0 !important;
         }
         .swiper-button-next::after,
         .swiper-button-prev::after {
-          font-size: 20px;
+          font-size: 20px !important;
+          font-weight: 900 !important;
+        }
+        /* Hide any default navigation styles */
+        .swiper-button-next:before,
+        .swiper-button-prev:before {
+          display: none !important;
         }
         .swiper-button-next,
         .swiper-rtl .swiper-button-prev {
@@ -114,6 +120,9 @@ export default function Hero() {
         .swiper-rtl .swiper-button-next {
           left: 20px;
         }
+          .collections-next ,.collections-prev {
+            display: none !important;
+          }
         @media (max-width: 768px) {
           .mobile-full-width {
             width: 100vw;
@@ -135,13 +144,14 @@ export default function Hero() {
           }
           .swiper-button-next,
           .swiper-button-prev {
-            width: 36px;
-            height: 36px;
+            width: 36px !important;
+            height: 36px !important;
           }
           .swiper-button-next::after,
           .swiper-button-prev::after {
-            font-size: 16px;
+            font-size: 16px !important;
           }
+
         }
       `}</style>
     </div>
