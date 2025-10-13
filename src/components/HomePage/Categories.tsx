@@ -30,15 +30,6 @@ export default function Categories() {
 
     return (
         <div className="max-w-7xl mx-auto px-4 py-16">
-            {/* Header */}
-            <div className="text-center mb-12">
-                <h2 className="text-4xl md:text-5xl font-light text-gray-900 mb-4 tracking-wide">
-                    Shop by Category
-                </h2>
-                <p className="text-lg text-gray-600 leading-relaxed">
-                    Discover our curated collections designed for every lifestyle
-                </p>
-            </div>
 
             {/* Categories Grid */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-7xl mx-auto">
@@ -59,11 +50,19 @@ export default function Categories() {
                         <h3 className="text-xl font-semibold text-gray-900 mb-2 tracking-wide">
                             {category.name}
                         </h3>
-                        <p className="text-sm text-gray-600 leading-relaxed">
-                            {category.description}
-                        </p>
+                        
                     </div>
                 ))}
+            </div>
+            <div className="relative flex items-center my-10">
+                <hr className="flex-grow border-t-2 border-gray-200" />
+                <img
+                    src="/logo-v2.png"
+                    alt="divider"
+                    className="mx-4 z-10 bg-white px-2 py-1 h-15 w-auto object-contain"
+                    style={{ position: "relative", top: 0 }}
+                />
+                <hr className="flex-grow border-t-2 border-gray-200" />
             </div>
         </div>
     )
