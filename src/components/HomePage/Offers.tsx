@@ -4,6 +4,7 @@ import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
+import { motion } from "framer-motion";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -16,14 +17,20 @@ export function Offers() {
     return (
     <div className="w-full bg-white">
       {/* Header Section */}
-      <div className="text-center py-12 px-4">
+      <motion.div 
+        className="text-center py-12 px-4"
+        initial={{ opacity: 0, y: -30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.3 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+      >
         <h1 className="text-2xl md:text-4xl font-semibold text-gray-900 mb-3 tracking-wide">
           DISCOVER OUR ONLINE EXCLUSIVE COLLECTIONS
         </h1>
         <p className="text-sm md:text-base text-gray-600">
           Elevate Your Style: Shop the Freshest Styles from our Online Exclusive Collections
         </p>
-      </div>
+      </motion.div>
 
       {/* Collections Carousel */}
       <div className="max-w-7xl mx-auto px-4 mb-16 ">
@@ -59,7 +66,17 @@ export function Offers() {
         >
           {collectionsData.map((collection, index) => (
             <SwiperSlide key={index}>
-              <div className="relative overflow-hidden rounded-none group cursor-pointer">
+              <motion.div 
+                className="relative overflow-hidden rounded-none group cursor-pointer"
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  ease: "easeOut" 
+                }}
+              >
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
                     src={collection.image}
@@ -72,7 +89,7 @@ export function Offers() {
                     {collection.title}
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </SwiperSlide>
           ))}
         </Swiper>

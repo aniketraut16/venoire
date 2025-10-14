@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getProducts } from '@/utils/products'
 import ProductCard from '../Product/ProductCard'
+import { motion } from 'framer-motion'
 
 const categories = ['ALL', 'MEN', 'WOMEN', 'BOYS', 'GIRLS']
 
@@ -58,11 +59,17 @@ export default function FewProducts() {
     <section className="py-16 bg-gradient-to-b from-slate-900 to-slate-800">
       <div className="max-w-7xl mx-auto px-4">
         {/* Title */}
-        <div className="text-center mb-8">
+        <motion.div 
+          className="text-center mb-8"
+          initial={{ opacity: 0, y: -30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           <h2 className="text-4xl md:text-5xl font-light text-yellow-400 mb-8 tracking-wide">
             Trending Styles
           </h2>
-        </div>
+        </motion.div>
 
         {/* Category Tabs */}
         <div className="flex justify-center mb-12">
@@ -107,10 +114,21 @@ export default function FewProducts() {
             className="flex gap-6 overflow-x-auto scrollbar-hide px-12"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {products.map((product) => (
-              <div key={product.id} className="flex-none w-80 relative">
+            {products.map((product, index) => (
+              <motion.div 
+                key={product.id} 
+                className="flex-none w-80 relative"
+                initial={{ opacity: 0, x: 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, amount: 0.2 }}
+                transition={{ 
+                  duration: 0.5, 
+                  delay: index * 0.1,
+                  ease: "easeOut" 
+                }}
+              >
                   <ProductCard {...product} mode="light" />
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

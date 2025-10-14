@@ -1,4 +1,6 @@
+'use client'
 import React from 'react'
+import { motion } from 'framer-motion'
 
 export default function SignInRequest() {
   return (
@@ -14,7 +16,13 @@ export default function SignInRequest() {
         <div className="absolute inset-0 bg-black opacity-40"></div>
       </div>
       <div className="relative z-10 flex justify-end w-full h-full items-center pr-8 md:pr-16">
-        <div className='bg-yellow-300 rounded-md p-14 flex flex-col justify-center shadow-2xl max-w-xl w-full'>
+        <motion.div 
+          className='bg-yellow-300 rounded-md p-14 flex flex-col justify-center shadow-2xl max-w-xl w-full'
+          initial={{ opacity: 0, scale: 0.8, y: 50 }}
+          whileInView={{ opacity: 1, scale: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+        >
           {/* Logo and Member Text */}
           <div className="flex items-center mb-6">
             <img src="/logo.png" alt="Logo" className='object-contain h-10 w-auto mr-2' />
@@ -32,7 +40,7 @@ export default function SignInRequest() {
           <button className='bg-blue-950 text-yellow-400 px-8 py-3 rounded-lg font-bold text-md uppercase hover:bg-blue-900 transition-colors duration-300 shadow-lg w-2/3 mx-auto'>
             SIGN UP NOW
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

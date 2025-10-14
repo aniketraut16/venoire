@@ -1,7 +1,7 @@
 'use client'
 import React, { useState, useEffect } from 'react'
 import { Heart, ShoppingBag, Search, Store, Phone, LogIn, Crown, Menu, X, Package, MapPin, MessageSquareQuote, User } from 'lucide-react'
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Navbar() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
@@ -10,28 +10,48 @@ export default function Navbar() {
     const [showTopBars, setShowTopBars] = useState(false)
     const [showPromoBar, setShowPromoBar] = useState(true)
     const [lastScrollY, setLastScrollY] = useState(0)
+    const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up')
     const router = useRouter();
+    const pathname = usePathname();
+    const isHomePage = pathname === '/';
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY
             const viewportHeight = window.innerHeight
             const tenVh = viewportHeight * 0.3
-            const sixtyVh = viewportHeight * 1
+            const oneVh = viewportHeight * 1
+            const scrollThreshold = 5 // Minimum scroll distance to detect direction
             
             setIsScrolled(scrollTop > 500)
-            setShowTopBars(scrollTop > tenVh)
             
-            // Handle promo bar visibility after 60vh
-            if (scrollTop > sixtyVh) {
+            // Detect scroll direction with threshold
+            if (Math.abs(scrollTop - lastScrollY) > scrollThreshold) {
                 if (scrollTop > lastScrollY) {
-                    // Scrolling down - hide promo bar
-                    setShowPromoBar(false)
+                    setScrollDirection('down')
+                } else if (scrollTop < lastScrollY) {
+                    setScrollDirection('up')
+                }
+            }
+            
+            // Only apply scroll behavior on home page
+            if (isHomePage) {
+                setShowTopBars(scrollTop > tenVh)
+                
+                // Handle promo bar visibility after 100vh
+                if (scrollTop > oneVh) {
+                    // After 100vh, show/hide based on scroll direction
+                    if (scrollDirection === 'down') {
+                        setShowPromoBar(false)
+                    } else {
+                        setShowPromoBar(true)
+                    }
                 } else {
-                    // Scrolling up - show promo bar
+                    // Below 100vh - always show promo bar (if showTopBars is true)
                     setShowPromoBar(true)
                 }
             } else {
-                // Below 60vh - always show promo bar (if showTopBars is true)
+                // On other pages, always show all bars
+                setShowTopBars(true)
                 setShowPromoBar(true)
             }
             
@@ -39,8 +59,12 @@ export default function Navbar() {
         }
 
         window.addEventListener('scroll', handleScroll)
+        
+        // Initial call to set correct state on mount
+        handleScroll()
+        
         return () => window.removeEventListener('scroll', handleScroll)
-    }, [lastScrollY])
+    }, [lastScrollY, scrollDirection, isHomePage])
 
     const handleMouseEnter = (item: string) => {
         setActiveDropdown(item)
@@ -162,24 +186,26 @@ export default function Navbar() {
     return (
         <div className="w-full fixed top-0 z-50">
             {/* 1st Level - Black Promo Strip with Golden Text */}
-            <div className={`bg-black text-yellow-400 overflow-hidden transition-all duration-300 ${!showTopBars || !showPromoBar ? 'h-0 py-0 opacity-0' : 'h-auto py-1 opacity-100'}`}>
-                <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '40s' }}>
-                    <span className="text-sm">
-                        {(() => {
-                            return doubledMessages.map((message, index) => (
-                                <span key={index}>
-                                    {message}
-                                    {index < doubledMessages.length - 1 && <span className="mx-8">•</span>}
-                                </span>
-                            ));
-                        })()}
-                    </span>
+            <div className={`bg-black text-yellow-400 overflow-hidden transition-all duration-500 ease-in-out ${isHomePage && (!showTopBars || !showPromoBar) ? 'max-h-0 opacity-0' : 'max-h-10 opacity-100'}`}>
+                <div className="py-1">
+                    <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '40s' }}>
+                        <span className="text-sm">
+                            {(() => {
+                                return doubledMessages.map((message, index) => (
+                                    <span key={index}>
+                                        {message}
+                                        {index < doubledMessages.length - 1 && <span className="mx-8">•</span>}
+                                    </span>
+                                ));
+                            })()}
+                        </span>
+                    </div>
                 </div>
             </div>
 
             {/* 2nd Level - Gray Top Bar with Icons - Desktop Only */}
-            <div className={`hidden md:block bg-[#252525] text-white transition-all duration-300 ${!showTopBars ? 'h-0 py-0 opacity-0 overflow-hidden' : 'h-auto py-2 opacity-100'}`}>
-                <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
+            <div className={`hidden md:block bg-[#252525] text-white overflow-hidden transition-all duration-500 ease-in-out ${isHomePage && !showTopBars ? 'max-h-0 opacity-0' : 'max-h-20 opacity-100'}`}>
+                <div className="max-w-7xl mx-auto px-4 flex justify-between items-center py-2">
                     {/* Left Side: Delivery Location */}
                     <div className="flex flex-col items-start">
                         <span className="text-xs leading-tight">Delivering to</span>
@@ -226,12 +252,12 @@ export default function Navbar() {
             </div>
 
             {/* 3rd Level - Main Navbar */}
-            <div className={`transition-all duration-500 ${!showTopBars ? 'bg-transparent pt-3 pb-1' : 'bg-black py-0'}`}>
-                <div className={`mx-auto px-4 transition-all duration-500 ${!showTopBars ? 'max-w-[98%] bg-white rounded-2xl shadow-lg' : 'max-w-7xl bg-black'}`}>
+            <div className={`transition-all duration-500 ${isHomePage && !showTopBars ? 'bg-transparent pt-3 pb-1' : 'bg-black py-0'}`}>
+                <div className={`mx-auto px-4 transition-all duration-500 ${isHomePage && !showTopBars ? 'max-w-[98%] bg-white rounded-2xl shadow-lg' : 'max-w-7xl bg-black'}`}>
                     <div className="flex items-center justify-between h-16">
                         {/* Mobile Burger Menu */}
                         <button
-                            className={`md:hidden transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}
+                            className={`md:hidden transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}
                             onClick={toggleMobileMenu}
                         >
                             <Menu size={24} />
@@ -244,7 +270,7 @@ export default function Navbar() {
                             <img
                                 src="/logo.png"
                                 alt="Venoire Logo"
-                                className={`h-10 w-auto transition-all duration-500 ${!showTopBars ? 'filter-none' : 'filter invert'}`}
+                                className={`h-10 w-auto transition-all duration-500 ${isHomePage && !showTopBars ? 'filter-none' : 'filter invert'}`}
                             />
                         </div>
 
@@ -258,7 +284,7 @@ export default function Navbar() {
                                     onMouseLeave={handleMouseLeave}
                                 >
                                     <button className={`transition-all duration-500 h-full px-6 font-normal border-b-3 flex items-center ${
-                                        !showTopBars 
+                                        isHomePage && !showTopBars 
                                             ? activeDropdown === item.name
                                                 ? 'text-black border-black bg-gray-100'
                                                 : 'text-black border-transparent hover:border-black hover:bg-gray-100'
@@ -284,13 +310,13 @@ export default function Navbar() {
                                     }
                                 }}
                                 className={`border rounded-md px-4 py-2 w-78 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-500 ${
-                                    !showTopBars 
+                                    isHomePage && !showTopBars 
                                         ? 'border-gray-300 bg-gray-50 text-black focus:ring-black placeholder-gray-500'
                                         : 'border-gray-600 bg-gray-800 text-white focus:ring-white placeholder-gray-400'
                                 }`}
                             />
                             <button className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-500 ${
-                                !showTopBars ? 'text-gray-600 hover:text-black' : 'text-gray-400 hover:text-gray-200'
+                                isHomePage && !showTopBars ? 'text-gray-600 hover:text-black' : 'text-gray-400 hover:text-gray-200'
                             }`}>
                                 <Search size={16} />
                             </button>
@@ -298,20 +324,20 @@ export default function Navbar() {
 
                         {/* Mobile Icons */}
                         <div className="flex md:hidden items-center space-x-4">
-                            <button className={`transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
+                            <button className={`transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
                                 <Search size={20} />
                             </button>
-                            <button className={`transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
+                            <button className={`transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
                                 <Heart size={20} />
                             </button>
-                            <button className={`transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
+                            <button className={`transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
                                 <ShoppingBag size={20} />
                             </button>
                         </div>
 
                         {/* Desktop Explore Luxury Button */}
                         <button className={`hidden md:flex px-4 py-2 rounded-md border hover:scale-105 transition-all duration-500 shadow-lg items-center space-x-2 font-lato-light cursor-pointer ${
-                            !showTopBars 
+                            isHomePage && !showTopBars 
                                 ? 'bg-white text-[#D4AF37] border-[#D4AF37] hover:bg-gray-50'
                                 : 'bg-black text-[#D4AF37] border-[#D4AF37] hover:bg-[#111]'
                         }`}>
@@ -325,7 +351,7 @@ export default function Navbar() {
             {/* 4th Level - Dropdown Menu - Desktop Only */}
             {activeDropdown && (
                 <div
-                    className={`hidden md:block ${!showTopBars ? 'w-[98%] mx-auto rounded-2xl' : 'w-full' }  bg-white border-b border-gray-200 shadow-lg ${!showTopBars ? 'pt-3' : ''}`}
+                    className={`hidden md:block ${isHomePage && !showTopBars ? 'w-[98%] mx-auto rounded-2xl' : 'w-full' }  bg-white border-b border-gray-200 shadow-lg ${isHomePage && !showTopBars ? 'pt-3' : ''}`}
                     onMouseEnter={() => setActiveDropdown(activeDropdown)}
                     onMouseLeave={handleMouseLeave}
                 >

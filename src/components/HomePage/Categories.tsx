@@ -1,5 +1,7 @@
+'use client'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { motion } from 'framer-motion'
 
 export default function Categories() {
     const router = useRouter()
@@ -45,11 +47,19 @@ export default function Categories() {
 
             {/* Categories Grid */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-8 max-w-7xl mx-auto">
-                {categories.map((category) => (
-                    <div
+                {categories.map((category, index) => (
+                    <motion.div
                         key={category.slug}
                         className="text-center cursor-pointer group transition-transform duration-300 hover:-translate-y-2"
                         onClick={() => handleCategoryClick(category.slug)}
+                        initial={{ opacity: 0, scale: 0.8, y: 50 }}
+                        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.3 }}
+                        transition={{ 
+                            duration: 0.5, 
+                            delay: index * 0.1,
+                            ease: "easeOut"
+                        }}
                     >
                         <div className="relative w-24 h-24 md:w-44 md:h-44 mx-auto mb-4 rounded-full overflow-hidden border-3 border-gray-200 group-hover:border-black group-hover:shadow-lg group-hover:shadow-[#D4AF37]/30 transition-all duration-300">
                             <img
@@ -63,7 +73,7 @@ export default function Categories() {
                             {category.name}
                         </h3>
                         
-                    </div>
+                    </motion.div>
                 ))}
             </div>
         </div>
