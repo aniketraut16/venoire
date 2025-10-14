@@ -3,6 +3,7 @@ import "./fonts.css";
 import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
+import SmoothScrolling from "@/components/common/SmoothScrolling";
 
 export const metadata: Metadata = {
   title: "Venoire",
@@ -21,9 +22,11 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <Navbar />
-        {children}
-        <Footer />
+        <SmoothScrolling>
+          <Navbar />
+          {children}
+          <Footer />
+        </SmoothScrolling>
       </body>
     </html>
   );

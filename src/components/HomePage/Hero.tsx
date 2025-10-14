@@ -29,7 +29,7 @@ export default function Hero() {
   ];
 
   return (
-    <div className="relative w-full mx-auto md:mx-auto mobile-full-width">
+    <div className="relative w-full h-[100vh] mx-auto md:mx-auto mobile-full-width">
       <Swiper
         cssMode={true}
         navigation={true}
@@ -54,7 +54,7 @@ export default function Hero() {
                 src={image}
                 alt={`Hero slide ${index + 1}`}
                 className="w-full h-full object-cover"
-                style={{ maxHeight: "90vh" }}
+                style={{ maxHeight: "100vh" }}
               />
               <div className="absolute inset-0 bg-black/20"></div>
             </div>
@@ -66,7 +66,7 @@ export default function Hero() {
       <style jsx global>{`
         .hero-swiper {
           width: 100%;
-          height: 90vh;
+          height: 100vh;
         }
         .hero-swiper .swiper-slide {
           width: 100%;

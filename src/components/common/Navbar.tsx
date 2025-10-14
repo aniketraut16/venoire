@@ -7,16 +7,40 @@ export default function Navbar() {
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [isScrolled, setIsScrolled] = useState(false)
+    const [showTopBars, setShowTopBars] = useState(false)
+    const [showPromoBar, setShowPromoBar] = useState(true)
+    const [lastScrollY, setLastScrollY] = useState(0)
     const router = useRouter();
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY
+            const viewportHeight = window.innerHeight
+            const tenVh = viewportHeight * 0.3
+            const sixtyVh = viewportHeight * 1
+            
             setIsScrolled(scrollTop > 500)
+            setShowTopBars(scrollTop > tenVh)
+            
+            // Handle promo bar visibility after 60vh
+            if (scrollTop > sixtyVh) {
+                if (scrollTop > lastScrollY) {
+                    // Scrolling down - hide promo bar
+                    setShowPromoBar(false)
+                } else {
+                    // Scrolling up - show promo bar
+                    setShowPromoBar(true)
+                }
+            } else {
+                // Below 60vh - always show promo bar (if showTopBars is true)
+                setShowPromoBar(true)
+            }
+            
+            setLastScrollY(scrollTop)
         }
 
         window.addEventListener('scroll', handleScroll)
         return () => window.removeEventListener('scroll', handleScroll)
-    }, [])
+    }, [lastScrollY])
 
     const handleMouseEnter = (item: string) => {
         setActiveDropdown(item)
@@ -138,7 +162,7 @@ export default function Navbar() {
     return (
         <div className="w-full fixed top-0 z-50">
             {/* 1st Level - Black Promo Strip with Golden Text */}
-            <div className={`bg-black text-yellow-400 py-1 overflow-hidden transition-all duration-300 ${isScrolled ? 'h-0 py-0 hidden' : 'h-auto py-1 opacity-100'}`}>
+            <div className={`bg-black text-yellow-400 overflow-hidden transition-all duration-300 ${!showTopBars || !showPromoBar ? 'h-0 py-0 opacity-0' : 'h-auto py-1 opacity-100'}`}>
                 <div className="animate-marquee whitespace-nowrap" style={{ animationDuration: '40s' }}>
                     <span className="text-sm">
                         {(() => {
@@ -154,7 +178,7 @@ export default function Navbar() {
             </div>
 
             {/* 2nd Level - Gray Top Bar with Icons - Desktop Only */}
-            <div className="hidden md:block bg-[#252525] text-white py-2">
+            <div className={`hidden md:block bg-[#252525] text-white transition-all duration-300 ${!showTopBars ? 'h-0 py-0 opacity-0 overflow-hidden' : 'h-auto py-2 opacity-100'}`}>
                 <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
                     {/* Left Side: Delivery Location */}
                     <div className="flex flex-col items-start">
@@ -202,12 +226,12 @@ export default function Navbar() {
             </div>
 
             {/* 3rd Level - Main Navbar */}
-            <div className="bg-black text-white border-b border-gray-200">
-                <div className="max-w-7xl mx-auto px-4">
+            <div className={`transition-all duration-500 ${!showTopBars ? 'bg-transparent pt-3 pb-1' : 'bg-black py-0'}`}>
+                <div className={`mx-auto px-4 transition-all duration-500 ${!showTopBars ? 'max-w-[98%] bg-white rounded-2xl shadow-lg' : 'max-w-7xl bg-black'}`}>
                     <div className="flex items-center justify-between h-16">
                         {/* Mobile Burger Menu */}
                         <button
-                            className="md:hidden text-white hover:text-gray-300 transition-colors"
+                            className={`md:hidden transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}
                             onClick={toggleMobileMenu}
                         >
                             <Menu size={24} />
@@ -220,7 +244,7 @@ export default function Navbar() {
                             <img
                                 src="/logo.png"
                                 alt="Venoire Logo"
-                                className="h-10 w-auto filter invert"
+                                className={`h-10 w-auto transition-all duration-500 ${!showTopBars ? 'filter-none' : 'filter invert'}`}
                             />
                         </div>
 
@@ -233,10 +257,15 @@ export default function Navbar() {
                                     onMouseEnter={() => handleMouseEnter(item.name)}
                                     onMouseLeave={handleMouseLeave}
                                 >
-                                    <button className={`text-white transition-all duration-300 h-full px-6 font-normal border-b-3 flex items-center ${activeDropdown === item.name
-                                        ? 'border-white bg-gray-800 text-white'
-                                        : 'border-transparent hover:border-white hover:bg-gray-800 hover:text-white'
-                                        }`}>
+                                    <button className={`transition-all duration-500 h-full px-6 font-normal border-b-3 flex items-center ${
+                                        !showTopBars 
+                                            ? activeDropdown === item.name
+                                                ? 'text-black border-black bg-gray-100'
+                                                : 'text-black border-transparent hover:border-black hover:bg-gray-100'
+                                            : activeDropdown === item.name
+                                                ? 'text-white border-white bg-gray-800'
+                                                : 'text-white border-transparent hover:border-white hover:bg-gray-800'
+                                    }`}>
                                         {item.name}
                                     </button>
                                 </div>
@@ -254,28 +283,38 @@ export default function Navbar() {
                                         router.push(`/search?query=${value}`);
                                     }
                                 }}
-                                className="border border-gray-600 bg-gray-800 text-white rounded-md px-4 py-2 w-78 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent placeholder-gray-400"
+                                className={`border rounded-md px-4 py-2 w-78 text-sm focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-500 ${
+                                    !showTopBars 
+                                        ? 'border-gray-300 bg-gray-50 text-black focus:ring-black placeholder-gray-500'
+                                        : 'border-gray-600 bg-gray-800 text-white focus:ring-white placeholder-gray-400'
+                                }`}
                             />
-                            <button className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-200">
+                            <button className={`absolute right-2 top-1/2 transform -translate-y-1/2 transition-colors duration-500 ${
+                                !showTopBars ? 'text-gray-600 hover:text-black' : 'text-gray-400 hover:text-gray-200'
+                            }`}>
                                 <Search size={16} />
                             </button>
                         </div>
 
                         {/* Mobile Icons */}
                         <div className="flex md:hidden items-center space-x-4">
-                            <button className="text-white hover:text-gray-300 transition-colors">
+                            <button className={`transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
                                 <Search size={20} />
                             </button>
-                            <button className="text-white hover:text-gray-300 transition-colors">
+                            <button className={`transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
                                 <Heart size={20} />
                             </button>
-                            <button className="text-white hover:text-gray-300 transition-colors">
+                            <button className={`transition-colors duration-500 ${!showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
                                 <ShoppingBag size={20} />
                             </button>
                         </div>
 
                         {/* Desktop Explore Luxury Button */}
-                        <button className="hidden md:flex bg-black text-[#D4AF37] px-4 py-2 rounded-md border border-[#D4AF37] hover:bg-[#111] hover:scale-105 transition-all shadow-lg items-center space-x-2 font-lato-light cursor-pointer">
+                        <button className={`hidden md:flex px-4 py-2 rounded-md border hover:scale-105 transition-all duration-500 shadow-lg items-center space-x-2 font-lato-light cursor-pointer ${
+                            !showTopBars 
+                                ? 'bg-white text-[#D4AF37] border-[#D4AF37] hover:bg-gray-50'
+                                : 'bg-black text-[#D4AF37] border-[#D4AF37] hover:bg-[#111]'
+                        }`}>
                             <Crown className="text-[#D4AF37]" />
                             <span className="tracking-wider">Explore Luxury</span>
                         </button>
@@ -286,7 +325,7 @@ export default function Navbar() {
             {/* 4th Level - Dropdown Menu - Desktop Only */}
             {activeDropdown && (
                 <div
-                    className="hidden md:block w-full bg-white border-b border-gray-200 shadow-lg"
+                    className={`hidden md:block ${!showTopBars ? 'w-[98%] mx-auto rounded-2xl' : 'w-full' }  bg-white border-b border-gray-200 shadow-lg ${!showTopBars ? 'pt-3' : ''}`}
                     onMouseEnter={() => setActiveDropdown(activeDropdown)}
                     onMouseLeave={handleMouseLeave}
                 >

@@ -10,7 +10,7 @@ import SignInRequest from "@/components/HomePage/SignInRequest";
 
 export default function HomePage() {
     return (
-        <div className="mt-20">
+        <div>
             <Hero />
             <Categories />
             <Divider />
