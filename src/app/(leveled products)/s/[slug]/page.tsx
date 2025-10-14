@@ -1,5 +1,5 @@
 import { getAllSubcategories } from "@/utils/subcategory";
-import SubCategoryPageContent from "@/pages/SubCategoryPage";
+import SubCategoryPageContent from "@/pagesview/SubCategoryPage";
 
 export async function generateStaticParams() {
     const subcategories = await getAllSubcategories();

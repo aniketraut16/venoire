@@ -1,5 +1,5 @@
 import { getProductsslugs } from '@/utils/products';
-import OneProductPage from '@/pages/OneProductPage';
+import OneProductPage from '@/pagesview/OneProductPage';
 
 
 export async function generateStaticParams() {

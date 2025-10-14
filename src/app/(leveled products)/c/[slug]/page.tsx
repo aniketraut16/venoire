@@ -1,5 +1,5 @@
 import { getAllCategories } from "@/utils/category";
-import CategoryPageContent from "@/pages/CategoryPage";
+import CategoryPageContent from "@/pagesview/CategoryPage";
 
 export async function generateStaticParams() {
     const categories = await getAllCategories();

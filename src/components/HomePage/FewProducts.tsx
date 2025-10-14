@@ -142,7 +142,7 @@ export default function FewProducts() {
               msOverflowStyle: 'none', 
               WebkitOverflowScrolling: 'touch',
               overscrollBehaviorX: 'contain',
-              overscrollBehaviorY: 'none'
+              // overscrollBehaviorY: 'none'
             }}
           >
             {products.map((product, index) => (

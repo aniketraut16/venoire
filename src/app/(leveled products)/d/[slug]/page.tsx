@@ -1,5 +1,5 @@
 import { getAllDepartments } from "@/utils/departments";
-import DepartmentPageContent from "@/pages/DepartmentPage";
+import DepartmentPageContent from "@/pagesview/DepartmentPage";
 
 export async function generateStaticParams() {
     const departments = await getAllDepartments();
