@@ -16,9 +16,10 @@ export default function HomePage() {
             <Divider />
             <Offers />
             <FewProducts />
-            {/* <Explore /> */}
-            <Divider />
+            {/* <Divider /> */}
+            <Explore />
             <SignInRequest />
+            <Divider />
             {/* <CategorizedProducts
                 title="Venoire's Most Loved"
                 description="Discover the favorites our customers can't get enough of. These best sellers are handpicked for their timeless style, premium quality, and exceptional value. "

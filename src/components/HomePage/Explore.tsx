@@ -2,7 +2,7 @@ import React from 'react'
 
 export default function Explore() {
     return (
-        <div className="flex justify-between max-w-7xl mx-auto mb-10">
+        <div className="flex justify-between max-w-7xl mx-auto mb-10 mt-10">
             {/* Left Column - Text Content (2 parts) */}
             <div className="w-[45%] bg-white flex  px-8 py-12 h-[85vh]">
                 <div className="max-w-md space-y-16">

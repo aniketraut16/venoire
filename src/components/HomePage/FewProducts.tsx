@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { getProducts } from '@/utils/products'
 import ProductCard from '../Product/ProductCard'
@@ -8,6 +8,7 @@ const categories = ['ALL', 'MEN', 'WOMEN', 'BOYS', 'GIRLS']
 
 export default function FewProducts() {
   const [activeCategory, setActiveCategory] = useState('ALL')
+  const [scrollProgress, setScrollProgress] = useState(0)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   
   // Get products based on active category - for demo using "Trending" catalog
@@ -15,6 +16,31 @@ export default function FewProducts() {
   
   // Products that should show "LAST FEW LEFT" badge (randomly selected for demo)
   const lastFewLeftProducts = [products[1]?.id, products[2]?.id, products[4]?.id]
+
+  // Calculate scroll progress
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollContainerRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
+        const maxScroll = scrollWidth - clientWidth
+        const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0
+        setScrollProgress(progress)
+      }
+    }
+
+    const container = scrollContainerRef.current
+    if (container) {
+      container.addEventListener('scroll', handleScroll)
+      // Initial calculation
+      handleScroll()
+    }
+
+    return () => {
+      if (container) {
+        container.removeEventListener('scroll', handleScroll)
+      }
+    }
+  }, [products])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -83,24 +109,22 @@ export default function FewProducts() {
           >
             {products.map((product) => (
               <div key={product.id} className="flex-none w-80 relative">
-                {/* Last Few Left Badge */}
-                {lastFewLeftProducts.includes(product.id) && (
-                  <div className="absolute top-4 left-4 z-20 bg-pink-500 text-white px-3 py-1 text-xs font-semibold rounded">
-                    LAST FEW LEFT
-                  </div>
-                )}
-                
-                {/* Product Card with custom styling for dark theme */}
-                
                   <ProductCard {...product} mode="light" />
-                
               </div>
             ))}
           </div>
         </div>
 
-        {/* Bottom Border Line */}
-        <div className="mt-12 border-b border-yellow-400/30"></div>
+        {/* Scroll Progress Indicator */}
+        <div className="mt-12 relative">
+          {/* Background track */}
+          <div className="w-full h-0.5 bg-yellow-400/30 rounded-full"></div>
+          {/* Progress bar */}
+          <div 
+            className="absolute top-0 left-0 h-0.5 bg-yellow-400 rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${scrollProgress}%` }}
+          ></div>
+        </div>
       </div>
 
       <style jsx>{`
