@@ -33,7 +33,7 @@ export function Offers() {
       </motion.div>
 
       {/* Collections Carousel */}
-      <div className="max-w-7xl mx-auto px-4 mb-16 ">
+      <div className="max-w-7xl mx-auto px-4 mb-16 relative">
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={20}
@@ -137,14 +137,18 @@ export function Offers() {
         @media (max-width: 768px) {
           .collections-swiper,
           .products-swiper {
-            padding: 0 40px;
+            padding: 0 10px;
           }
         }
 
         @media (max-width: 640px) {
           .collections-swiper,
           .products-swiper {
-            padding: 0 30px;
+            padding: 0;
+          }
+          .collections-next,
+          .collections-prev {
+            display: none !important;
           }
         }
       `}</style>

@@ -252,12 +252,12 @@ export default function Navbar() {
             </div>
 
             {/* 3rd Level - Main Navbar */}
-            <div className={`transition-all duration-500 ${isHomePage && !showTopBars ? 'bg-transparent pt-3 pb-1' : 'bg-black py-0'}`}>
-                <div className={`mx-auto px-4 transition-all duration-500 ${isHomePage && !showTopBars ? 'max-w-[98%] bg-white rounded-2xl shadow-lg' : 'max-w-7xl bg-black'}`}>
+            <div className={`transition-all duration-500 ${isHomePage && !showTopBars ? 'bg-transparent md:pt-3 md:pb-1' : 'bg-black py-0'}`}>
+                <div className={`mx-auto px-4 transition-all duration-500 ${isHomePage && !showTopBars ? 'max-w-7xl md:max-w-[98%] bg-black md:bg-white md:rounded-2xl md:shadow-lg' : 'max-w-7xl bg-black'}`}>
                     <div className="flex items-center justify-between h-16">
                         {/* Mobile Burger Menu */}
                         <button
-                            className={`md:hidden transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}
+                            className="md:hidden transition-colors duration-500 text-white hover:text-gray-300"
                             onClick={toggleMobileMenu}
                         >
                             <Menu size={24} />
@@ -270,7 +270,7 @@ export default function Navbar() {
                             <img
                                 src="/logo.png"
                                 alt="Venoire Logo"
-                                className={`h-10 w-auto transition-all duration-500 ${isHomePage && !showTopBars ? 'filter-none' : 'filter invert'}`}
+                                className={`h-10 w-auto transition-all duration-500 filter invert md:filter-none ${isHomePage && !showTopBars ? 'md:filter-none' : 'md:filter md:invert'}`}
                             />
                         </div>
 
@@ -324,13 +324,13 @@ export default function Navbar() {
 
                         {/* Mobile Icons */}
                         <div className="flex md:hidden items-center space-x-4">
-                            <button className={`transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
+                            <button className="transition-colors duration-500 text-white hover:text-gray-300">
                                 <Search size={20} />
                             </button>
-                            <button className={`transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
+                            <button className="transition-colors duration-500 text-white hover:text-gray-300">
                                 <Heart size={20} />
                             </button>
-                            <button className={`transition-colors duration-500 ${isHomePage && !showTopBars ? 'text-black hover:text-gray-600' : 'text-white hover:text-gray-300'}`}>
+                            <button className="transition-colors duration-500 text-white hover:text-gray-300">
                                 <ShoppingBag size={20} />
                             </button>
                         </div>

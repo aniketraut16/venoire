@@ -29,7 +29,7 @@ export default function Hero() {
   ];
 
   return (
-    <div className="relative w-full h-[100vh] mx-auto md:mx-auto mobile-full-width">
+    <div className="relative w-full h-[70vh] md:h-[100vh] mx-auto md:mx-auto mobile-full-width">
       <Swiper
         cssMode={true}
         navigation={true}
@@ -66,11 +66,16 @@ export default function Hero() {
       <style jsx global>{`
         .hero-swiper {
           width: 100%;
-          height: 100vh;
+          height: 70vh;
         }
         .hero-swiper .swiper-slide {
           width: 100%;
           height: 100%;
+        }
+        @media (min-width: 768px) {
+          .hero-swiper {
+            height: 100vh;
+          }
         }
         .swiper-pagination-bullet {
           width: 8px;
@@ -130,7 +135,7 @@ export default function Hero() {
             position: relative;
           }
           .hero-swiper {
-            height: 100vh;
+            height: 70vh;
             width: 100vw;
           }
           .hero-swiper .swiper-slide {
@@ -139,7 +144,7 @@ export default function Hero() {
           }
           .hero-swiper .swiper-slide img {
             width: 100vw;
-            height: 100vh;
+            height: 70vh;
             object-fit: cover;
           }
           .swiper-button-next,

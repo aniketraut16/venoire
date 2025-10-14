@@ -10,9 +10,23 @@ import SignInRequest from "@/components/HomePage/SignInRequest";
 
 export default function HomePage() {
     return (
-        <div>
-            <Hero />
-            <Categories />
+        <div className="mt-12 md:mt-0">
+            {/* Mobile: Categories first, Desktop: Hero first */}
+            <div className="md:hidden">
+                <Categories />
+            </div>
+            <div className="hidden md:block">
+                <Hero />
+            </div>
+            
+            {/* Mobile: Hero second, Desktop: Categories second */}
+            <div className="md:hidden">
+                <Hero />
+            </div>
+            <div className="hidden md:block">
+                <Categories />
+            </div>
+            
             <Divider />
             <Offers />
             <FewProducts />
