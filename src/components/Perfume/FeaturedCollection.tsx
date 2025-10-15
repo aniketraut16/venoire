@@ -83,6 +83,16 @@ export default function FeaturedCollection() {
             </div>
           ))}
         </div>
+        
+        {/* View All Collections Button */}
+        <div className="text-center mt-12">
+          <Link 
+            href="/perfume/collection?id=c0"
+            className="inline-block bg-[#ff5900] hover:bg-[#ff6b1a] text-white font-bold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
+          >
+            View All Collections
+          </Link>
+        </div>
       </div>
     </section>
   );
