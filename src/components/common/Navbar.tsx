@@ -20,7 +20,7 @@ export default function Navbar() {
             const viewportHeight = window.innerHeight
             const tenVh = viewportHeight * 0.3
             const oneVh = viewportHeight * 1
-            const scrollThreshold = 5 // Minimum scroll distance to detect direction
+            const scrollThreshold = 5 
             
             setIsScrolled(scrollTop > 500)
             
@@ -270,7 +270,7 @@ export default function Navbar() {
                             <img
                                 src="/logo.png"
                                 alt="Venoire Logo"
-                                className={`h-10 w-auto transition-all duration-500 filter invert md:filter-none ${isHomePage && !showTopBars ? 'md:filter-none' : 'md:filter md:invert'}`}
+                                className={`h-10 w-auto transition-all duration-500 ${isHomePage && !showTopBars ? 'filter-none' : 'filter invert'}`}
                             />
                         </div>
 
@@ -321,6 +321,36 @@ export default function Navbar() {
                                 <Search size={16} />
                             </button>
                         </div>
+
+                        {/* Desktop Icons for White Navbar (Initial State) */}
+                        {isHomePage && !showTopBars && (
+                            <div className="hidden md:flex items-center space-x-4">
+                                <button 
+                                    className="text-black hover:text-gray-600 transition-colors"
+                                    onClick={() => router.push('/auth')}
+                                >
+                                    <User size={20} />
+                                </button>
+                                <button 
+                                    className="text-black hover:text-gray-600 transition-colors relative"
+                                    onClick={() => router.push('/wishlist')}
+                                >
+                                    <Heart size={20} />
+                                    <span className="absolute -top-2 -right-3 bg-[#D4AF37] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                                        3
+                                    </span>
+                                </button>
+                                <button 
+                                    className="text-black hover:text-gray-600 transition-colors relative"
+                                    onClick={() => router.push('/cart')}
+                                >
+                                    <ShoppingBag size={20} />
+                                    <span className="absolute -top-2 -right-3 bg-[#D4AF37] text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center">
+                                        3
+                                    </span>
+                                </button>
+                            </div>
+                        )}
 
                         {/* Mobile Icons */}
                         <div className="flex md:hidden items-center space-x-4">
