@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
+import { Perfume } from "@/types/perfume";
 
 interface OnePerfumecardProps {
   perfume: Perfume;
