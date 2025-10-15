@@ -1,4 +1,4 @@
-type Perfume = {
+export type Perfume = {
     id: string;
     name: string;
     slug: string;
@@ -19,7 +19,7 @@ type Perfume = {
     brandAndManufacturerInfo: string;
 }
 
-type PerfumeCollection = {
+export type PerfumeCollection = {
     id: string;
     name: string;
     description: string;

@@ -1,3 +1,5 @@
+import { Perfume } from "@/types/perfume";
+import { PerfumeCollection } from "@/types/perfume";
 const perfumes: Perfume[] = [
   {
     id: "1",
@@ -578,6 +580,10 @@ function getPerfumesByCollection(collectionId: string) {
   };
 }
 
+function getTopPerfumes() {
+  return perfumes.slice(0, 4);
+}
+
 function getAllCollections() {
   return perfumeCollections.map((collection) => ({
     id: collection.id,
@@ -598,4 +604,4 @@ function getPerfumeBySlug(slug: string) {
 }
 
 // Export all data
-export { getPerfumesByCollection, getAllCollections, perfumeslugcdn, getPerfumeBySlug };
+export { getPerfumesByCollection, getAllCollections, perfumeslugcdn, getPerfumeBySlug, getTopPerfumes };

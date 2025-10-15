@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation';
 import { getPerfumeBySlug } from '@/utils/perfume';
-import Image from 'next/image';
+import { Perfume } from '@/types/perfume';
 import { FiMinus, FiPlus, FiPackage, FiTruck, FiRefreshCw } from 'react-icons/fi';
 
 export default function OnePerfumePage() {

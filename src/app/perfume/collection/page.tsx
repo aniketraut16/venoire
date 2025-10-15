@@ -4,7 +4,8 @@ import { getAllCollections, getPerfumesByCollection } from "@/utils/perfume";
 import { useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useState } from "react";
 import OnePerfumecard from "@/components/Perfume/OnePerfumecard";
-import Image from "next/image";
+import { PerfumeCollection } from "@/types/perfume";
+import { Perfume } from "@/types/perfume";
 import { FiSearch, FiFilter, FiChevronRight } from "react-icons/fi";
 
 const CollectionPageContent = () => {

@@ -10,36 +10,42 @@ export default function Categories() {
             slug: 'mens',
             name: 'Mens',
             image: '/category/mens.jpg',
-            description: 'Premium menswear collection'
+            description: 'Premium menswear collection',
+            link: '/d/mens'
+
         },
         {
             slug: 'womens',
             name: 'Womens',
             image: '/category/womens.png',
-            description: 'Elegant womens fashion'
+            description: 'Elegant womens fashion',
+            link: '/d/womens'
         },
         {
             slug: 'kids',
             name: 'Kids',
             image: '/category/kids.jpeg',
-            description: 'Stylish kids clothing'
+            description: 'Stylish kids clothing',
+            link: '/d/kids'
         },
         {
             slug: 'perfumes',
             name: 'Perfumes',
             image: '/category/perfumes.jpg',
-            description: 'Luxury perfumes'
+            description: 'Luxury perfumes',
+            link: '/perfume'
         },
         {
             slug: 'gifts',
             name: 'Gifts',
             image: '/category/gifts.jpg',
-            description: 'Luxury gifts'
+            description: 'Luxury gifts',
+            link: '/d/gifts'
         }
     ]
 
-    const handleCategoryClick = (categoryId: string) => {
-        router.push(`/d/${categoryId}`)
+    const handleCategoryClick = (link: string) => {
+        router.push(link)
     }
 
     return (
@@ -83,7 +89,7 @@ export default function Categories() {
                     <motion.div
                         key={category.slug}
                         className="text-center cursor-pointer group transition-transform duration-300 hover:-translate-y-2"
-                        onClick={() => handleCategoryClick(category.slug)}
+                        onClick={() => handleCategoryClick(category.link)}
                         initial={{ opacity: 0, scale: 0.8, y: 50 }}
                         whileInView={{ opacity: 1, scale: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.3 }}
