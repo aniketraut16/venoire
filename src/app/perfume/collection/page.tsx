@@ -103,12 +103,10 @@ const CollectionPageContent = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner with Cover Image */}
       <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-red-500 to-orange-500 overflow-hidden">
-        <Image
+        <img
           src={collection.coverImage}
           alt={collection.name}
-          fill
-          className="object-cover opacity-40"
-          priority
+          className="object-cover w-full h-full opacity-90"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">

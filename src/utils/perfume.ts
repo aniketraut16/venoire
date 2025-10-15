@@ -486,7 +486,7 @@ const perfumeCollections: PerfumeCollection[] = [
     id: "c0",
     name: "All Perfumes",
     description: "A collection of all perfumes",
-    coverImage: "/images/festive-collection.jpg",
+    coverImage: "https://static.vecteezy.com/system/resources/previews/030/200/785/non_2x/banner-features-a-selection-of-fragrances-in-elegant-bottles-generative-ai-photo.jpg",
     perfumes: [
       perfumes[0], // Mystic Dawn
       perfumes[1], // Velvet Oud
@@ -593,6 +593,9 @@ function perfumeslugcdn() {
     slug: perfume.slug,
   }));
 }
+function getPerfumeBySlug(slug: string) {
+  return perfumes.find((perfume) => perfume.slug === slug);
+}
 
 // Export all data
-export { getPerfumesByCollection, getAllCollections, perfumeslugcdn };
+export { getPerfumesByCollection, getAllCollections, perfumeslugcdn, getPerfumeBySlug };

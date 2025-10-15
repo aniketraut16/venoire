@@ -65,10 +65,9 @@ function FeatureCard({ item }: { item: typeof featureItems[0] }) {
     <div className={`${item.span} relative group overflow-hidden rounded-lg min-h-[240px] md:min-h-[320px]`}>
       {/* Image */}
       <div className="absolute inset-0">
-        <Image
+        <img
           src={item.src}
           alt={item.title}
-          fill
           className="object-cover"
         />
       </div>

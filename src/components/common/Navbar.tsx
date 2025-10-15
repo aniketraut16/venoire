@@ -13,7 +13,7 @@ export default function Navbar() {
     const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up')
     const router = useRouter();
     const pathname = usePathname();
-    const isHomePage = pathname === '/' || pathname === '/perfume';
+    const isHomePage = pathname === '/' || pathname.startsWith('/perfume');
     useEffect(() => {
         const handleScroll = () => {
             const scrollTop = window.scrollY

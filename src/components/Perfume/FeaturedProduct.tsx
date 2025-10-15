@@ -9,10 +9,9 @@ export default function FeaturedProduct() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
           {/* Image */}
           <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
-            <Image
+            <img
               src="/perfume/perfume-personlize.png"
               alt="Create Your Signature Scent"
-              fill
               className="object-cover"
             />
           </div>
