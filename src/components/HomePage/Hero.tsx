@@ -63,11 +63,6 @@ export default function Hero() {
     >
       <Swiper
         cssMode={true}
-        // navigation={true}
-        // pagination={{
-        //   clickable: true,
-        // }}
-        // mousewheel={true}
         keyboard={true}
         modules={[Navigation, Pagination, Mousewheel, Keyboard, Autoplay]}
         autoplay={{
