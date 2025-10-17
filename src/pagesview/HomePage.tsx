@@ -7,7 +7,7 @@ import FewProducts from "@/components/HomePage/FewProducts";
 import Divider from "@/components/HomePage/divider";
 import SignInRequest from "@/components/HomePage/SignInRequest";
 import LittleAboutUs from "@/components/HomePage/LittleAboutUs";
-import FewPerfumes from "./FewPerfumes";
+import FewPerfumes from "@/components/HomePage/FewPerfumes";
 import InstaReels from "@/components/HomePage/InstaReels";
 export default function HomePage() {
   return (

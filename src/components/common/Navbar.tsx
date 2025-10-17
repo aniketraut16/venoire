@@ -3,12 +3,14 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, User, ShoppingBag, Menu, X } from 'lucide-react'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 
 export default function Navbar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
     const [scrollPosition, setScrollPosition] = useState(0)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null)
+    const pathname = usePathname()
 
     useEffect(() => {
         const handleScroll = () => {
@@ -19,6 +21,11 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
+    // Check if we're on home page or perfume pages
+    const isHomePage = pathname === '/'
+    const isPerfumePage = pathname?.startsWith('/perfume')
+    const shouldUseScrollEffect = isHomePage || isPerfumePage
+
     // Calculate opacity based on scroll position
     // 0-70vh: transparent (opacity 0)
     // 70vh-100vh: gradually white (opacity 0 to 1)
@@ -26,13 +33,15 @@ export default function Navbar() {
     const startFade = viewportHeight * 0.7
     const endFade = viewportHeight
     
-    const bgOpacity = scrollPosition < startFade 
-        ? 0 
-        : scrollPosition >= endFade 
-        ? 1 
-        : (scrollPosition - startFade) / (endFade - startFade)
+    const bgOpacity = shouldUseScrollEffect 
+        ? (scrollPosition < startFade 
+            ? 0 
+            : scrollPosition >= endFade 
+            ? 1 
+            : (scrollPosition - startFade) / (endFade - startFade))
+        : 1 // Always white on other pages
     
-    const isTransparent = bgOpacity < 0.5
+    const isTransparent = shouldUseScrollEffect && bgOpacity < 0.5
     const textColor = isTransparent ? 'text-white' : 'text-black'
     const borderColor = isTransparent ? 'border-white/20' : 'border-gray-200'
 
@@ -114,18 +123,18 @@ export default function Navbar() {
     return (
         <>
             <nav 
-                className={`fixed top-0 left-0 right-0  ${borderColor} z-50 transition-colors duration-300`}
+                className={`fixed top-0 left-0 right-0 ${borderColor} z-50 transition-colors duration-300`}
                 style={{ backgroundColor: `rgba(255, 255, 255, ${bgOpacity})` }}
             >
-                <div className="max-w-[1920px] mx-auto px-16 h-20">
+                <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16 h-16 sm:h-18 md:h-20">
                     <div className="flex items-center justify-between h-full relative">
                         {/* Mobile Menu Button (Left Side) */}
-                        <div className="flex items-center gap-4 md:hidden">
+                        <div className="flex items-center gap-3 md:hidden">
                             <button 
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className={`${textColor} hover:opacity-70 transition-opacity`}
+                                className={`${textColor} hover:opacity-70 transition-opacity p-1`}
                             >
-                                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                                {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
                             </button>
                         </div>
 
@@ -155,14 +164,14 @@ export default function Navbar() {
                                     alt="Venoire" 
                                     width={180} 
                                     height={50}
-                                    className="h-10 w-auto object-contain"
+                                    className="h-8 sm:h-9 md:h-10 w-auto object-contain"
                                     style={isTransparent ? { filter: 'brightness(0) invert(1)' } : {}}
                                 />
                             </Link>
                         </div>
 
                         {/* RIGHT SECTION - Desktop Only */}
-                        <div className="hidden md:flex items-center gap-8 flex-1 justify-end">
+                        <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1 justify-end">
                             {/* Explore Links */}
                             <Link 
                                 href="/collections" 
@@ -198,12 +207,13 @@ export default function Navbar() {
                         </div>
 
                         {/* Mobile Icons (Right Side) */}
-                        <div className="flex items-center gap-4 md:hidden">
-                            <Link href="/auth" className={`${textColor} transition-opacity hover:opacity-70`}>
+                        <div className="flex items-center gap-3 sm:gap-4 md:hidden">
+                            <Link href="/auth" className={`${textColor} transition-opacity hover:opacity-70 p-1`}>
                                 <User size={20} strokeWidth={1.5} />
                             </Link>
-                            <Link href="/cart" className={`${textColor} transition-opacity hover:opacity-70`}>
+                            <Link href="/cart" className={`${textColor} transition-opacity hover:opacity-70 relative p-1`}>
                                 <ShoppingBag size={20} strokeWidth={1.5} />
+                                <span className={`absolute -top-1 -right-1 text-[9px] font-medium ${textColor}`}>(0)</span>
                             </Link>
                         </div>
                     </div>
@@ -247,16 +257,30 @@ export default function Navbar() {
 
             {/* Mobile Sidebar Menu */}
             <div
-                className={`fixed top-20 left-0 bottom-0 w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 md:hidden overflow-y-auto ${
+                className={`fixed top-16 sm:top-18 md:top-20 left-0 bottom-0 w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 md:hidden overflow-y-auto ${
                     isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                <div className="p-6">
-                    {/* Mobile Contact Link */}
-                    <div className="mb-6 pb-4 border-b border-gray-200">
+                <div className="p-4 sm:p-6">
+                    {/* Mobile Explore Links - Moved to Top */}
+                    <div className="mb-6 pb-4 border-b border-gray-200 space-y-3">
+                        <Link
+                            href="/collections"
+                            className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            NEW ARRIVALS
+                        </Link>
+                        <Link
+                            href="/luxury"
+                            className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            EXPLORE LUXURY
+                        </Link>
                         <Link
                             href="/contact"
-                            className="block text-sm font-semibold tracking-wide hover:text-gray-600"
+                            className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             CONTACT
@@ -264,22 +288,24 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile Menu Items */}
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                         {menuItems.map((item) => (
-                            <div key={item.name} className="border-b border-gray-200 pb-4">
+                            <div key={item.name} className="border-b border-gray-200 pb-3">
                                 <button
                                     onClick={() => setExpandedMobileMenu(expandedMobileMenu === item.name ? null : item.name)}
-                                    className="flex items-center justify-between w-full text-left font-semibold text-base tracking-wide mb-2"
+                                    className="flex items-center justify-between w-full text-left font-semibold text-sm sm:text-base tracking-wider mb-2 hover:text-gray-600 transition-colors uppercase"
                                 >
                                     {item.name}
-                                    <span className="text-xl">{expandedMobileMenu === item.name ? '−' : '+'}</span>
+                                    <span className="text-lg sm:text-xl transition-transform duration-200" style={{ transform: expandedMobileMenu === item.name ? 'rotate(180deg)' : 'rotate(0)' }}>
+                                        {expandedMobileMenu === item.name ? '−' : '+'}
+                                    </span>
                                 </button>
                                 
                                 {expandedMobileMenu === item.name && (
-                                    <div className="mt-4 space-y-4 pl-2">
+                                    <div className="mt-3 space-y-3 pl-2 animate-slideDown">
                                         {item.sections.map((section, idx) => (
                                             <div key={idx}>
-                                                <h4 className="text-sm font-semibold mb-2 text-gray-900">
+                                                <h4 className="text-xs sm:text-sm font-semibold mb-2 text-gray-900 tracking-wide">
                                                     {section.title}
                                                 </h4>
                                                 <ul className="space-y-1.5 pl-2">
@@ -287,7 +313,7 @@ export default function Navbar() {
                                                         <li key={subIdx}>
                                                             <Link
                                                                 href="#"
-                                                                className="text-sm text-gray-600 hover:text-black"
+                                                                className="text-xs sm:text-sm text-gray-600 hover:text-black transition-colors block py-0.5"
                                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                             >
                                                                 {subsection}
@@ -303,39 +329,21 @@ export default function Navbar() {
                         ))}
                     </div>
 
-                    {/* Mobile Explore Links */}
-                    <div className="mt-8 space-y-4 border-t border-gray-200 pt-6">
-                        <Link
-                            href="/collections"
-                            className="block text-sm font-semibold tracking-wide hover:text-gray-600"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            THE MAISON
-                        </Link>
-                        <Link
-                            href="/luxury"
-                            className="block text-sm font-semibold tracking-wide hover:text-gray-600"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            JOIN THE CIRCLE
-                        </Link>
-                    </div>
-
                     {/* Mobile Search & Wishlist */}
-                    <div className="mt-8 border-t border-gray-200 pt-6 space-y-4">
-                        <button className="flex items-center gap-3 text-sm font-medium hover:text-gray-600 w-full">
+                    <div className="mt-6 border-t border-gray-200 pt-6 space-y-3">
+                        <button className="flex items-center gap-3 text-xs sm:text-sm font-medium hover:text-gray-600 w-full transition-colors py-2">
                             <Search size={20} strokeWidth={1.5} />
-                            <span>Search</span>
+                            <span className="tracking-wide uppercase">Search</span>
                         </button>
                         <Link
                             href="/wishlist"
-                            className="flex items-center gap-3 text-sm font-medium hover:text-gray-600"
+                            className="flex items-center gap-3 text-xs sm:text-sm font-medium hover:text-gray-600 transition-colors py-2"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
-                            <span>Wishlist</span>
+                            <span className="tracking-wide uppercase">Wishlist</span>
                         </Link>
                     </div>
                 </div>

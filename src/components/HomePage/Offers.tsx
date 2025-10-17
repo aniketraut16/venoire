@@ -18,22 +18,22 @@ export function Offers() {
     <div className="w-full bg-white">
       {/* Header Section */}
       <motion.div 
-        className="text-center py-12 px-4"
+        className="text-center py-8 sm:py-10 md:py-12 px-4 sm:px-6"
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h1 className="text-2xl md:text-4xl font-semibold text-gray-900 mb-3 tracking-wide">
+        <h1 className="text-2xl  lg:text-3xl xl:text-4xl font-semibold text-gray-900 mb-2 sm:mb-3 tracking-wide px-2">
           DISCOVER OUR ONLINE EXCLUSIVE COLLECTIONS
         </h1>
-        <p className="text-sm md:text-base text-gray-600">
+        <p className="text-base text-gray-600 px-4">
           Elevate Your Style: Shop the Freshest Styles from our Online Exclusive Collections
         </p>
       </motion.div>
 
       {/* Collections Carousel */}
-      <div className="max-w-7xl mx-auto px-4 mb-16 relative">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 mb-12 sm:mb-14 md:mb-16 relative">
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={20}
@@ -52,9 +52,13 @@ export function Offers() {
           }}
           loop={true}
           breakpoints={{
+            480: {
+              slidesPerView: 1.5,
+              spaceBetween: 12,
+            },
             640: {
               slidesPerView: 2,
-              spaceBetween: 20,
+              spaceBetween: 16,
             },
             1024: {
               slidesPerView: 3,
@@ -84,8 +88,8 @@ export function Offers() {
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
-                <div className="absolute bottom-6 left-6">
-                  <button className="bg-white text-gray-900 px-6 py-2.5 text-sm font-medium tracking-wider hover:bg-gray-100 transition-colors">
+                <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 left-3 sm:left-4 md:left-6">
+                  <button className="bg-white text-gray-900 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 text-xs sm:text-sm font-medium tracking-wider hover:bg-gray-100 transition-colors">
                     {collection.title}
                   </button>
                 </div>
@@ -95,16 +99,16 @@ export function Offers() {
         </Swiper>
 
         {/* Custom Pagination */}
-        <div className="collections-pagination flex justify-center mt-6"></div>
+        <div className="collections-pagination flex justify-center mt-4 sm:mt-5 md:mt-6"></div>
 
-        {/* Custom Navigation Arrows */}
-        <button className="collections-prev absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Custom Navigation Arrows - Hidden on Mobile */}
+        <button className="collections-prev hidden sm:flex absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white w-8 h-8 md:w-10 md:h-10 rounded-full items-center justify-center shadow-lg transition-all">
+          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <button className="collections-next absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg transition-all">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button className="collections-next hidden sm:flex absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white w-8 h-8 md:w-10 md:h-10 rounded-full items-center justify-center shadow-lg transition-all">
+          <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -137,18 +141,21 @@ export function Offers() {
         @media (max-width: 768px) {
           .collections-swiper,
           .products-swiper {
-            padding: 0 10px;
+            padding: 0 8px;
           }
         }
 
         @media (max-width: 640px) {
           .collections-swiper,
           .products-swiper {
-            padding: 0;
+            padding: 0 4px;
           }
-          .collections-next,
-          .collections-prev {
-            display: none !important;
+        }
+        
+        @media (max-width: 480px) {
+          .collections-swiper,
+          .products-swiper {
+            padding: 0;
           }
         }
       `}</style>
