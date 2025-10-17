@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -19,23 +19,54 @@ import type { Swiper as SwiperType } from "swiper";
 
 export default function Hero() {
   const swiperRef = useRef<SwiperType | null>(null);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const [scrollScale, setScrollScale] = useState(1);
 
   const heroImages = [
-    "/banner1.png",
-    "/banner2.png",
-    "/banner3.png",
-    "/banner4.png",
-    "/banner5.png",
+    "/banner1.jpg",
+    "/banner2.jpg",
+    "/banner3.jpg",
+    "/banner4.jpg",
   ];
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        const elementTop = rect.top;
+        const elementHeight = rect.height;
+        const windowHeight = window.innerHeight;
+
+        // Calculate scroll progress (0 to 1)
+        // When element is at top of screen, progress = 1
+        // When element is at bottom of screen, progress = 0
+        const scrollProgress = Math.max(
+          0,
+          Math.min(1, (windowHeight - elementTop) / (windowHeight + elementHeight))
+        );
+
+        // Scale from 1 to 1.8 based on scroll progress
+        const scale = 1 + scrollProgress * 0.8;
+        setScrollScale(scale);
+      }
+    };
+
+    handleScroll(); // Initial call
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="relative w-full h-[70vh] md:h-[100vh] mx-auto md:mx-auto mobile-full-width">
+    <div 
+      ref={heroRef}
+      className="relative w-full h-[70vh] md:h-[100vh] mx-auto md:mx-auto mobile-full-width overflow-hidden"
+    >
       <Swiper
         cssMode={true}
-        navigation={true}
-        pagination={{
-          clickable: true,
-        }}
+        // navigation={true}
+        // pagination={{
+        //   clickable: true,
+        // }}
         // mousewheel={true}
         keyboard={true}
         modules={[Navigation, Pagination, Mousewheel, Keyboard, Autoplay]}
@@ -53,8 +84,12 @@ export default function Hero() {
               <img
                 src={image}
                 alt={`Hero slide ${index + 1}`}
-                className="w-full h-full object-cover"
-                style={{ maxHeight: "100vh" }}
+                className="w-full h-full object-contain transition-transform duration-100 ease-out"
+                style={{ 
+                  maxHeight: "100vh",
+                  transform: `scale(${scrollScale})`,
+                  transformOrigin: "center center"
+                }}
               />
               <div className="absolute inset-0 bg-black/20"></div>
             </div>
@@ -99,9 +134,9 @@ export default function Hero() {
           color: #fff !important;
           width: 44px !important;
           height: 44px !important;
-          border: 1px solid #fff;
+    
           background: transparent !important;
-          border-radius: 50%;
+         
           padding: 12px;
           top: 50% !important;
           transform: translateY(-50%) !important;
@@ -109,7 +144,7 @@ export default function Hero() {
         }
         .swiper-button-next::after,
         .swiper-button-prev::after {
-          font-size: 20px !important;
+          font-size: 24px !important;
           font-weight: 900 !important;
         }
         /* Hide any default navigation styles */
