@@ -24,11 +24,8 @@ export default function Navbar() {
     // Check if we're on home page or perfume pages
     const isHomePage = pathname === '/'
     const isPerfumePage = pathname?.startsWith('/perfume')
-    const shouldUseScrollEffect = isHomePage || isPerfumePage
+    const shouldUseScrollEffect = isHomePage || isPerfumePage 
 
-    // Calculate opacity based on scroll position
-    // 0-70vh: transparent (opacity 0)
-    // 70vh-100vh: gradually white (opacity 0 to 1)
     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 1000
     const startFade = viewportHeight * 0.7
     const endFade = viewportHeight
@@ -123,7 +120,7 @@ export default function Navbar() {
     return (
         <>
             <nav 
-                className={`fixed top-0 left-0 right-0 ${borderColor} z-50 transition-colors duration-300`}
+                className={`fixed top-0 left-0 right-0 ${borderColor} z-50 transition-colors duration-300 ${bgOpacity > 0.5 ? 'shadow-lg' : ''}`}
                 style={{ backgroundColor: `rgba(255, 255, 255, ${bgOpacity})` }}
             >
                 <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16 h-16 sm:h-18 md:h-20">
@@ -181,9 +178,9 @@ export default function Navbar() {
                             </Link>
                             <Link 
                                 href="/luxury" 
-                                className={`text-xs font-medium tracking-widest transition-colors uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
+                                className={`text-xl league-script-regular font-medium tracking-widest transition-colors  ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
                             >
-                                EXPLORE LUXURY
+                                Explore Luxury
                             </Link>
                             
                             {/* Icons */}
@@ -276,7 +273,7 @@ export default function Navbar() {
                             className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
-                            EXPLORE LUXURY
+                            Explore Luxury
                         </Link>
                         <Link
                             href="/contact"

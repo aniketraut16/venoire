@@ -1,6 +1,7 @@
 'use client'
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 const perfumeQualities = [
   {
@@ -34,22 +35,41 @@ export default function FewPerfumes() {
     <section className="w-full py-8 sm:py-12 md:py-16 bg-gradient-to-b from-white to-gray-50">
       {/* Header Section */}
       <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-32 text-center">
-        <h2 className="text-5xl xl:text-6xl font-light tracking-tight mb-4 sm:mb-5 md:mb-6">
+        <motion.h2 
+          className="text-5xl xl:text-6xl font-light tracking-tight mb-4 sm:mb-5 md:mb-6"
+          initial={{ opacity: 0, y: -30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+        >
           The Art of
           <span className="block font-serif italic text-5xl xl:text-6xl mt-1 sm:mt-2">
             Perfumery
           </span>
-        </h2>
-        <p className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed mb-6 sm:mb-7 md:mb-8 max-w-2xl mx-auto px-2">
+        </motion.h2>
+        <motion.p 
+          className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed mb-6 sm:mb-7 md:mb-8 max-w-2xl mx-auto px-2"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
+        >
           Discover the exceptional qualities that make our fragrances a testament to luxury, 
           craftsmanship, and timeless elegance. Each bottle tells a unique story.
-        </p>
-        <Link
-          href="/perfume"
-          className="inline-block px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-black text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors duration-300"
+        </motion.p>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
         >
-          Explore Collection
-        </Link>
+          <Link
+            href="/perfume"
+            className="inline-block px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-black text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors duration-300"
+          >
+            Explore Collection
+          </Link>
+        </motion.div>
       </div>
 
       {/* ScrollStack Section */}
