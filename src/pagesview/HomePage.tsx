@@ -8,6 +8,7 @@ import Divider from "@/components/HomePage/divider";
 import SignInRequest from "@/components/HomePage/SignInRequest";
 import LittleAboutUs from "@/components/HomePage/LittleAboutUs";
 import FewPerfumes from "./FewPerfumes";
+import InstaReels from "@/components/HomePage/InstaReels";
 export default function HomePage() {
   return (
     <div>
@@ -20,7 +21,7 @@ export default function HomePage() {
       <FewProducts />
       <Explore />
       <SignInRequest />
-      <Divider />
+      <InstaReels />
     </div>
   );
 }
