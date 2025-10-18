@@ -46,7 +46,6 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
   // Focus input when popup opens and handle body scroll and smooth scrolling
   useEffect(() => {
     if (isOpen) {
-      console.log('SearchPopup: Opening - disabling smooth scroll')
       // Focus input
       if (searchInputRef.current) {
         searchInputRef.current.focus()
@@ -56,7 +55,6 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
       document.body.style.overflow = 'hidden'
       disableSmoothScroll()
     } else {
-      console.log('SearchPopup: Closing - enabling smooth scroll')
       // Re-enable body scroll and smooth scrolling
       document.body.style.overflow = 'unset'
       enableSmoothScroll()

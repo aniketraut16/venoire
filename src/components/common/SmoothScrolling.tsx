@@ -11,11 +11,8 @@ const SmoothScrolling = ({ children }: PropsWithChildren) => {
   // Initialize and control Lenis based on isEnabled
   useEffect(() => {
     if (!isEnabled) {
-      console.log('SmoothScrolling: Smooth scroll disabled, skipping initialization')
       return;
     }
-
-    console.log('SmoothScrolling: Initializing Lenis')
     const lenis = new Lenis({
       lerp: 0.1,
       duration: 1.5,
@@ -34,7 +31,6 @@ const SmoothScrolling = ({ children }: PropsWithChildren) => {
     rafRef.current = requestAnimationFrame(raf);
 
     return () => {
-      console.log('SmoothScrolling: Cleaning up Lenis')
       if (rafRef.current) {
         cancelAnimationFrame(rafRef.current);
       }

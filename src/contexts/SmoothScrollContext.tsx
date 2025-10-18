@@ -25,12 +25,10 @@ export const SmoothScrollProvider: React.FC<SmoothScrollProviderProps> = ({ chil
   const [isEnabled, setIsEnabled] = useState(false)
 
   const enableSmoothScroll = () => {
-    console.log('SmoothScrollContext: Enabling smooth scroll')
     setIsEnabled(true)
   }
 
   const disableSmoothScroll = () => {
-    console.log('SmoothScrollContext: Disabling smooth scroll')
     setIsEnabled(false)
   }
 

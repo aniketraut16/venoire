@@ -5,6 +5,7 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import SmoothScrolling from "@/components/common/SmoothScrolling";
 import { SmoothScrollProvider } from "@/contexts/SmoothScrollContext";
+import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({
           <Navbar />
           <SmoothScrolling>{children}</SmoothScrolling>
           <Footer />
+          <LoginPopupWrapper />
         </SmoothScrollProvider>
       </body>
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
