@@ -254,63 +254,114 @@ export default function Navbar() {
 
             {/* Mobile Sidebar Menu */}
             <div
-                className={`fixed top-16 sm:top-18 md:top-20 left-0 bottom-0 w-full max-w-sm bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 md:hidden overflow-y-auto ${
+                className={`fixed inset-0 bg-white transform transition-transform duration-300 ease-in-out z-[9999] md:hidden overflow-y-auto ${
                     isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
             >
-                <div className="p-4 sm:p-6">
-                    {/* Mobile Explore Links - Moved to Top */}
-                    <div className="mb-6 pb-4 border-b border-gray-200 space-y-3">
-                        <Link
-                            href="/collections"
-                            className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            NEW ARRIVALS
-                        </Link>
+                {/* Header Section */}
+                <div className="sticky top-0 bg-white flex items-center justify-between p-4 border-b border-gray-200">
+                    <Image 
+                        src="/logo.png" 
+                        alt="Venoire" 
+                        width={140} 
+                        height={40}
+                        className="h-8 w-auto object-contain"
+                    />
+                    <button 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="text-black hover:opacity-70 transition-opacity p-2"
+                    >
+                        <X size={24} />
+                    </button>
+                </div>
+
+                <div className="min-h-full">
+                    {/* User Section */}
+                    <div className="p-4 border-b border-gray-200">
+                        {/* For now, showing welcome section - can be made dynamic later */}
+                        <div className="mb-4">
+                            <h2 className="text-lg font-semibold text-black mb-1">WELCOME</h2>
+                            <p className="text-sm text-gray-600 mb-4">Enjoy a tailored shopping experience.</p>
+                            <Link
+                                href="/auth"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="block w-full bg-black text-white py-3 px-4 text-sm font-medium tracking-wide uppercase hover:bg-gray-800 transition-colors text-center"
+                            >
+                                LOG IN / SIGN UP
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* Explore Luxury Button */}
+                    <div className="p-4">
                         <Link
                             href="/luxury"
-                            className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
+                            className="relative block w-full text-white py-5 px-8 text-center font-bold tracking-wider uppercase shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 rounded-lg overflow-hidden group"
+                            style={{
+                                background: 'linear-gradient(135deg, #8B4513 0%, #B8860B 25%, #DAA520 50%, #FFD700 75%, #FFF8DC 100%)',
+                                boxShadow: '0 8px 32px rgba(218, 165, 32, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                            }}
                         >
-                            Explore Luxury
-                        </Link>
-                        <Link
-                            href="/contact"
-                            className="block text-xs sm:text-sm font-semibold tracking-wider hover:text-gray-600 uppercase transition-colors"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                        >
-                            CONTACT
+                            {/* Shine effect overlay */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                            
+                            {/* Crown icon and text */}
+                            <div className="relative flex items-center justify-center gap-3">
+                                <svg 
+                                    width="24" 
+                                    height="24" 
+                                    viewBox="0 0 24 24" 
+                                    fill="currentColor" 
+                                    className="drop-shadow-lg"
+                                >
+                                    <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm2.7-2h8.6l.9-4.4L14 12l-2-4-2 4-3.2-2.4L7.7 14z"/>
+                                </svg>
+                                <span className="text-lg font-black tracking-[0.2em] drop-shadow-lg">
+                                    Explore Luxury
+                                </span>
+                            </div>
+                            
+                            {/* Border glow effect */}
+                            <div className="absolute inset-0 rounded-lg border-2 border-yellow-300/30 group-hover:border-yellow-200/50 transition-colors duration-300"></div>
                         </Link>
                     </div>
 
-                    {/* Mobile Menu Items */}
-                    <div className="space-y-3">
+                    {/* Divider */}
+                    <hr className="border-gray-200" />
+
+                    {/* Menu Accordion */}
+                    <div className="p-4 space-y-2">
                         {menuItems.map((item) => (
-                            <div key={item.name} className="border-b border-gray-200 pb-3">
+                            <div key={item.name} className="border-b border-gray-100 last:border-b-0">
                                 <button
                                     onClick={() => setExpandedMobileMenu(expandedMobileMenu === item.name ? null : item.name)}
-                                    className="flex items-center justify-between w-full text-left font-semibold text-sm sm:text-base tracking-wider mb-2 hover:text-gray-600 transition-colors uppercase"
+                                    className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
                                 >
-                                    {item.name}
-                                    <span className="text-lg sm:text-xl transition-transform duration-200" style={{ transform: expandedMobileMenu === item.name ? 'rotate(180deg)' : 'rotate(0)' }}>
-                                        {expandedMobileMenu === item.name ? '−' : '+'}
-                                    </span>
+                                    <span className="font-medium text-sm tracking-wider uppercase">{item.name}</span>
+                                    <svg 
+                                        className={`w-5 h-5 transition-transform duration-200 ${expandedMobileMenu === item.name ? 'rotate-180' : ''}`}
+                                        fill="none" 
+                                        stroke="currentColor" 
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                    </svg>
                                 </button>
                                 
                                 {expandedMobileMenu === item.name && (
-                                    <div className="mt-3 space-y-3 pl-2 animate-slideDown">
+                                    <div className="pb-4 pl-4 space-y-3">
                                         {item.sections.map((section, idx) => (
                                             <div key={idx}>
-                                                <h4 className="text-xs sm:text-sm font-semibold mb-2 text-gray-900 tracking-wide">
+                                                <h4 className="text-xs font-semibold mb-2 text-gray-900 tracking-wide uppercase">
                                                     {section.title}
                                                 </h4>
-                                                <ul className="space-y-1.5 pl-2">
+                                                <ul className="space-y-2 pl-2">
                                                     {section.subsections.map((subsection, subIdx) => (
                                                         <li key={subIdx}>
                                                             <Link
                                                                 href="#"
-                                                                className="text-xs sm:text-sm text-gray-600 hover:text-black transition-colors block py-0.5"
+                                                                className="text-sm text-gray-600 hover:text-black transition-colors block py-1"
                                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                             >
                                                                 {subsection}
@@ -326,33 +377,62 @@ export default function Navbar() {
                         ))}
                     </div>
 
-                    {/* Mobile Search & Wishlist */}
-                    <div className="mt-6 border-t border-gray-200 pt-6 space-y-3">
-                        <button className="flex items-center gap-3 text-xs sm:text-sm font-medium hover:text-gray-600 w-full transition-colors py-2">
-                            <Search size={20} strokeWidth={1.5} />
-                            <span className="tracking-wide uppercase">Search</span>
-                        </button>
+                    {/* Divider */}
+                    <hr className="border-gray-200" />
+
+                    {/* Bottom Actions */}
+                    <div className="p-4 space-y-1">
                         <Link
-                            href="/wishlist"
-                            className="flex items-center gap-3 text-xs sm:text-sm font-medium hover:text-gray-600 transition-colors py-2"
+                            href="/cart"
+                            className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <ShoppingBag size={20} strokeWidth={1.5} />
+                            <span className="font-medium text-sm tracking-wide">MY CART</span>
+                        </Link>
+                        
+                        <button className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors w-full text-left">
+                            <Search size={20} strokeWidth={1.5} />
+                            <span className="font-medium text-sm tracking-wide">SEARCH</span>
+                        </button>
+                        
+                        <Link
+                            href="/collections"
+                            className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                             </svg>
-                            <span className="tracking-wide uppercase">Wishlist</span>
+                            <span className="font-medium text-sm tracking-wide">NEW ARRIVALS</span>
+                        </Link>
+
+                        <Link
+                            href="/contact"
+                            className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span className="font-medium text-sm tracking-wide">CONTACT US</span>
+                        </Link>
+
+                        <Link
+                            href="/wishlist"
+                            className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors"
+                            onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                            </svg>
+                            <span className="font-medium text-sm tracking-wide">WISHLIST</span>
                         </Link>
                     </div>
                 </div>
             </div>
 
-            {/* Mobile Menu Overlay */}
-            {isMobileMenuOpen && (
-                <div
-                    className="fixed inset-0 bg-black/50 z-30 md:hidden"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                />
-            )}
+            {/* Mobile Menu Overlay - Not needed since sidebar is full screen */}
         </>
     )
 }
