@@ -14,6 +14,9 @@ export const useLoginPopup = () => {
 
   // Check if user is logged in (you can customize this logic)
   const isUserLoggedIn = (): boolean => {
+    // Only check localStorage on client side
+    if (typeof window === 'undefined') return false
+    
     // Check for auth token, user data, etc.
     // For now, checking if there's any user data in localStorage
     const userData = localStorage.getItem('user')
@@ -23,6 +26,9 @@ export const useLoginPopup = () => {
 
   // Check if popup was shown recently (within 1 hour)
   const wasShownRecently = (): boolean => {
+    // Only check localStorage on client side
+    if (typeof window === 'undefined') return false
+    
     const lastShown = localStorage.getItem('loginPopupLastShown')
     if (!lastShown) return false
 
@@ -74,6 +80,7 @@ export const useLoginPopup = () => {
         isUserLoggedIn: isUserLoggedIn(),
         wasShownRecently: wasShownRecently(),
         getLastShownTime: () => {
+          if (typeof window === 'undefined') return 'Never'
           const lastShown = localStorage.getItem('loginPopupLastShown')
           return lastShown ? new Date(parseInt(lastShown)).toLocaleString() : 'Never'
         }
@@ -84,7 +91,7 @@ export const useLoginPopup = () => {
 
   // Mark popup as shown when it opens
   useEffect(() => {
-    if (state.isOpen && state.shouldShow) {
+    if (state.isOpen && state.shouldShow && typeof window !== 'undefined') {
       localStorage.setItem('loginPopupLastShown', Date.now().toString())
       console.log('LoginPopup: Marked as shown in localStorage')
     }
@@ -104,21 +111,27 @@ export const useLoginPopup = () => {
       isOpen: true,
       shouldShow: true
     })
-    localStorage.setItem('loginPopupLastShown', Date.now().toString())
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('loginPopupLastShown', Date.now().toString())
+    }
   }
 
   // Function to reset popup state (for testing)
   const resetPopupState = () => {
-    localStorage.removeItem('loginPopupLastShown')
-    localStorage.removeItem('user')
-    localStorage.removeItem('authToken')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('loginPopupLastShown')
+      localStorage.removeItem('user')
+      localStorage.removeItem('authToken')
+    }
     console.log('LoginPopup: State reset, popup will show on next page load')
   }
 
   // Function to simulate user login (for testing)
   const simulateLogin = () => {
-    localStorage.setItem('user', JSON.stringify({ name: 'Test User', email: 'test@example.com' }))
-    localStorage.setItem('authToken', 'dummy-auth-token')
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('user', JSON.stringify({ name: 'Test User', email: 'test@example.com' }))
+      localStorage.setItem('authToken', 'dummy-auth-token')
+    }
     setState(prev => ({ ...prev, isOpen: false }))
     console.log('LoginPopup: User logged in, popup closed')
   }
