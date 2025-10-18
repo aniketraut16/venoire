@@ -22,13 +22,6 @@ export default function Categories() {
             link: '/d/womens'
         },
         {
-            slug: 'kids',
-            name: 'Kids',
-            image: '/category/kids.jpeg',
-            description: 'Stylish kids clothing',
-            link: '/d/kids'
-        },
-        {
             slug: 'perfumes',
             name: 'Perfumes',
             image: '/category/perfumes.jpg',
@@ -36,12 +29,12 @@ export default function Categories() {
             link: '/perfume'
         },
         {
-            slug: 'gifts',
-            name: 'Gifts',
-            image: '/category/gifts.jpg',
-            description: 'Luxury gifts',
-            link: '/d/gifts'
-        }
+            slug: 'lux',
+            name: 'Luxury',
+            image: '/category/lux.jpeg',
+            description: 'Luxury collection',
+            link: '/luxury'
+        },
     ]
 
     const handleCategoryClick = (link: string) => {
@@ -52,7 +45,7 @@ export default function Categories() {
         <div className="max-w-7xl mx-auto px-0 md:px-4 pt-8 md:pt-16">
             {/* Mobile: Horizontal Scrollable Single Row */}
             <div className="md:hidden overflow-x-auto scrollbar-hide pb-4">
-                <div className="flex gap-6 px-2">
+                <div className="flex gap-6 px-2 items-center justify-evenly">
                     {categories.map((category, index) => (
                         <motion.div
                             key={category.slug}
@@ -84,7 +77,7 @@ export default function Categories() {
             </div>
 
             {/* Desktop: Grid Layout */}
-            <div className="hidden md:grid grid-cols-5 gap-8 max-w-7xl mx-auto">
+            <div className="hidden md:grid grid-cols-4 gap-8 max-w-7xl mx-auto">
                 {categories.map((category, index) => (
                     <motion.div
                         key={category.slug}

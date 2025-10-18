@@ -10,7 +10,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
-export function Offers() {
+export default function BrowseCollections() {
   const collectionsSwiperRef = useRef<SwiperType | null>(null);
   const productsSwiperRef = useRef<SwiperType | null>(null);
 
@@ -185,56 +185,4 @@ const collectionsData = [
     title: "GIFT ITEMS",
     image: "/category/gifts.jpg",
   },
-];
-
-// Products Data
-const productsData = [
-  {
-    category: "Handbags",
-    name: "Women Black Casual Handbag",
-    price: 4599,
-    image: "/best-sellers/Classic-Crewneck-T-Shirt.png",
-    badge: "JUST IN",
-    colors: [{ name: "Black", hex: "#000000" }],
-  },
-  {
-    category: "Casual Shirts",
-    name: "Men Pink Solid Full Sleeves Casual Shirt",
-    price: 2799,
-    image: "/best-sellers/Polo-Shirt.png",
-    badge: "JUST IN",
-    colors: [{ name: "Pink", hex: "#FFC0CB" }],
-  },
-  {
-    category: "Suits And Blazers",
-    name: "Boys Green Textured Suit",
-    price: 2999,
-    image: "/best-sellers/Oxford-Button-Down-Shirt.png",
-    badge: "JUST IN",
-    colors: [{ name: "Green", hex: "#90EE90" }],
-  },
-  {
-    category: "T-Shirts",
-    name: "Men Navy Blue Solid T-Shirt",
-    price: 1299,
-    image: "/best-sellers/Flannel-Shirt.png",
-    badge: "JUST IN",
-    colors: [{ name: "Navy", hex: "#000080" }],
-  },
-  {
-    category: "Casual Shirts",
-    name: "Men White Printed Casual Shirt",
-    price: 1899,
-    image: "/best-sellers/Henley-Shirt.png",
-    badge: "JUST IN",
-    colors: [{ name: "White", hex: "#FFFFFF" }],
-  },
-  {
-    category: "Ethnic Wear",
-    name: "Women Beige Ethnic Set",
-    price: 3499,
-    image: "/best-sellers/Camp-Collar-Shirt.png",
-    badge: "JUST IN",
-    colors: [{ name: "Beige", hex: "#F5F5DC" }],
-    },
 ];

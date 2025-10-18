@@ -1,7 +1,7 @@
 "use client";
 import Hero from "@/components/HomePage/Hero";
 import Categories from "@/components/HomePage/Categories";
-import { Offers } from "@/components/HomePage/Offers";
+import  BrowseCollections  from "@/components/HomePage/BrowseCollections";
 import Explore from "@/components/HomePage/Explore";
 import FewProducts from "@/components/HomePage/FewProducts";
 import Divider from "@/components/HomePage/divider";
@@ -16,7 +16,7 @@ export default function HomePage() {
       <LittleAboutUs />
       <Divider />
       <Categories />
-      <Offers />
+      <BrowseCollections />
       <FewPerfumes />
       <FewProducts />
       <Explore />

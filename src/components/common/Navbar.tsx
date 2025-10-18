@@ -4,13 +4,17 @@ import Link from 'next/link'
 import { Search, User, ShoppingBag, Menu, X } from 'lucide-react'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import SearchPopup from './SearchPopup'
+import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 
 export default function Navbar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
     const [scrollPosition, setScrollPosition] = useState(0)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null)
+    const [isSearchOpen, setIsSearchOpen] = useState(false)
     const pathname = usePathname()
+    const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
 
     useEffect(() => {
         const handleScroll = () => {
@@ -20,6 +24,22 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
+
+    // Handle body scroll and smooth scrolling for mobile menu
+    useEffect(() => {
+        if (isMobileMenuOpen) {
+            document.body.style.overflow = 'hidden'
+            disableSmoothScroll()
+        } else {
+            document.body.style.overflow = 'unset'
+            enableSmoothScroll()
+        }
+
+        return () => {
+            document.body.style.overflow = 'unset'
+            enableSmoothScroll()
+        }
+    }, [isMobileMenuOpen, disableSmoothScroll, enableSmoothScroll])
 
     // Check if we're on home page or perfume pages
     const isHomePage = pathname === '/'
@@ -93,27 +113,6 @@ export default function Navbar() {
                     subsections: []
                 }
             ]
-        },
-        {
-            name: 'PERFUMES',
-            sections: [
-                {
-                    title: 'Fragrance Collections',
-                    subsections: ['New Arrivals', 'Best Sellers', 'Luxury Perfumes', 'Designer Fragrances', 'Niche Perfumes']
-                },
-                {
-                    title: 'Shop by Gender',
-                    subsections: ['Men\'s Perfumes', 'Women\'s Perfumes', 'Unisex Fragrances']
-                },
-                {
-                    title: 'Shop by Type',
-                    subsections: ['Eau de Parfum', 'Eau de Toilette', 'Perfume Oils', 'Body Mists', 'Gift Sets']
-                },
-                {
-                    title: 'Fragrance Families',
-                    subsections: ['Floral', 'Woody', 'Oriental', 'Fresh', 'Citrus', 'Spicy']
-                }
-            ]
         }
     ]
 
@@ -151,6 +150,14 @@ export default function Navbar() {
                                     </button>
                                 </div>
                             ))}
+                            
+                            {/* Perfumes Link */}
+                            <Link 
+                                href="/perfume"
+                                className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
+                            >
+                                PERFUMES
+                            </Link>
                         </div>
 
                         {/* LOGO SECTION - Centered on Desktop, Centered on Mobile */}
@@ -185,7 +192,10 @@ export default function Navbar() {
                             
                             {/* Icons */}
                             <div className="flex items-center gap-5 ml-2">
-                                <button className={`${textColor} transition-opacity hover:opacity-70`}>
+                                <button 
+                                    onClick={() => setIsSearchOpen(true)}
+                                    className={`${textColor} transition-opacity hover:opacity-70`}
+                                >
                                     <Search size={19} strokeWidth={1.5} />
                                 </button>
                                 <Link href="/wishlist" className={`${textColor} transition-opacity hover:opacity-70`}>
@@ -205,6 +215,12 @@ export default function Navbar() {
 
                         {/* Mobile Icons (Right Side) */}
                         <div className="flex items-center gap-3 sm:gap-4 md:hidden">
+                            <button 
+                                onClick={() => setIsSearchOpen(true)}
+                                className={`${textColor} transition-opacity hover:opacity-70 p-1`}
+                            >
+                                <Search size={20} strokeWidth={1.5} />
+                            </button>
                             <Link href="/auth" className={`${textColor} transition-opacity hover:opacity-70 p-1`}>
                                 <User size={20} strokeWidth={1.5} />
                             </Link>
@@ -254,9 +270,10 @@ export default function Navbar() {
 
             {/* Mobile Sidebar Menu */}
             <div
-                className={`fixed inset-0 bg-white transform transition-transform duration-300 ease-in-out z-[9999] md:hidden overflow-y-auto ${
+                className={`fixed inset-0 bg-white transform transition-transform duration-300 ease-in-out z-[9999] md:hidden overflow-y-auto overscroll-contain ${
                     isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
+                style={{ WebkitOverflowScrolling: 'touch' }}
             >
                 {/* Header Section */}
                 <div className="sticky top-0 bg-white flex items-center justify-between p-4 border-b border-gray-200">
@@ -375,6 +392,17 @@ export default function Navbar() {
                                 )}
                             </div>
                         ))}
+                        
+                        {/* Perfumes Link */}
+                        <div className="border-b border-gray-100">
+                            <Link
+                                href="/perfume"
+                                onClick={() => setIsMobileMenuOpen(false)}
+                                className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
+                            >
+                                <span className="font-medium text-sm tracking-wider uppercase">PERFUMES</span>
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Divider */}
@@ -391,7 +419,13 @@ export default function Navbar() {
                             <span className="font-medium text-sm tracking-wide">MY CART</span>
                         </Link>
                         
-                        <button className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors w-full text-left">
+                        <button 
+                            onClick={() => {
+                                setIsSearchOpen(true)
+                                setIsMobileMenuOpen(false)
+                            }}
+                            className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors w-full text-left"
+                        >
                             <Search size={20} strokeWidth={1.5} />
                             <span className="font-medium text-sm tracking-wide">SEARCH</span>
                         </button>
@@ -433,6 +467,12 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Overlay - Not needed since sidebar is full screen */}
+
+            {/* Search Popup */}
+            <SearchPopup 
+                isOpen={isSearchOpen} 
+                onClose={() => setIsSearchOpen(false)} 
+            />
         </>
     )
 }
