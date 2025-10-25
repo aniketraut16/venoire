@@ -1,3 +1,5 @@
+import { Product } from "./product";
+
 // Base types for navigation items
 export interface NavSubsection {
 
@@ -46,3 +48,10 @@ export interface NavSubsection {
     slug: string;
     image: string;
   } 
+
+  export interface TopProductswithCategory {
+    category_name: string;
+    category_slug: string;
+    products: Product[];
+
+  }

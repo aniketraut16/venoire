@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CategoryorCollection, NavbarContentResponse } from "@/types/homepage";
+import { CategoryorCollection, NavbarContentResponse, TopProductswithCategory } from "@/types/homepage";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getNavbarContent = async (): Promise<NavbarContentResponse> => {
@@ -32,5 +32,15 @@ export const getCategories = async (): Promise<{
         collections: [],
         categories: []
     };
+  }
+};
+
+export const getTopProducts = async (): Promise<TopProductswithCategory[]> => {
+  try {
+    const response = await axios.get(`${baseUrl}/home/top-products`);
+    return response.data.data as TopProductswithCategory[];
+  } catch (error) {
+    console.error("Error fetching top products:", error);
+    return [];
   }
 };

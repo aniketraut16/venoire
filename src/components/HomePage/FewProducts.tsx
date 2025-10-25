@@ -1,14 +1,14 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { getProducts } from '@/utils/products'
 import ProductCard from '../Product/ProductCard'
 import { motion } from 'framer-motion'
-
-const categories = ['ALL', 'MEN', 'WOMEN', 'BOYS', 'GIRLS']
+import { TopProductswithCategory } from '@/types/homepage'
+import { getTopProducts } from '@/utils/homepage'
 
 export default function FewProducts() {
-  const [activeCategory, setActiveCategory] = useState('ALL')
+  const [activeCategory, setActiveCategory] = useState<string | null>(null)
+  const [topProducts, setTopProducts] = useState<TopProductswithCategory[]>([])
   const [scrollProgress, setScrollProgress] = useState(0)
   const [showArrows, setShowArrows] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
@@ -23,13 +23,15 @@ export default function FewProducts() {
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
-  
-  // Get products based on active category - for demo using "Trending" catalog
-  const products = getProducts("Trending", 10)
-  
-  // Products that should show "LAST FEW LEFT" badge (randomly selected for demo)
-  const lastFewLeftProducts = [products[1]?.id, products[2]?.id, products[4]?.id]
 
+  useEffect(() => {
+    const fetchTopProducts = async () => {
+      const topProducts = await getTopProducts()
+      setTopProducts(topProducts)
+      setActiveCategory(topProducts[0].category_slug)
+    }
+    fetchTopProducts()
+  }, [])
   // Calculate scroll progress and check if arrows should be shown
   useEffect(() => {
     const handleScroll = () => {
@@ -58,7 +60,7 @@ export default function FewProducts() {
       }
       window.removeEventListener('resize', handleScroll)
     }
-  }, [products])
+  }, [topProducts])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -93,17 +95,17 @@ export default function FewProducts() {
         {/* Category Tabs */}
         <div className="flex justify-center mb-6 sm:mb-8 md:mb-12 overflow-x-auto scrollbar-hide">
           <div className="flex space-x-3 sm:space-x-4 md:space-x-6 lg:space-x-8 px-2 min-w-max">
-            {categories.map((category) => (
+            {topProducts.map((category) => (
               <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
+                key={category.category_slug}
+                onClick={() => setActiveCategory(category.category_slug)}
                 className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium tracking-wider transition-colors duration-200 whitespace-nowrap ${
-                  activeCategory === category
+                  activeCategory === category.category_slug
                     ? 'text-white border-b-2 border-yellow-400'
                     : 'text-gray-300 hover:text-white'
                 }`}
               >
-                {category}
+                {category.category_name}
               </button>
             ))}
           </div>
@@ -145,7 +147,7 @@ export default function FewProducts() {
               // overscrollBehaviorY: 'none'
             }}
           >
-            {products.map((product, index) => (
+            {topProducts.find((category) => category.category_slug === activeCategory)?.products.map((product, index) => (
               <motion.div 
                 key={product.id} 
                 className="flex-none w-[75vw] sm:w-[45vw] md:w-[350px] lg:w-80 relative snap-start"
