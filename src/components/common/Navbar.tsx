@@ -6,6 +6,8 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import SearchPopup from './SearchPopup'
 import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
+import { getNavbarContent } from '@/utils/homepage'
+import { MenuItem } from '@/types/homepage'
 
 export default function Navbar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -13,6 +15,7 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([])
     const pathname = usePathname()
     const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
 
@@ -62,59 +65,30 @@ export default function Navbar() {
     const textColor = isTransparent ? 'text-white' : 'text-black'
     const borderColor = isTransparent ? 'border-white/20' : 'border-gray-200'
 
-    const menuItems = [
-        {
-            name: 'ALL',
-            sections: [
-                {
-                    title: 'Featured Collections',
-                    subsections: ['New Arrivals', 'Best Sellers', 'Editor\'s Choice', 'Limited Edition', 'Trending Now']
-                },
-                {
-                    title: 'Shop by Category',
-                    subsections: ['Men\'s Fashion', 'Women\'s Fashion', 'Kids Fashion', 'Accessories', 'Footwear', 'Beauty & Personal Care']
-                },
-                {
-                    title: 'Special Offers',
-                    subsections: ['Sale Items', 'Bundle Deals', 'Clearance', 'Gift Cards', 'Student Discounts']
-                },
-                {
-                    title: 'Brand Collections',
-                    subsections: ['Premium Brands', 'Designer Labels', 'Exclusive Collaborations', 'Sustainable Fashion']
-                }
-            ]
-        },
-        {
-            name: 'MENS',
-            sections: [
-                {
-                    title: 'Formal Shirts',
-                    subsections: ['Dress Shirts', 'Oxford Shirts', 'Button-Down Shirts', 'Tuxedo Shirts', 'French Cuff Shirts', 'Slim Fit Formal']
-                },
-                {
-                    title: 'Casual Shirts',
-                    subsections: ['Linen Shirts', 'Denim Shirts', 'Flannel Shirts', 'Chambray Shirts', 'Short Sleeve Shirts', 'Camp Collar Shirts']
-                },
-                {
-                    title: 'Pattern & Print Shirts',
-                    subsections: ['Striped Shirts', 'Checkered Shirts', 'Floral Shirts', 'Printed Shirts', 'Geometric Patterns', 'Solid Colors']
-                },
-                {
-                    title: 'Special Occasion Shirts',
-                    subsections: ['Party Shirts', 'Wedding Shirts', 'Nehru Collar Shirts', 'Band Collar Shirts', 'Cuban Collar Shirts', 'Designer Shirts']
-                }
-            ]
-        },
-        {
-            name: 'WOMENS',
-            sections: [
-                {
-                    title: 'Coming Soon',
-                    subsections: []
-                }
-            ]
+    const hrefGenerator = (type: string, slug: string) => {
+        switch (type) {
+            case 'collection':
+                return `/d/${slug}`
+            case 'category':
+                return `/c/${slug}`
+            case 'tag':
+                return `/t/${slug}`
+            case 'offer':
+                return `/o/${slug}`
+            default:
+                return '#'
         }
-    ]
+    }
+
+    useEffect(() => {
+        const fetchNavbarContent = async () => {
+            const response = await getNavbarContent()
+            if (response.success) {
+                setMenuItems(response.data?.menuItems || [])
+            }
+        }
+        fetchNavbarContent()
+    }, [])
 
     return (
         <>
@@ -142,22 +116,25 @@ export default function Navbar() {
                                 <div
                                     key={item.name}
                                     className="relative"
-                                    onMouseEnter={() => setActiveMenu(item.name)}
-                                    onMouseLeave={() => setActiveMenu(null)}
+                                    {...(item.slug?.includes('perfume') ? {} : {
+                                        onMouseEnter: () => setActiveMenu(item.name),
+                                        onMouseLeave: () => setActiveMenu(null)
+                                    })}
                                 >
-                                    <button className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}>
-                                        {item.name}
-                                    </button>
+                                    {item.slug?.includes('perfume') ? (
+                                        <Link 
+                                            href="/perfume"
+                                            className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
+                                        >
+                                            {item.name}
+                                        </Link>
+                                    ) : (
+                                        <button className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}>
+                                            {item.name}
+                                        </button>
+                                    )}
                                 </div>
                             ))}
-                            
-                            {/* Perfumes Link */}
-                            <Link 
-                                href="/perfume"
-                                className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
-                            >
-                                PERFUMES
-                            </Link>
                         </div>
 
                         {/* LOGO SECTION - Centered on Desktop, Centered on Mobile */}
@@ -245,17 +222,18 @@ export default function Navbar() {
                                     .find(item => item.name === activeMenu)
                                     ?.sections.map((section, index) => (
                                         <div key={index}>
-                                            <h3 className="text-sm font-semibold mb-4 tracking-wide text-black">
+                                            <h3 className="text-sm font-semibold mb-4 tracking-wide text-black uppercase border-b border-gray-200 pb-2">
+                                        
                                                 {section.title}
                                             </h3>
                                             <ul className="space-y-2">
                                                 {section.subsections.map((subsection, subIndex) => (
                                                     <li key={subIndex}>
                                                         <Link 
-                                                            href="#" 
+                                                            href={hrefGenerator(subsection.type, subsection.slug || '')} 
                                                             className="text-sm text-gray-600 hover:text-black transition-colors"
                                                         >
-                                                            {subsection}
+                                                            {subsection.name}
                                                         </Link>
                                                     </li>
                                                 ))}
@@ -377,11 +355,11 @@ export default function Navbar() {
                                                     {section.subsections.map((subsection, subIdx) => (
                                                         <li key={subIdx}>
                                                             <Link
-                                                                href="#"
+                                                                href={hrefGenerator(subsection.type, subsection.slug || '')}
                                                                 className="text-sm text-gray-600 hover:text-black transition-colors block py-1"
                                                                 onClick={() => setIsMobileMenuOpen(false)}
                                                             >
-                                                                {subsection}
+                                                                {subsection.name}
                                                             </Link>
                                                         </li>
                                                     ))}
@@ -392,17 +370,6 @@ export default function Navbar() {
                                 )}
                             </div>
                         ))}
-                        
-                        {/* Perfumes Link */}
-                        <div className="border-b border-gray-100">
-                            <Link
-                                href="/perfume"
-                                onClick={() => setIsMobileMenuOpen(false)}
-                                className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
-                            >
-                                <span className="font-medium text-sm tracking-wider uppercase">PERFUMES</span>
-                            </Link>
-                        </div>
                     </div>
 
                     {/* Divider */}

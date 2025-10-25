@@ -2,43 +2,12 @@
 import { useRouter } from 'next/navigation'
 import React from 'react'
 import { motion } from 'framer-motion'
+import { CategoryorCollection } from '@/types/homepage'
 
-export default function Categories() {
+export default function Categories({ categories }: { categories: CategoryorCollection[] }) {
     const router = useRouter()
-    const categories = [
-        {
-            slug: 'mens',
-            name: 'Mens',
-            image: '/category/mens.jpg',
-            description: 'Premium menswear collection',
-            link: '/d/mens'
-
-        },
-        {
-            slug: 'womens',
-            name: 'Womens',
-            image: '/category/womens.png',
-            description: 'Elegant womens fashion',
-            link: '/d/womens'
-        },
-        {
-            slug: 'perfumes',
-            name: 'Perfumes',
-            image: '/category/perfumes.jpg',
-            description: 'Luxury perfumes',
-            link: '/perfume'
-        },
-        {
-            slug: 'lux',
-            name: 'Luxury',
-            image: '/category/lux.jpeg',
-            description: 'Luxury collection',
-            link: '/luxury'
-        },
-    ]
-
-    const handleCategoryClick = (link: string) => {
-        router.push(link)
+        const handleCategoryClick = (slug: string) => {
+        router.push(`/c/${slug}`)
     }
 
     return (
@@ -62,9 +31,12 @@ export default function Categories() {
                         >
                             <div className="relative w-20 h-20 mx-auto mb-2 rounded-full overflow-hidden border-2 border-gray-200 group-active:border-black transition-all duration-300">
                                 <img
-                                    src={category.image}
+                                    src={category.image || '/fallback.png'}
                                     alt={category.name}
                                     className="w-full h-full object-cover"
+                                    onError={(e) => {
+                                        e.currentTarget.src = '/fallback.png'
+                                    }}
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 pointer-events-none"></div>
                             </div>
@@ -78,11 +50,11 @@ export default function Categories() {
 
             {/* Desktop: Grid Layout */}
             <div className="hidden md:grid grid-cols-4 gap-8 max-w-7xl mx-auto">
-                {categories.map((category, index) => (
+                {categories.map((category: CategoryorCollection, index: number) => (
                     <motion.div
                         key={category.slug}
                         className="text-center cursor-pointer group transition-transform duration-300 hover:-translate-y-2"
-                        onClick={() => handleCategoryClick(category.link)}
+                        onClick={() => handleCategoryClick(category.slug)}
                         initial={{ opacity: 0, scale: 0.8, y: 50 }}
                         whileInView={{ opacity: 1, scale: 1, y: 0 }}
                         viewport={{ once: true, amount: 0.3 }}
@@ -94,9 +66,12 @@ export default function Categories() {
                     >
                         <div className="relative w-44 h-44 mx-auto mb-4 rounded-full overflow-hidden border-3 border-gray-200 group-hover:border-black group-hover:shadow-lg group-hover:shadow-[#D4AF37]/30 transition-all duration-300">
                             <img
-                                src={category.image}
+                                src={category.image || '/fallback.png'}
                                 alt={category.name}
                                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                onError={(e) => {
+                                    e.currentTarget.src = '/fallback.png'
+                                }}
                             />
                             <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 pointer-events-none"></div>
                         </div>

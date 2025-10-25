@@ -9,8 +9,9 @@ import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import { CategoryorCollection } from "@/types/homepage";
 
-export default function BrowseCollections() {
+export default function BrowseCollections({ collections }: { collections: CategoryorCollection[] }) {
   const collectionsSwiperRef = useRef<SwiperType | null>(null);
   const productsSwiperRef = useRef<SwiperType | null>(null);
 
@@ -68,7 +69,7 @@ export default function BrowseCollections() {
           className="collections-swiper"
           onSwiper={(swiper) => (collectionsSwiperRef.current = swiper)}
         >
-          {collectionsData.map((collection, index) => (
+          {collections.map((collection: CategoryorCollection, index: number) => (
             <SwiperSlide key={index}>
               <motion.div 
                 className="relative overflow-hidden rounded-none group cursor-pointer"
@@ -83,14 +84,17 @@ export default function BrowseCollections() {
               >
                 <div className="aspect-[3/4] overflow-hidden">
                   <img
-                    src={collection.image}
-                    alt={collection.title}
+                    src={collection.image || '/fallback.png'}
+                    alt={collection.name}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                        e.currentTarget.src = '/fallback.png'
+                    }}
                   />
                 </div>
                 <div className="absolute bottom-3 sm:bottom-4 md:bottom-6 left-3 sm:left-4 md:left-6">
                   <button className="bg-white text-gray-900 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 md:py-2.5 text-xs sm:text-sm font-medium tracking-wider hover:bg-gray-100 transition-colors">
-                    {collection.title}
+                    {collection.name}
                   </button>
                 </div>
               </motion.div>
