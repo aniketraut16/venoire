@@ -13,7 +13,7 @@ export default function CategoryPageContent() {
             filters={{
                 department: true,
                 category: true,
-                subCategory: false,
+                tag: false,
             }}
             slug={slug}
             headers={{

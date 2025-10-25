@@ -13,7 +13,7 @@ export default function SubCategoryPageContent() {
             filters={{
                 department: true,
                 category: true,
-                subCategory: true,
+                tag: true,
             }}
             slug={slug}
             headers={{

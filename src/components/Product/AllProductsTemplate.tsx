@@ -1,143 +1,32 @@
 "use client"
-import { Product } from '@/types/product';
-import { getProducts } from '@/utils/products';
-import React, { useState } from 'react';
+import { Product, ProductFilters, Attribute } from '@/types/product';
+import { getProducts, getAttributes } from '@/utils/products';
+import React, { useState, useEffect } from 'react';
 import ProductCard from '@/components/Product/ProductCard';
+import { useDebounce } from '@/hooks/useDebounce';
 
-// Static filter options with counts
-const FILTERS = [
-    {
-        key: 'discount', label: 'Discount', options: [
-            { value: '10%+', count: 120 },
-            { value: '20%+', count: 80 },
-            { value: '30%+', count: 60 },
-            { value: '40%+', count: 40 },
-            { value: '50%+', count: 20 },
-        ]
-    },
-    {
-        key: 'department', label: 'Department', options: [
-            { value: 'Mens', count: 200 },
-            { value: 'Womens', count: 180 },
-            { value: 'Kids', count: 90 },
-            { value: 'Perfumes', count: 50 },
-            { value: 'Gifts', count: 30 },
-        ]
-    },
-    {
-        key: 'category', label: 'Category', options: [
-            { value: 'T-Shirts', count: 100 },
-            { value: 'Shirts', count: 90 },
-            { value: 'Blazers', count: 50 },
-            { value: 'Dresses', count: 30 },
-            { value: 'Tops', count: 25 },
-            { value: 'Handbags', count: 15 },
-            { value: 'Shoes', count: 20 },
-            { value: 'Jeans', count: 35 },
-            { value: 'Trousers', count: 50 },
-        ]
-    },
-    {
-        key: 'subCategory', label: 'Subcategory', options: [
-            { value: 'Polo Shirts', count: 60 },
-            { value: 'Flannel Shirts', count: 40 },
-            { value: 'Casual Shirts', count: 60 },
-            { value: 'Ceremonial Shirts', count: 9 },
-            { value: 'Crew Neck T-Shirts', count: 22 },
-            { value: 'Casual Blazers', count: 12 },
-            { value: 'Casual Shoes', count: 18 },
-            { value: 'Ath Fit Jeans', count: 7 },
-            { value: 'Casual', count: 80 },
-            { value: 'Formal', count: 60 },
-            { value: 'Party', count: 40 },
-            { value: 'Work', count: 30 },
-            { value: 'Outdoor', count: 20 },
-        ]
-    },
-    {
-        key: 'occasion', label: 'Occasion', options: [
-            { value: 'Casual', count: 100 },
-            { value: 'Formal', count: 80 },
-            { value: 'Party', count: 60 },
-            { value: 'Work', count: 40 },
-            { value: 'Outdoor', count: 20 },
-        ]
-    },
-    {
-        key: 'size', label: 'Sizes', options: [
-            { value: '36', count: 40 },
-            { value: '38', count: 50 },
-            { value: '40', count: 60 },
-            { value: '42', count: 70 },
-        ]
-    },
-    {
-        key: 'price', label: 'Price', options: [
-            { value: 'Under ₹100', count: 30 },
-            { value: '₹100-₹200', count: 60 },
-            { value: '₹200-₹300', count: 40 },
-            { value: 'Above ₹300', count: 20 },
-        ]
-    },
-    {
-        key: 'color', label: 'Color', options: [
-            { value: 'White', count: 40 },
-            { value: 'Black', count: 50 },
-            { value: 'Blue', count: 60 },
-            { value: 'Red', count: 30 },
-            { value: 'Grey', count: 20 },
-            { value: 'Brown', count: 10 },
-            { value: 'Green', count: 15 },
-            { value: 'Multicolor', count: 5 },
-        ]
-    },
-    {
-        key: 'fit', label: 'Fit', options: [
-            { value: 'Regular Fit', count: 40 },
-            { value: 'Slim Fit', count: 30 },
-            { value: 'Relaxed Fit', count: 20 },
-            { value: 'Oversized Fit', count: 10 },
-            { value: 'Athletic Fit', count: 5 },
-            { value: 'Tailored Fit', count: 8 },
-        ]
-    },
-    {
-        key: 'sleeves', label: 'Sleeves', options: [
-            { value: 'Short Sleeves', count: 40 },
-            { value: 'Long Sleeves', count: 30 },
-            { value: 'Sleeveless', count: 10 },
-        ]
-    },
-];
 
 const MAX_VISIBLE_OPTIONS = 8;
 
 // 1. Separate filter definitions for top bar and sidebar
 const BASE_TOPBAR_FILTERS = [
-    { key: 'discount', label: 'Discount' },
-    { key: 'size', label: 'Size' },
-    { key: 'price', label: 'Price' },
-];
-const SIDEBAR_FILTERS = [
-    { key: 'category', label: 'Clothing Type' },
-    { key: 'subCategory', label: 'Style' },
-    { key: 'occasion', label: 'Occasion' },
-    { key: 'color', label: 'Color' },
-    { key: 'fit', label: 'Fit' },
-    { key: 'sleeves', label: 'Sleeves' },
+    { key: 'rating', label: 'Rating' },
+    { key: 'price', label: 'Price Range' },
 ];
 const SORT_OPTIONS = [
-    { value: 'relevance', label: 'Relevance' },
-    { value: 'priceLowHigh', label: 'Price: Low to High' },
-    { value: 'priceHighLow', label: 'Price: High to Low' },
-    { value: 'newest', label: 'Newest First' },
+    { value: 'created_at', label: 'Newest First' },
+    { value: 'updated_at', label: 'Recently Updated' },
+    { value: 'name', label: 'Name A-Z' },
+    { value: 'price', label: 'Price' },
+    { value: 'rating', label: 'Rating' },
+    { value: 'rating_count', label: 'Most Reviewed' },
 ];
 
 export default function AllProductTemplate(props: {
     filters: {
         department: boolean,
         category: boolean,
-        subCategory: boolean,
+        tag: boolean,
     },
     slug: string | null,
     headers: {
@@ -145,16 +34,87 @@ export default function AllProductTemplate(props: {
         description: string,
     },
     searchQuery?: string | null,
+    collectionId?: string,
+    categoryId?: string,
+    tagId?: string,
 }) {
-    const { filters, slug, headers, searchQuery } = props;
-    const [products, setProducts] = useState<Product[]>(getProducts(null, 20));
+    const { filters, slug, headers, searchQuery, collectionId, categoryId, tagId } = props;
+    const [products, setProducts] = useState<Product[]>([]);
+    const [attributes, setAttributes] = useState<Attribute[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 20,
+        total: 0,
+        totalPages: 0,
+        hasNextPage: false,
+        hasPrevPage: false
+    });
 
+    // Search functionality
+    const [searchTerm, setSearchTerm] = useState(searchQuery || '');
+    const debouncedSearchTerm = useDebounce(searchTerm, 500);
+    
     // Single-select for top bar filters
     const [topbarSelected, setTopbarSelected] = useState<{ [key: string]: string | null }>({});
     // Multi-select for sidebar filters
     const [selected, setSelected] = useState<{ [key: string]: string[] }>({});
     const [showAll, setShowAll] = useState<{ [key: string]: boolean }>({});
-    const [sortBy, setSortBy] = useState<string>('relevance');
+    const [sortBy, setSortBy] = useState<string>('created_at');
+    const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+    const [minPrice, setMinPrice] = useState<string>('');
+    const [maxPrice, setMaxPrice] = useState<string>('');
+    const [rating, setRating] = useState<string>('');
+
+    // Fetch products and attributes on component mount and when filters change
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                // Fetch attributes
+                const attributesResponse = await getAttributes();
+                if (attributesResponse.success && attributesResponse.data) {
+                    setAttributes(attributesResponse.data);
+                }
+
+                // Build filter object
+                const filterParams: ProductFilters = {
+                    search: debouncedSearchTerm || undefined,
+                    collection_id: collectionId,
+                    category_id: categoryId,
+                    tag_id: tagId,
+                    min_price: minPrice ? parseFloat(minPrice) : undefined,
+                    max_price: maxPrice ? parseFloat(maxPrice) : undefined,
+                    rating: rating ? parseFloat(rating) : undefined,
+                    sort_by: sortBy as any,
+                    sort_order: sortOrder,
+                    page: pagination.page,
+                    limit: pagination.limit,
+                };
+
+                // Add attribute filters
+                const attributeIds = Object.values(selected).flat();
+                if (attributeIds.length > 0) {
+                    filterParams.attributes = attributeIds.join(',');
+                }
+
+                // Fetch products
+                const productsResponse = await getProducts(filterParams);
+                if (productsResponse.success && productsResponse.data) {
+                    setProducts(productsResponse.data);
+                    if (productsResponse.pagination) {
+                        setPagination(productsResponse.pagination);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, [debouncedSearchTerm, collectionId, categoryId, tagId, minPrice, maxPrice, rating, sortBy, sortOrder, selected, pagination.page]);
 
     // Dynamically add department to topbar filters if not true
     const TOPBAR_FILTERS = !filters.department
@@ -164,12 +124,6 @@ export default function AllProductTemplate(props: {
         ]
         : BASE_TOPBAR_FILTERS;
 
-    // Helper for sidebar filter visibility
-    const shouldShowSidebarFilter = (key: string) => {
-        if (key === 'category' && filters.category) return false;
-        if (key === 'subCategory' && filters.subCategory) return false;
-        return true;
-    };
 
     // Count selected for badge
     const getSelectedCount = (key: string) => (selected[key]?.length || 0);
@@ -188,28 +142,67 @@ export default function AllProductTemplate(props: {
     // Render top bar dropdowns
     const renderTopBar = () => (
         <div className="w-full flex flex-row items-center gap-8 px-8 py-6 bg-white border-b border-gray-200">
-            {TOPBAR_FILTERS.map(filter => {
-                const filterDef = FILTERS.find(f => f.key === filter.key);
-                if (!filterDef) return null;
-                return (
-                    <div key={filter.key} className="flex flex-col min-w-[180px]">
-                        <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor={`topbar-${filter.key}`}>{filter.label}</label>
-                        <select
-                            id={`topbar-${filter.key}`}
-                            className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
-                            style={{ borderRadius: 0 }}
-                            value={topbarSelected[filter.key] || ''}
-                            onChange={e => setTopbarSelected(sel => ({ ...sel, [filter.key]: e.target.value }))}
-                        >
-                            <option value="">Select {filter.label}</option>
-                            {filterDef.options.map(option => (
-                                <option key={option.value} value={option.value}>{option.value} ({option.count})</option>
-                            ))}
-                        </select>
-                    </div>
-                );
-            })}
+            {/* Search Input */}
+            <div className="flex flex-col min-w-[200px]">
+                <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="search">Search</label>
+                <input
+                    id="search"
+                    type="text"
+                    placeholder="Search products..."
+                    className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+                    style={{ borderRadius: 0 }}
+                    value={searchTerm}
+                    onChange={e => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {/* Rating Filter */}
+            <div className="flex flex-col min-w-[120px]">
+                <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="rating">Rating</label>
+                <select
+                    id="rating"
+                    className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+                    style={{ borderRadius: 0 }}
+                    value={rating}
+                    onChange={e => setRating(e.target.value)}
+                >
+                    <option value="">Any Rating</option>
+                    <option value="4">4+ Stars</option>
+                    <option value="3">3+ Stars</option>
+                    <option value="2">2+ Stars</option>
+                    <option value="1">1+ Stars</option>
+                </select>
+            </div>
+
+            {/* Price Range */}
+            <div className="flex flex-col min-w-[120px]">
+                <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="min-price">Min Price</label>
+                <input
+                    id="min-price"
+                    type="number"
+                    placeholder="Min"
+                    className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+                    style={{ borderRadius: 0 }}
+                    value={minPrice}
+                    onChange={e => setMinPrice(e.target.value)}
+                />
+            </div>
+            <div className="flex flex-col min-w-[120px]">
+                <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="max-price">Max Price</label>
+                <input
+                    id="max-price"
+                    type="number"
+                    placeholder="Max"
+                    className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+                    style={{ borderRadius: 0 }}
+                    value={maxPrice}
+                    onChange={e => setMaxPrice(e.target.value)}
+                />
+            </div>
+
             <div className="flex-1" />
+            
+            {/* Sort By */}
             <div className="flex flex-col min-w-[180px]">
                 <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="sort-by">Sort By</label>
                 <select
@@ -224,51 +217,64 @@ export default function AllProductTemplate(props: {
                     ))}
                 </select>
             </div>
+
+            {/* Sort Order */}
+            <div className="flex flex-col min-w-[120px]">
+                <label className="mb-1 text-xs font-semibold text-gray-700" htmlFor="sort-order">Order</label>
+                <select
+                    id="sort-order"
+                    className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+                    style={{ borderRadius: 0 }}
+                    value={sortOrder}
+                    onChange={e => setSortOrder(e.target.value as 'asc' | 'desc')}
+                >
+                    <option value="desc">Descending</option>
+                    <option value="asc">Ascending</option>
+                </select>
+            </div>
         </div>
     );
 
     // Render sidebar filters
     const renderSidebar = () => (
         <div className="w-72 bg-white border-r border-gray-200 py-6 px-4 flex flex-col gap-6" style={{ borderRadius: 0 }}>
-            {SIDEBAR_FILTERS.filter(f => shouldShowSidebarFilter(f.key)).map(filter => {
-                const filterDef = FILTERS.find(fil => fil.key === filter.key);
-                if (!filterDef) return null;
-                const visibleOptions = showAll[filter.key] ? filterDef.options : filterDef.options.slice(0, MAX_VISIBLE_OPTIONS);
+            {attributes.map(attribute => {
+                const visibleOptions = showAll[attribute.id] ? attribute.values : attribute.values.slice(0, MAX_VISIBLE_OPTIONS);
                 return (
-                    <div key={filter.key} className="mb-4">
-                        <div className=" text-base mb-2 text-black">{filter.label}</div>
+                    <div key={attribute.id} className="mb-4">
+                        <div className="text-base mb-2 text-black">{attribute.display_name}</div>
                         <div className="flex flex-col gap-2">
                             {visibleOptions.map(option => {
-                                const checked = selected[filter.key]?.includes(option.value);
+                                const checked = selected[attribute.id]?.includes(option.id);
                                 return (
-                                    <label key={option.value} className={`flex items-center gap-2 text-sm font-medium ${checked ? 'font-bold' : ''}`}>
+                                    <label key={option.id} className={`flex items-center gap-2 text-sm font-medium ${checked ? 'font-bold' : ''}`}>
                                         <input
                                             type="checkbox"
                                             className="accent-black w-4 h-4"
                                             checked={checked}
                                             onChange={() => {
                                                 setSelected(sel => {
-                                                    const arr = sel[filter.key] || [];
-                                                    if (arr.includes(option.value)) {
-                                                        return { ...sel, [filter.key]: arr.filter((v: string) => v !== option.value) };
+                                                    const arr = sel[attribute.id] || [];
+                                                    if (arr.includes(option.id)) {
+                                                        return { ...sel, [attribute.id]: arr.filter((v: string) => v !== option.id) };
                                                     } else {
-                                                        return { ...sel, [filter.key]: [...arr, option.value] };
+                                                        return { ...sel, [attribute.id]: [...arr, option.id] };
                                                     }
                                                 });
                                             }}
                                         />
-                                        <span>{option.value} <span className="text-gray-600">({option.count})</span></span>
+                                        <span>{option.display_value} <span className="text-gray-600">({option.product_count})</span></span>
                                     </label>
                                 );
                             })}
                         </div>
-                        {filterDef.options.length > MAX_VISIBLE_OPTIONS && (
+                        {attribute.values.length > MAX_VISIBLE_OPTIONS && (
                             <button
                                 className="underline text-black text-xs mt-2 bg-transparent border-none px-2 py-1"
                                 style={{ borderRadius: 0 }}
-                                onClick={() => setShowAll(s => ({ ...s, [filter.key]: !s[filter.key] }))}
+                                onClick={() => setShowAll(s => ({ ...s, [attribute.id]: !s[attribute.id] }))}
                             >
-                                {showAll[filter.key] ? 'Show Less' : 'Show More'}
+                                {showAll[attribute.id] ? 'Show Less' : 'Show More'}
                             </button>
                         )}
                     </div>
@@ -280,22 +286,24 @@ export default function AllProductTemplate(props: {
     // Render selected chips
     const renderSelectedChips = () => {
         const chips = [];
-        for (const filter of SIDEBAR_FILTERS) {
-            if (!shouldShowSidebarFilter(filter.key)) continue;
-            const arr = selected[filter.key] || [];
-            for (const value of arr) {
-                chips.push(
-                    <span key={filter.key + value} className="inline-flex items-center border border-black px-4 py-2 mr-2 mb-2 bg-white text-black text-sm font-medium" style={{ borderRadius: 0 }}>
-                        {value}
-                        <button
-                            className="ml-2 text-black hover:underline"
-                            style={{ borderRadius: 0 }}
-                            onClick={() => removeSelected(filter.key, value)}
-                        >
-                            ×
-                        </button>
-                    </span>
-                );
+        for (const attribute of attributes) {
+            const arr = selected[attribute.id] || [];
+            for (const valueId of arr) {
+                const value = attribute.values.find(v => v.id === valueId);
+                if (value) {
+                    chips.push(
+                        <span key={attribute.id + valueId} className="inline-flex items-center border border-black px-4 py-2 mr-2 mb-2 bg-white text-black text-sm font-medium" style={{ borderRadius: 0 }}>
+                            {value.display_value}
+                            <button
+                                className="ml-2 text-black hover:underline"
+                                style={{ borderRadius: 0 }}
+                                onClick={() => removeSelected(attribute.id, valueId)}
+                            >
+                                ×
+                            </button>
+                        </span>
+                    );
+                }
             }
         }
         if (chips.length === 0) return null;
@@ -326,11 +334,46 @@ export default function AllProductTemplate(props: {
                     {renderSelectedChips()}
                     {/* Products Grid */}
                     <div className="max-w-7xl mx-auto px-4 py-12">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                            {products.map(product => (
-                                <ProductCard key={product.id} {...product} />
-                            ))}
-                        </div>
+                        {loading ? (
+                            <div className="flex justify-center items-center py-12">
+                                <div className="text-lg">Loading products...</div>
+                            </div>
+                        ) : products.length === 0 ? (
+                            <div className="flex justify-center items-center py-12">
+                                <div className="text-lg text-gray-600">No products found matching your criteria.</div>
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                                {products.map(product => (
+                                    <ProductCard key={product.id} {...product} />
+                                ))}
+                            </div>
+                        )}
+                        
+                        {/* Pagination */}
+                        {pagination.totalPages > 1 && (
+                            <div className="flex justify-center items-center gap-4 mt-8">
+                                <button
+                                    onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                                    disabled={!pagination.hasPrevPage}
+                                    className="px-4 py-2 border border-black text-black bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{ borderRadius: 0 }}
+                                >
+                                    Previous
+                                </button>
+                                <span className="text-sm">
+                                    Page {pagination.page} of {pagination.totalPages}
+                                </span>
+                                <button
+                                    onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                                    disabled={!pagination.hasNextPage}
+                                    className="px-4 py-2 border border-black text-black bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+                                    style={{ borderRadius: 0 }}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

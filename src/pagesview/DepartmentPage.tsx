@@ -13,7 +13,7 @@ export default function DepartmentPageContent() {
             filters={{
                 department: true,
                 category: false,
-                subCategory: false,
+                tag: false,
             }}
             slug={slug}
             headers={{

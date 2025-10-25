@@ -6,7 +6,7 @@ export default function AllProductPage() {
         <AllProductTemplate filters={{
             department: false,
             category: false,
-            subCategory: false,
+            tag: false,
         }} slug={null}
             headers={
                 {
