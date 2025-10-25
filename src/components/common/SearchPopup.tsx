@@ -4,8 +4,6 @@ import { Search, X } from 'lucide-react'
 import Link from 'next/link'
 import { getProducts } from '@/utils/products'
 import { getPerfumesByCollection } from '@/utils/perfume'
-import { Product } from '@/types/product'
-import { Perfume } from '@/types/perfume'
 import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 
 interface SearchResult {
@@ -96,24 +94,6 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     const searchTerm = query.toLowerCase().trim()
     const results: SearchResult[] = []
 
-    // Search products
-    const products = getProducts(null, 50) // Get more products for search
-    const matchingProducts = products.filter(product =>
-      product.name.toLowerCase().includes(searchTerm) ||
-      product.category.toLowerCase().includes(searchTerm)
-    )
-
-    matchingProducts.forEach(product => {
-      results.push({
-        id: product.id,
-        name: product.name,
-        slug: product.slug,
-        thumbnail: product.thumbnail,
-        type: 'product',
-        price: product.price,
-        category: product.category
-      })
-    })
 
     // Search perfumes
     const perfumeCollection = getPerfumesByCollection('c0') // All perfumes

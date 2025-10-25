@@ -1,11 +1,21 @@
-import { getAllCategories } from "@/utils/category";
 import CategoryPageContent from "@/pagesview/CategoryPage";
+import { getCdn } from "@/utils/cdn";
 
 export async function generateStaticParams() {
-    const categories = await getAllCategories();
-    return categories.map(category => ({
-        slug: category.slug,
-    }));
+    try {
+        const categories = await getCdn("categories");
+        if (!categories.success || !categories.data?.categories) {
+            return [];
+        }
+        return categories.data.categories
+            .filter((category: any) => category.slug && typeof category.slug === 'string')
+            .map((category: { slug: string }) => ({
+                slug: category.slug,
+            }));
+    } catch (error) {
+        console.error("Error generating static params for categories:", error);
+        return [];
+    }
 }
 export default function CategoryPage() {
     return <CategoryPageContent />;
