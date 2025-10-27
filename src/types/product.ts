@@ -4,7 +4,7 @@ export type Product = {
 
   name: string;
   category: string;
-  catalog: "Best Seller" | "New Arrival" | "Trending" | "Featured" | "Sale";
+  catalog: string;
 
   price: number;
   originalPrice: number;
@@ -14,29 +14,39 @@ export type Product = {
   mode?: "light" | "dark";
 };
 
-export type DetailProduct = {
-  id: string;
-  slug: string;
-  name: string;
-  category: string;
-  catalog: "Best Seller" | "New Arrival" | "Trending" | "Featured" | "Sale";
+
+export interface ProductPricing {
   price: number;
   originalPrice: number;
   discount: number;
   itemsRemaining: number;
-  size: string[];
-  thumbnail: string;
+  size: string | null;
+}
+
+export interface ProductAttribute {
+  name: string;
+  value: string;
+}
+
+export interface DetailProduct {
+  id: string;
+  slug: string;
+  name: string;
+  category: string | null;
+  tags: string[];
+  pricing: ProductPricing[];
+  thumbnail: string | null;
   images: string[];
-  description: string;
-  material: string; // e.g. "60% Rayon, 34% Polyester and 6% Elastane"
-  fit: string; // e.g. "Ultra Slim Fit"
-  pattern: string; // e.g. "Textured"
-  sleeves: string; // e.g. "Full Sleeves"
-  occasion: string; // e.g. "Formal"
-  color: string; // e.g. "Light Blue"
-  productType: string; // e.g. "Blazer"
-  collection: string; // e.g. "VH Move"
-};
+  description: string | null;
+  attributes: ProductAttribute[];
+}
+
+export interface DetailProductResponse {
+  success: boolean;
+  message: string;
+  data: DetailProduct | null;
+  error: string;
+}
 
 
 export interface ProductFilters {
