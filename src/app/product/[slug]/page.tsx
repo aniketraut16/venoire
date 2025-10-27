@@ -1,4 +1,3 @@
-import { getProductsslugs } from "@/utils/products";
 import OneProductPage from "@/pagesview/OneProductPage";
 import { getCdn } from "@/utils/cdn";
 
