@@ -40,8 +40,9 @@ export default function AllProductsPage(props: {
   });
 
   // Search functionality
-  const [searchTerm, setSearchTerm] = useState(searchQuery || "");
+  const [searchTerm, setSearchTerm] = useState(searchQuery ?? "");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
 
   // Multi-select for sidebar filters
   const [selected, setSelected] = useState<{ [key: string]: string[] }>({});
@@ -51,6 +52,14 @@ export default function AllProductsPage(props: {
   const [minPrice, setMinPrice] = useState<string>("");
   const [maxPrice, setMaxPrice] = useState<string>("");
   const [rating, setRating] = useState<string>("");
+
+  // Mobile modal states
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isSortModalOpen, setIsSortModalOpen] = useState(false);
+
+  // Price debouncing
+  const debouncedMinPrice = useDebounce(minPrice, 500);
+  const debouncedMaxPrice = useDebounce(maxPrice, 500);
 
   // Fetch products and attributes on component mount and when filters change
   useEffect(() => {
@@ -66,8 +75,8 @@ export default function AllProductsPage(props: {
         // Build filter object
         const filterParams: ProductFilters = {
           search: debouncedSearchTerm || undefined,
-          min_price: minPrice ? parseFloat(minPrice) : undefined,
-          max_price: maxPrice ? parseFloat(maxPrice) : undefined,
+          min_price: debouncedMinPrice ? parseFloat(debouncedMinPrice) : undefined,
+          max_price: debouncedMaxPrice ? parseFloat(debouncedMaxPrice) : undefined,
           rating: rating ? parseFloat(rating) : undefined,
           sort_by: sortBy as any,
           sort_order: sortOrder,
@@ -111,10 +120,10 @@ export default function AllProductsPage(props: {
     fetchData();
   }, [
     debouncedSearchTerm,
+    debouncedMinPrice,
+    debouncedMaxPrice,
     slug_type,
     slug,
-    minPrice,
-    maxPrice,
     rating,
     sortBy,
     sortOrder,
@@ -134,9 +143,253 @@ export default function AllProductsPage(props: {
   // Clear all selected
   const clearAll = () => setSelected({});
 
+  // Mobile Filter Modal
+  const renderMobileFilterModal = () => (
+    <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+      isFilterModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+    }`}>
+      {/* Backdrop */}
+      <div 
+        className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+          isFilterModalOpen ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={() => setIsFilterModalOpen(false)}
+      />
+      
+      {/* Modal Content */}
+      <div className={`absolute bottom-0 left-0 right-0 h-[90vh] bg-white shadow-lg overflow-y-auto transition-transform duration-300 ease-out ${
+        isFilterModalOpen ? 'translate-y-0' : 'translate-y-full'
+      }`} style={{ borderRadius: '20px 20px 0 0' }}>
+        <div className="p-4">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-black">Filter Products</h2>
+            <button
+              onClick={() => setIsFilterModalOpen(false)}
+              className="text-black text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+          
+          {/* Filter Content */}
+          <div className="space-y-6">
+            {attributes.map((attribute) => {
+              const visibleOptions = showAll[attribute.id]
+                ? attribute.values
+                : attribute.values.slice(0, MAX_VISIBLE_OPTIONS);
+              return (
+                <div key={attribute.id} className="mb-4">
+                  <div className="text-base mb-2 text-black font-semibold">
+                    {attribute.display_name}
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    {visibleOptions.map((option) => {
+                      const checked = selected[attribute.id]?.includes(option.id);
+                      return (
+                        <label
+                          key={option.id}
+                          className={`flex items-center gap-2 text-sm font-medium ${
+                            checked ? "font-bold" : ""
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            className="accent-black w-4 h-4"
+                            checked={checked}
+                            onChange={() => {
+                              setSelected((sel) => {
+                                const arr = sel[attribute.id] || [];
+                                if (arr.includes(option.id)) {
+                                  return {
+                                    ...sel,
+                                    [attribute.id]: arr.filter(
+                                      (v: string) => v !== option.id
+                                    ),
+                                  };
+                                } else {
+                                  return {
+                                    ...sel,
+                                    [attribute.id]: [...arr, option.id],
+                                  };
+                                }
+                              });
+                            }}
+                          />
+                          <span>
+                            {option.display_value}{" "}
+                            <span className="text-gray-600">
+                              ({option.product_count})
+                            </span>
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {attribute.values.length > MAX_VISIBLE_OPTIONS && (
+                    <button
+                      className="underline text-black text-xs mt-2 bg-transparent border-none px-2 py-1"
+                      style={{ borderRadius: 0 }}
+                      onClick={() =>
+                        setShowAll((s) => ({
+                          ...s,
+                          [attribute.id]: !s[attribute.id],
+                        }))
+                      }
+                    >
+                      {showAll[attribute.id] ? "Show Less" : "Show More"}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* Apply Button */}
+          <div className="mt-8 pt-4 border-t border-gray-200">
+            <button
+              onClick={() => setIsFilterModalOpen(false)}
+              className="w-full bg-black text-white py-3 px-4 font-semibold"
+              style={{ borderRadius: 0 }}
+            >
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Mobile Sort Modal
+  const renderMobileSortModal = () => (
+    <div className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+      isSortModalOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+    }`}>
+      {/* Backdrop */}
+      <div 
+        className={`absolute inset-0 bg-black/50 transition-opacity duration-300 ${
+          isSortModalOpen ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={() => setIsSortModalOpen(false)}
+      />
+      
+      {/* Modal Content */}
+      <div className={`absolute bottom-0 left-0 right-0 h-[90vh] bg-white shadow-lg overflow-y-auto transition-transform duration-300 ease-out ${
+        isSortModalOpen ? 'translate-y-0' : 'translate-y-full'
+      }`} style={{ borderRadius: '20px 20px 0 0' }}>
+        <div className="p-4">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-black">Sort Products</h2>
+            <button
+              onClick={() => setIsSortModalOpen(false)}
+              className="text-black text-2xl font-bold"
+            >
+              ×
+            </button>
+          </div>
+          
+          {/* Sort Options */}
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Sort By
+              </label>
+              <select
+                className="w-full border border-black px-4 py-3 text-black bg-white text-sm font-medium"
+                style={{ borderRadius: 0 }}
+                value={sortBy || ""}
+                onChange={(e) => setSortBy(e.target.value || "")}
+              >
+                {SORT_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Order
+              </label>
+              <select
+                className="w-full border border-black px-4 py-3 text-black bg-white text-sm font-medium"
+                style={{ borderRadius: 0 }}
+                value={sortOrder || ""}
+                onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+              >
+                <option value="desc">Descending</option>
+                <option value="asc">Ascending</option>
+              </select>
+            </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Rating
+              </label>
+              <select
+                className="w-full border border-black px-4 py-3 text-black bg-white text-sm font-medium"
+                style={{ borderRadius: 0 }}
+                value={rating || ""}
+                onChange={(e) => setRating(e.target.value || "")}
+              >
+                <option value="">Any Rating</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="1">1+ Stars</option>
+              </select>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Min Price
+                </label>
+                <input
+                  type="number"
+                  placeholder="Min"
+                  className="w-full border border-black px-4 py-3 text-black bg-white text-sm font-medium"
+                  style={{ borderRadius: 0 }}
+                  value={minPrice || ""}
+                  onChange={(e) => setMinPrice(e.target.value || "")}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Max Price
+                </label>
+                <input
+                  type="number"
+                  placeholder="Max"
+                  className="w-full border border-black px-4 py-3 text-black bg-white text-sm font-medium"
+                  style={{ borderRadius: 0 }}
+                  value={maxPrice || ""}
+                  onChange={(e) => setMaxPrice(e.target.value || "")}
+                />
+              </div>
+            </div>
+          </div>
+          
+          {/* Apply Button */}
+          <div className="mt-8 pt-4 border-t border-gray-200">
+            <button
+              onClick={() => setIsSortModalOpen(false)}
+              className="w-full bg-black text-white py-3 px-4 font-semibold"
+              style={{ borderRadius: 0 }}
+            >
+              Apply Sort
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   // Render top bar dropdowns
   const renderTopBar = () => (
-    <div className="w-full flex flex-row items-center gap-8 px-8 py-6 bg-white border-b border-gray-200">
+    <div className="w-full hidden lg:flex flex-row items-center gap-8 px-8 py-6 bg-white border-b border-gray-200">
       {/* Search Input */}
       <div className="flex flex-col min-w-[200px]">
         <label
@@ -151,8 +404,8 @@ export default function AllProductsPage(props: {
           placeholder="Search products..."
           className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          value={searchTerm || ""}
+          onChange={(e) => setSearchTerm(e.target.value || "")}
         />
       </div>
 
@@ -168,8 +421,8 @@ export default function AllProductsPage(props: {
           id="rating"
           className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
-          value={rating}
-          onChange={(e) => setRating(e.target.value)}
+          value={rating || ""}
+          onChange={(e) => setRating(e.target.value || "")}
         >
           <option value="">Any Rating</option>
           <option value="4">4+ Stars</option>
@@ -193,8 +446,8 @@ export default function AllProductsPage(props: {
           placeholder="Min"
           className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
-          value={minPrice}
-          onChange={(e) => setMinPrice(e.target.value)}
+          value={minPrice || ""}
+          onChange={(e) => setMinPrice(e.target.value || "")}
         />
       </div>
       <div className="flex flex-col min-w-[120px]">
@@ -210,8 +463,8 @@ export default function AllProductsPage(props: {
           placeholder="Max"
           className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
-          value={maxPrice}
-          onChange={(e) => setMaxPrice(e.target.value)}
+          value={maxPrice || ""}
+          onChange={(e) => setMaxPrice(e.target.value || "")}
         />
       </div>
 
@@ -229,8 +482,8 @@ export default function AllProductsPage(props: {
           id="sort-by"
           className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
+          value={sortBy || ""}
+          onChange={(e) => setSortBy(e.target.value || "")}
         >
           {SORT_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>
@@ -252,7 +505,7 @@ export default function AllProductsPage(props: {
           id="sort-order"
           className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
-          value={sortOrder}
+          value={sortOrder || ""}
           onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
         >
           <option value="desc">Descending</option>
@@ -265,7 +518,7 @@ export default function AllProductsPage(props: {
   // Render sidebar filters
   const renderSidebar = () => (
     <div
-      className="w-72 bg-white border-r border-gray-200 py-6 px-4 flex flex-col gap-6"
+      className="hidden lg:flex w-72 bg-white border-r border-gray-200 py-6 px-4 flex-col gap-6"
       style={{ borderRadius: 0 }}
     >
       {attributes.map((attribute) => {
@@ -385,27 +638,53 @@ export default function AllProductsPage(props: {
     );
   };
 
+  // Mobile Bottom Buttons
+  const renderMobileBottomButtons = () => (
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40">
+      <div className="flex gap-4">
+        <button
+          onClick={() => setIsFilterModalOpen(true)}
+          className="flex-1 bg-black text-white py-3 px-4 font-semibold text-center"
+          style={{ borderRadius: 0 }}
+        >
+          Filter by Color, Fits, etc
+        </button>
+        <button
+          onClick={() => setIsSortModalOpen(true)}
+          className="flex-1 bg-white text-black border border-black py-3 px-4 font-semibold text-center"
+          style={{ borderRadius: 0 }}
+        >
+          Sort
+        </button>
+      </div>
+    </div>
+  );
+
   // Layout: sidebar left, main content right
   return (
     <div className="max-w-7xl mx-auto min-h-screen bg-white mt-25 flex flex-col">
       {/* Header */}
-      <div className="w-full px-8 py-8 bg-white border-b border-gray-300">
-        <h1 className="text-3xl font-serif text-black tracking-tight">
+      <div className="w-full px-4 lg:px-8 py-6 lg:py-8 bg-white border-b border-gray-300">
+        <h1 className="text-2xl lg:text-3xl font-serif text-black tracking-tight">
           {headers.title}
         </h1>
-        <p className="text-gray-600 mt-2 text-base">{headers.description}</p>
+        <p className="text-gray-600 mt-2 text-sm lg:text-base">{headers.description}</p>
       </div>
-      {/* Top Bar */}
+      
+      {/* Top Bar - Desktop Only */}
       {renderTopBar()}
+      
       <div className="flex flex-row flex-1">
-        {/* Sidebar */}
+        {/* Sidebar - Desktop Only */}
         {renderSidebar()}
+        
         {/* Main Area */}
         <div className="flex-1 flex flex-col">
           {/* Selected Chips */}
           {renderSelectedChips()}
+          
           {/* Products Grid */}
-          <div className="max-w-7xl mx-auto px-4 py-12">
+          <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12 pb-20 lg:pb-12">
             {products.length === 0 ? (
               <div className="flex justify-center items-center py-12">
                 <div className="text-lg text-gray-600">
@@ -413,7 +692,7 @@ export default function AllProductsPage(props: {
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
                 {products.map((product) => (
                   <ProductCard key={product.id} {...product} />
                 ))}
@@ -451,6 +730,13 @@ export default function AllProductsPage(props: {
           </div>
         </div>
       </div>
+      
+      {/* Mobile Bottom Buttons */}
+      {renderMobileBottomButtons()}
+      
+      {/* Mobile Modals */}
+      {renderMobileFilterModal()}
+      {renderMobileSortModal()}
     </div>
   );
 }
