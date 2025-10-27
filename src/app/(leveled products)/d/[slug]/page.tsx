@@ -1,13 +1,13 @@
-import DepartmentPageContent from "@/pagesview/DepartmentPage";
+import AllProductPageMiddleware from "@/pagesview/AllProductPageMiddleware";
 import { getCdn } from "@/utils/cdn";
 
 export async function generateStaticParams() {
     try {
-        const departments = await getCdn("collections");
-        if (!departments.success || !departments.data?.collections) {
+        const collections = await getCdn("collections");
+        if (!collections.success || !collections.data?.collections) {
             return [];
         }
-        return departments.data.collections
+        return collections.data.collections
             .filter((collection: any) => collection.slug && typeof collection.slug === 'string')
             .map((collection: { slug: string }) => ({
                 slug: collection.slug,
@@ -17,6 +17,6 @@ export async function generateStaticParams() {
         return [];
     }
 }
-export default function DepartmentPage() {
-    return <DepartmentPageContent />;
+export default function CollectionPage() {
+    return <AllProductPageMiddleware slug_type="collection" />;
 }

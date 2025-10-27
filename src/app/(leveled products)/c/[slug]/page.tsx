@@ -1,4 +1,4 @@
-import CategoryPageContent from "@/pagesview/CategoryPage";
+import AllProductPageMiddleware from "@/pagesview/AllProductPageMiddleware";
 import { getCdn } from "@/utils/cdn";
 
 export async function generateStaticParams() {
@@ -18,5 +18,5 @@ export async function generateStaticParams() {
     }
 }
 export default function CategoryPage() {
-    return <CategoryPageContent />;
+    return <AllProductPageMiddleware slug_type="category" />;
 }

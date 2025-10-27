@@ -42,8 +42,11 @@ export type DetailProduct = {
 export interface ProductFilters {
   search?: string;
   category_id?: string;
+  category_slug?: string;
   collection_id?: string;
+  collection_slug?: string;
   tag_id?: string;
+  tag_slug?: string;
   product_type?: "clothing" | "perfume";
   min_price?: number;
   max_price?: number;
@@ -65,6 +68,10 @@ export interface ProductsResponse {
     totalPages: number;
     hasNextPage: boolean;
     hasPrevPage: boolean;
+  };
+  headers?: {
+    title: string;
+    description: string;
   };
   filters?: ProductFilters & { attributes?: string[] };
   message?: string;

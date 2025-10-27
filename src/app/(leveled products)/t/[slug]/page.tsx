@@ -1,5 +1,4 @@
-import { getAllSubcategories } from "@/utils/subcategory";
-import TagPageContent from "@/pagesview/TagsPage";
+import AllProductPageMiddleware from "@/pagesview/AllProductPageMiddleware";
 import { getCdn } from "@/utils/cdn";
 
 export async function generateStaticParams() {
@@ -18,6 +17,6 @@ export async function generateStaticParams() {
         return [];
     }
 }
-export default function SubCategoryPage() {
-    return <TagPageContent />;
+export default function TagPage() {
+    return <AllProductPageMiddleware slug_type="tag" />;
 }

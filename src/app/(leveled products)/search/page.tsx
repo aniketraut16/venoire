@@ -1,12 +1,12 @@
 'use client'
-import AllProductTemplate from '@/components/Product/AllProductsTemplate';
+import AllProductsPage from '@/pagesview/AllProductsPage';
 import { useSearchParams } from 'next/navigation';
 import React, { Suspense } from 'react'
 
 function SearchPageContent() {
     const searchParams = useSearchParams();
     const searchQuery = searchParams ? searchParams.get('query') : '';
-    return <AllProductTemplate filters={{ department: false, category: false, tag: false }} slug={null} headers={{ title: 'Results for your query \"' + searchQuery + '\"', description: '' }} searchQuery={searchQuery} />
+    return <AllProductsPage slug_type="none" slug={null} searchQuery={searchQuery} />
 }
 
 export default function SearchPage() {
