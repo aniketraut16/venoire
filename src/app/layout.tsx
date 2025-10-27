@@ -5,6 +5,7 @@ import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import SmoothScrolling from "@/components/common/SmoothScrolling";
 import { SmoothScrollProvider } from "@/contexts/SmoothScrollContext";
+import { LoadingWrapper } from "@/components/common/LoadingWrapper";
 import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
 import Script from "next/script";
 
@@ -25,12 +26,14 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <SmoothScrollProvider>
-          <Navbar />
-          <SmoothScrolling>{children}</SmoothScrolling>
-          <Footer />
-          <LoginPopupWrapper />
-        </SmoothScrollProvider>
+        <LoadingWrapper>
+          <SmoothScrollProvider>
+            <Navbar />
+            <SmoothScrolling>{children}</SmoothScrolling>
+            <Footer />
+            <LoginPopupWrapper />
+          </SmoothScrollProvider>
+        </LoadingWrapper>
       </body>
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
     </html>

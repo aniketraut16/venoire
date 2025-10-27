@@ -4,6 +4,7 @@ import { getProducts, getAttributes } from "@/utils/products";
 import React, { useState, useEffect } from "react";
 import ProductCard from "@/components/Product/ProductCard";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useLoading } from "@/contexts/LoadingContext";
 
 const MAX_VISIBLE_OPTIONS = 8;
 
@@ -28,7 +29,7 @@ export default function AllProductsPage(props: {
   }>({ title: "", description: "" });
   const [products, setProducts] = useState<Product[]>([]);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { startLoading, stopLoading } = useLoading();
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -42,10 +43,6 @@ export default function AllProductsPage(props: {
   const [searchTerm, setSearchTerm] = useState(searchQuery || "");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  // Single-select for top bar filters
-  const [topbarSelected, setTopbarSelected] = useState<{
-    [key: string]: string | null;
-  }>({});
   // Multi-select for sidebar filters
   const [selected, setSelected] = useState<{ [key: string]: string[] }>({});
   const [showAll, setShowAll] = useState<{ [key: string]: boolean }>({});
@@ -58,7 +55,7 @@ export default function AllProductsPage(props: {
   // Fetch products and attributes on component mount and when filters change
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      startLoading();
       try {
         // Fetch attributes
         const attributesResponse = await getAttributes();
@@ -107,7 +104,7 @@ export default function AllProductsPage(props: {
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     };
 
@@ -390,7 +387,7 @@ export default function AllProductsPage(props: {
 
   // Layout: sidebar left, main content right
   return (
-    <div className="max-w-7xl mx-auto min-h-screen bg-white mt-45 flex flex-col">
+    <div className="max-w-7xl mx-auto min-h-screen bg-white mt-25 flex flex-col">
       {/* Header */}
       <div className="w-full px-8 py-8 bg-white border-b border-gray-300">
         <h1 className="text-3xl font-serif text-black tracking-tight">
@@ -409,11 +406,7 @@ export default function AllProductsPage(props: {
           {renderSelectedChips()}
           {/* Products Grid */}
           <div className="max-w-7xl mx-auto px-4 py-12">
-            {loading ? (
-              <div className="flex justify-center items-center py-12">
-                <div className="text-lg">Loading products...</div>
-              </div>
-            ) : products.length === 0 ? (
+            {products.length === 0 ? (
               <div className="flex justify-center items-center py-12">
                 <div className="text-lg text-gray-600">
                   No products found matching your criteria.
