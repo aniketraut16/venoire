@@ -7,6 +7,7 @@ import SmoothScrolling from "@/components/common/SmoothScrolling";
 import { SmoothScrollProvider } from "@/contexts/SmoothScrollContext";
 import { LoadingWrapper } from "@/components/common/LoadingWrapper";
 import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
+import { AuthProvider } from "@/contexts/AuthContext";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -26,14 +27,16 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
-        <LoadingWrapper>
-          <SmoothScrollProvider>
-            <Navbar />
-            <SmoothScrolling>{children}</SmoothScrolling>
-            <Footer />
-            <LoginPopupWrapper />
-          </SmoothScrollProvider>
-        </LoadingWrapper>
+        <AuthProvider>
+          <LoadingWrapper>
+            <SmoothScrollProvider>
+              <Navbar />
+              <SmoothScrolling>{children}</SmoothScrolling>
+              <Footer />
+              <LoginPopupWrapper />
+            </SmoothScrollProvider>
+          </LoadingWrapper>
+        </AuthProvider>
       </body>
       <Script src="https://www.instagram.com/embed.js" strategy="lazyOnload" />
     </html>

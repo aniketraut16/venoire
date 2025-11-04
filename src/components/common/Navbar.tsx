@@ -8,6 +8,7 @@ import SearchPopup from './SearchPopup'
 import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 import { getNavbarContent } from '@/utils/homepage'
 import { MenuItem } from '@/types/homepage'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Navbar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -18,7 +19,7 @@ export default function Navbar() {
     const [menuItems, setMenuItems] = useState<MenuItem[]>([])
     const pathname = usePathname()
     const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
-
+    const { user , needsCompleteSetup } = useAuth()
     useEffect(() => {
         const handleScroll = () => {
             setScrollPosition(window.scrollY)
@@ -180,7 +181,7 @@ export default function Navbar() {
                                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                                     </svg>
                                 </Link>
-                                <Link href="/auth" className={`${textColor} transition-opacity hover:opacity-70`}>
+                                <Link href={user ? needsCompleteSetup ? "/complete-profile" : "/profile" : "/auth"} className={`${textColor} transition-opacity hover:opacity-70`}>
                                     <User size={19} strokeWidth={1.5} />
                                 </Link>
                                 <Link href="/cart" className={`${textColor} transition-opacity hover:opacity-70 relative`}>
@@ -198,7 +199,7 @@ export default function Navbar() {
                             >
                                 <Search size={20} strokeWidth={1.5} />
                             </button>
-                            <Link href="/auth" className={`${textColor} transition-opacity hover:opacity-70 p-1`}>
+                            <Link href={user ? needsCompleteSetup ? "/complete-profile" : "/profile" : "/auth"} className={`${textColor} transition-opacity hover:opacity-70 p-1`}>
                                 <User size={20} strokeWidth={1.5} />
                             </Link>
                             <Link href="/cart" className={`${textColor} transition-opacity hover:opacity-70 relative p-1`}>
@@ -278,11 +279,11 @@ export default function Navbar() {
                             <h2 className="text-lg font-semibold text-black mb-1">WELCOME</h2>
                             <p className="text-sm text-gray-600 mb-4">Enjoy a tailored shopping experience.</p>
                             <Link
-                                href="/auth"
+                                href={user ? "/profile" : "/auth"}
                                 onClick={() => setIsMobileMenuOpen(false)}
                                 className="block w-full bg-black text-white py-3 px-4 text-sm font-medium tracking-wide uppercase hover:bg-gray-800 transition-colors text-center"
                             >
-                                LOG IN / SIGN UP
+                                {user ? "PROFILE" : "LOG IN / SIGN UP"}
                             </Link>
                         </div>
                     </div>

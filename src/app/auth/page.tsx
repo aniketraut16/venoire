@@ -1,12 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaEnvelope, FaLock, FaUser } from "react-icons/fa";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-// import { useAuth } from "@/context/AuthContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
     useRouter,
-    // useSearchParams
+    useSearchParams
 } from "next/navigation";
 
 export default function Login() {
@@ -19,10 +18,10 @@ export default function Login() {
     const [isResettingPassword, setIsResettingPassword] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // const { login, register, loginWithGoogle, resetPassword, needsProfileCompletion } = useAuth();
+    const { user, login, register, loginWithGoogle, resetPassword, needsCompleteSetup } = useAuth();
     const router = useRouter();
-    // const searchParams = useSearchParams();
-    // const redirectUrl = searchParams.get('redirect');
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect');
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -31,53 +30,52 @@ export default function Login() {
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
-        // setLoading(true);
+        setLoading(true);
 
-        // try {
-        //     if (isResettingPassword) {
-        //         await resetPassword(email);
-        //         setLoading(false);
-        //         setIsResettingPassword(false);
-        //         alert("Password reset email sent. Check your inbox.");
-        //         return;
-        //     }
+        try {
+            if (isResettingPassword) {
+                await resetPassword(email);
+                setLoading(false);
+                setIsResettingPassword(false);
+                alert("Password reset email sent. Check your inbox.");
+                return;
+            }
 
-        //     if (isLogin) {
-        //         await login(email, password);
-        //     } else {
-        //         await register(name, email, password);
-        //     }
-
-        //     // Successful login/register
-        //     if (redirectUrl) {
-        //         router.push(redirectUrl);
-        //     } else {
-        //         router.push(needsProfileCompletion ? "/complete-profile" : "/");
-        //     }
-        // } catch (err: any) {
-        //     setLoading(false);
-        //     setError(err.message || "Authentication failed");
-        // }
+            if (isLogin) {
+                await login(email, password);
+            } else {
+                await register(name, email, password);
+            }
+            // Defer routing to the effect that watches user/needsCompleteSetup
+            setLoading(false);
+        } catch (err: any) {
+            setLoading(false);
+            setError(err.message || "Authentication failed");
+        }
     };
 
     const handleGoogleLogin = async () => {
         setError("");
-        // setLoading(true);
+        setLoading(true);
 
-        // try {
-        //     await loginWithGoogle();
-
-        //     // Successful login
-        //     if (redirectUrl) {
-        //         router.push(redirectUrl);
-        //     } else {
-        //         router.push(needsProfileCompletion ? "/complete-profile" : "/");
-        //     }
-        // } catch (err: any) {
-        //     setLoading(false);
-        //     setError(err.message || "Google login failed");
-        // }
+        try {
+            await loginWithGoogle();
+            // Defer routing to the effect that watches user/needsCompleteSetup
+            setLoading(false);
+        } catch (err: any) {
+            setLoading(false);
+            setError(err.message || "Google login failed");
+        }
     };
+
+    useEffect(() => {
+        if (!user) return;
+        if (redirectUrl) {
+            router.push(redirectUrl);
+            return;
+        }
+        router.push(needsCompleteSetup ? "/complete-profile" : "/");
+    }, [user, needsCompleteSetup, redirectUrl, router]);
 
     return (
         <div className="min-h-screen relative flex items-center justify-center px-4 pt-45 pb-15 bg-gray-100">
