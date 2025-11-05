@@ -45,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             if (currentUser) {
                 const token = await currentUser.getIdTokenResult();
                 setToken(token.token);
+                console.log(token.token);
 
                 const dbUser = await CheckUserExists(token.token);
                 if (dbUser) {

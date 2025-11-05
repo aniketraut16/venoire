@@ -1,4 +1,4 @@
-import { AttributesResponse, DetailProduct, DetailProductResponse, Product, ProductFilters, ProductsResponse } from "@/types/product";
+import { AttributesResponse,  DetailProductResponse, ProductFilters, ProductsResponse } from "@/types/product";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
