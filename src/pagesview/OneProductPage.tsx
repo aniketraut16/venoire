@@ -4,10 +4,11 @@ import React, { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'next/navigation'
 import { getDetailProduct } from '@/utils/products'
 import type { DetailProduct, ProductPricing } from '@/types/product'
-import { Heart, ShoppingCart, Truck, Tag, Star, ChevronDown, MapPin, Package, Calendar, Loader } from 'lucide-react'
+import { Heart, ShoppingCart, Truck, Tag, Star, Package, Calendar, Loader } from 'lucide-react'
 import { Lens } from '@/components/ui/lens'
 import OnproductImageView from '@/components/Product/OnproductImageView'
 import { useLoading } from '@/contexts/LoadingContext';
+import { useCart } from '@/contexts/cartContext';
 
 export default function OneProductPage() {
   const params = useParams()
@@ -17,11 +18,10 @@ export default function OneProductPage() {
   const [selectedVariant, setSelectedVariant] = useState<ProductPricing | null>(null)
   const [isWishlisted, setIsWishlisted] = useState(false)
   const [couponCode, setCouponCode] = useState('')
-  const [selectedLocation, setSelectedLocation] = useState('')
-  const [showLocationDropdown, setShowLocationDropdown] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { startLoading, stopLoading } = useLoading();
+  const { addToCart } = useCart();
 
 
   useEffect(() => {
@@ -38,8 +38,6 @@ export default function OneProductPage() {
     fetchProduct()
   }, [slug])
 
-  const locations = ['New York', 'Los Angeles', 'Chicago', 'Houston', 'Phoenix']
-
   const handleSizeSelect = (size: string) => {
     if (!product) return
     const variant = product.pricing.find((v) => v.size === size)
@@ -51,6 +49,17 @@ export default function OneProductPage() {
   const displayedPrice = useMemo(() => selectedVariant?.price ?? 0, [selectedVariant])
   const displayedOriginalPrice = useMemo(() => selectedVariant?.originalPrice ?? 0, [selectedVariant])
   const displayedDiscount = useMemo(() => selectedVariant?.discount ?? 0, [selectedVariant])
+
+  const getSelectedVariantId = (): string | null => {
+    const idCandidate = selectedVariant?.id ?? null;
+    return idCandidate && String(idCandidate).length > 0 ? String(idCandidate) : null;
+  }
+
+  const handleAddToCart = async () => {
+    const variantId = getSelectedVariantId();
+    if (!variantId) return;
+    await addToCart({ productVariantId: variantId, quantity: 1 });
+  }
 
   if (!product) {
     return (
@@ -163,6 +172,7 @@ export default function OneProductPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     disabled={!selectedVariant}
+                    onClick={handleAddToCart}
                     className="bg-white border border-gray-900 text-gray-900 py-3 px-4 lato-bold uppercase tracking-wide hover:bg-gray-900 hover:text-white disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
                   >
                     <ShoppingCart className="h-4 w-4" />
@@ -171,7 +181,7 @@ export default function OneProductPage() {
 
                   <button
                     onClick={toggleWishlist}
-                    className={`py-3 px-4 lato-bold uppercase tracking-wide transition-colors border flex items-center justify-center gap-2 text-sm ${
+                    className={`w-full py-3 px-4 lato-bold uppercase tracking-wide transition-colors border flex items-center justify-center gap-2 text-sm ${
                       isWishlisted
                         ? 'border-red-500 bg-red-50 text-red-600'
                         : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'

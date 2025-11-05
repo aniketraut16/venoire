@@ -16,6 +16,7 @@ export type Product = {
 
 
 export interface ProductPricing {
+  id: string;
   price: number;
   originalPrice: number;
   discount: number;
