@@ -8,6 +8,7 @@ import { SmoothScrollProvider } from "@/contexts/SmoothScrollContext";
 import { LoadingWrapper } from "@/components/common/LoadingWrapper";
 import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { CartProvider } from "@/contexts/cartContext";
 import Script from "next/script";
 
 export const metadata: Metadata = {
@@ -29,12 +30,14 @@ export default function RootLayout({
       <body>
         <AuthProvider>
           <LoadingWrapper>
-            <SmoothScrollProvider>
-              <Navbar />
-              <SmoothScrolling>{children}</SmoothScrolling>
-              <Footer />
-              <LoginPopupWrapper />
-            </SmoothScrollProvider>
+            <CartProvider>
+              <SmoothScrollProvider>
+                <Navbar />
+                <SmoothScrolling>{children}</SmoothScrolling>
+                <Footer />
+                <LoginPopupWrapper />
+              </SmoothScrollProvider>
+            </CartProvider>
           </LoadingWrapper>
         </AuthProvider>
       </body>

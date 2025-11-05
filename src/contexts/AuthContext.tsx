@@ -15,7 +15,6 @@ import {
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
 import { DBUser } from "@/types/user";
-import axios from "axios";
 import { CheckUserExists } from "@/utils/user";
 
 type AuthContextType = {

@@ -1,0 +1,115 @@
+"use client";
+
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
+import { AddToCartArgs, CartItem } from "@/types/cart";
+import { addToCart as addToCartApi, getCart as getCartApi, removeFromCart as removeFromCartApi, updateCartItem as updateCartItemApi, mergeCartAfterLogin as mergeCartAfterLoginApi } from "@/utils/cart";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLoading } from "./LoadingContext";
+
+type CartContextType = {
+  items: CartItem[];
+  count: number;
+  addToCart: (args: AddToCartArgs) => Promise<boolean>;
+  removeFromCart: (itemId: string) => Promise<boolean>;
+  updateCartItem: (itemId: string, args: AddToCartArgs) => Promise<boolean>;
+};
+
+const CartContext = createContext<CartContextType | undefined>(undefined);
+
+export function CartProvider({ children }: { children: ReactNode }) {
+  const { token } = useAuth();
+  const [items, setItems] = useState<CartItem[]>([]);
+  const {  startLoading, stopLoading } = useLoading();
+
+  const computeCount = useCallback((list: CartItem[]) => {
+    return list.reduce((sum, item) => sum + (Number(item.quantity) || 0), 0);
+  }, []);
+
+  const refresh = useCallback(async () => {
+    try {
+      startLoading();
+      const fetched = await getCartApi(token ?? null);
+      setItems(fetched);
+    } finally {
+      stopLoading();
+    }
+  }, [token]);
+
+  const addToCart = useCallback(
+    async (args: AddToCartArgs): Promise<boolean> => {
+      startLoading();
+      const ok = await addToCartApi(args, token ?? null);
+      if (ok) {
+        await refresh();
+      }
+      stopLoading();
+      return ok;
+    },
+    [token, refresh]
+  );
+
+  const removeFromCart = useCallback(
+    async (itemId: string): Promise<boolean> => {
+      startLoading();
+      const ok = await removeFromCartApi(itemId, token ?? null);
+      if (ok) {
+        await refresh();
+      }
+      stopLoading();
+      return ok;
+    },
+    [token, refresh]
+  );
+
+  const updateCartItem = useCallback(
+    async (itemId: string, args: AddToCartArgs): Promise<boolean> => {
+      startLoading();
+      const ok = await updateCartItemApi(itemId, args, token ?? null);
+      if (ok) {
+        await refresh();
+      }
+      stopLoading();
+      return ok;
+    },
+    [token, refresh]
+  );
+
+  useEffect(() => {
+    startLoading();
+    refresh().finally(() => {
+      stopLoading();
+    });
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!token) return;
+    startLoading();
+    mergeCartAfterLoginApi(token).finally(() => {
+      stopLoading();
+    });
+  }, [token]);
+
+  const value = useMemo<CartContextType>(() => ({
+    items,
+    count: computeCount(items),
+    addToCart,
+    removeFromCart,
+    updateCartItem,
+  }), [items, refresh, addToCart, removeFromCart, updateCartItem, computeCount]);
+
+  return (
+    <CartContext.Provider value={value}>
+      {children}
+    </CartContext.Provider>
+  );
+}
+
+export function useCart() {
+  const context = useContext(CartContext);
+  if (context === undefined) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+}
+
+

@@ -9,6 +9,7 @@ import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 import { getNavbarContent } from '@/utils/homepage'
 import { MenuItem } from '@/types/homepage'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCart } from '@/contexts/cartContext'
 
 export default function Navbar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -20,6 +21,7 @@ export default function Navbar() {
     const pathname = usePathname()
     const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
     const { user , needsCompleteSetup } = useAuth()
+    const { count } = useCart()
     useEffect(() => {
         const handleScroll = () => {
             setScrollPosition(window.scrollY)
@@ -186,7 +188,7 @@ export default function Navbar() {
                                 </Link>
                                 <Link href="/cart" className={`${textColor} transition-opacity hover:opacity-70 relative`}>
                                     <ShoppingBag size={19} strokeWidth={1.5} />
-                                    <span className={`absolute -top-1 -right-2 text-[10px] font-medium ${textColor}`}>(0)</span>
+                                    <span className={`absolute -top-2 -right-3 text-[10px] font-medium ${textColor} bg-black text-white rounded-full px-1 py-0.5`}>{count}</span>
                                 </Link>
                             </div>
                         </div>
@@ -204,7 +206,7 @@ export default function Navbar() {
                             </Link>
                             <Link href="/cart" className={`${textColor} transition-opacity hover:opacity-70 relative p-1`}>
                                 <ShoppingBag size={20} strokeWidth={1.5} />
-                                <span className={`absolute -top-1 -right-1 text-[9px] font-medium ${textColor}`}>(0)</span>
+                                <span className={`absolute -top-1 -right-2 text-[10px] font-medium ${textColor} bg-black text-white rounded-full px-1 py-0.5`}>{count}</span>
                             </Link>
                         </div>
                     </div>

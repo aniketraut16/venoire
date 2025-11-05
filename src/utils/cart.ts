@@ -1,7 +1,16 @@
 import { AddToCartArgs, CartItem } from "@/types/cart";
 import axios from "axios";
-import { cookies } from "next/headers";
+import Cookies from 'js-cookie';
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+// Helper functions to manage cookies in the browser
+const getCookie = (name: string): string | undefined => {
+  return Cookies.get(name) ?? undefined;
+};
+
+const setCookie = (name: string, value: string, days: number = 30): void => {
+  Cookies.set(name, value, { expires: days });
+};
 
 export const addToCart = async (
   args: AddToCartArgs,
@@ -10,12 +19,10 @@ export const addToCart = async (
   try {
     let sessionId = null;
     if (!token) {
-      sessionId = (await cookies()).get("sessionId")?.value;
+      sessionId = getCookie("sessionId");
       if (!sessionId) {
         sessionId = crypto.randomUUID();
-        (await cookies()).set("sessionId", sessionId, {
-          maxAge: 60 * 60 * 24 * 30,
-        });
+        setCookie("sessionId", sessionId, 30);
       }
     }
     const headers = token
@@ -37,7 +44,7 @@ export const getCart = async (
   try {
     let sessionId = null;
     if (!token) {
-      sessionId = (await cookies()).get("sessionId")?.value;
+      sessionId = getCookie("sessionId");
       if (!sessionId) {
         return [];
       }
@@ -62,7 +69,7 @@ export const removeFromCart = async (
   try {
     let sessionId = null;
     if (!token) {
-      sessionId = (await cookies()).get("sessionId")?.value;
+      sessionId = getCookie("sessionId");
       if (!sessionId) {
         return false;
       }
@@ -88,7 +95,7 @@ export const updateCartItem = async (
   try {
     let sessionId = null;
     if (!token) {
-      sessionId = (await cookies()).get("sessionId")?.value;
+      sessionId = getCookie("sessionId");
       if (!sessionId) {
         return false;
       }
@@ -110,7 +117,7 @@ export const mergeCartAfterLogin = async (token: string): Promise<void> => {
   try {
     let sessionId = null;
     if (!token) {
-      sessionId = (await cookies()).get("sessionId")?.value;
+      sessionId = getCookie("sessionId");
       if (!sessionId) {
         return;
       }
