@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -8,7 +8,7 @@ import {
     useSearchParams
 } from "next/navigation";
 
-export default function Login() {
+function Login() {
     const [isLogin, setIsLogin] = useState(true);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -254,4 +254,12 @@ export default function Login() {
             </div>
         </div>
     );
-} 
+}
+
+export default function AuthPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <Login />
+        </Suspense>
+    );
+}
