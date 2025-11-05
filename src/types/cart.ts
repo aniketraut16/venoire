@@ -1,8 +1,14 @@
 export type CartItem = {
   id: string;
   quantity: number;
-  size?: string;
-  ml_volume?: string;
+  size?: {
+    size: string;
+    variantId: string;
+  };
+  ml_volume?: {
+    ml_volume: string;
+    variantId: string;
+  };
   possibleSizes?: {
     size: string;
     variantId: string;
@@ -19,6 +25,6 @@ export type CartItem = {
 };
 
 export type AddToCartArgs = {
-  productVariantId: string,
-  quantity: number,
-}
+  productVariantId: string;
+  quantity: number;
+};

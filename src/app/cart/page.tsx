@@ -1,79 +1,113 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Heart, Trash2, ChevronDown, Shield, Package, Truck, Info } from 'lucide-react';
-
-type CartItem = {
-    id: string;
-    quantity: number;
-    size: string;
-    possibleSizes: string[];
-    price: number;
-    name: string;
-    brand: string;
-    image: string;
-};
-
-const cartDetails = [
-    {
-        id: "1",
-        quantity: 1,
-        size: "39",
-        possibleSizes: ["36", "38", "39", "40", "42"],
-        price: 2299,
-        name: "Men White Slim Fit Stripe Full Sleeves Casual Shirt",
-        brand: "PETER ENGLAND",
-        image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=400&fit=crop",
-    },
-    {
-        id: "2",
-        quantity: 2,
-        size: "40",
-        possibleSizes: ["38", "40", "42", "44"],
-        price: 1999,
-        name: "Women Black Casual Top",
-        brand: "VERO MODA",
-        image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=400&fit=crop",
-    },
-    {
-        id: "3",
-        quantity: 1,
-        size: "42",
-        possibleSizes: ["40", "42", "44", "46"],
-        price: 3499,
-        name: "Unisex Blue Denim Jacket",
-        brand: "LEVI'S",
-        image: "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=300&h=400&fit=crop",
-    },
-];
-
-const getCartDetails = () => {
-    return cartDetails;
-};
+import { useCart } from '@/contexts/cartContext';
+import { CartItem } from '@/types/cart';
 
 export default function ShoppingCartPage() {
-    const [cartItems, setCartItems] = useState<CartItem[]>(getCartDetails());
+    const { items: cartItems, removeFromCart, updateCartItem, count } = useCart();
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
+    const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
-
-    const updateSize = (itemId: string, newSize: string) => {
-        setSelectedSizes(prev => ({ ...prev, [itemId]: newSize }));
-    };
-
-    const updateQuantity = (itemId: string, newQuantity: number) => {
-        setSelectedQuantities(prev => ({ ...prev, [itemId]: newQuantity }));
-    };
-
-    const removeItem = (itemId: string) => {
-        setCartItems(prev => prev.filter(item => item.id !== itemId));
-    };
 
     const moveToWishlist = (itemId: string) => {
         // Handle move to wishlist logic
         console.log('Move to wishlist:', itemId);
     };
 
-    const bagTotal = cartItems.reduce((total, item) => total + item.price, 0);
-    const shipping = 0; // Free shipping
+    // Keep local selections in sync when cart items update from server
+    useEffect(() => {
+        const nextSizes: { [key: string]: string } = {};
+        const nextVolumes: { [key: string]: string } = {};
+        const nextQuantities: { [key: string]: number } = {};
+
+        cartItems.forEach((item: CartItem) => {
+            if (item.productType === "clothing") {
+                const current = selectedSizes[item.id];
+                const isCurrentValid = current && (item.possibleSizes ?? []).some(s => s.size === current);
+                nextSizes[item.id] = isCurrentValid ? current : (item.size?.size ?? "");
+            }
+            if (item.productType === "perfume") {
+                const current = selectedVolumes[item.id];
+                const isCurrentValid = current && (item.possibleVolumes ?? []).some(v => v.ml_volume === current);
+                nextVolumes[item.id] = isCurrentValid ? current : (item.ml_volume?.ml_volume ?? "");
+            }
+            const qtyNum = Number(item.quantity);
+            nextQuantities[item.id] = Number.isFinite(qtyNum) && qtyNum > 0 ? qtyNum : 1;
+        });
+
+        setSelectedSizes(prev => ({ ...prev, ...nextSizes }));
+        setSelectedVolumes(prev => ({ ...prev, ...nextVolumes }));
+        setSelectedQuantities(prev => ({ ...prev, ...nextQuantities }));
+    }, [cartItems]);
+
+    const getCurrentQuantity = (item: CartItem): number => {
+        const q = selectedQuantities[item.id] ?? item.quantity ?? 1;
+        const asNum = Number(q);
+        return Number.isFinite(asNum) && asNum > 0 ? asNum : 1;
+    };
+
+    const getCurrentVariantId = (item: CartItem): string | null => {
+        if (item.productType === "clothing") {
+            const selectedSizeValue = selectedSizes[item.id];
+            if (selectedSizeValue && item.possibleSizes && item.possibleSizes.length > 0) {
+                const match = item.possibleSizes.find(s => s.size === selectedSizeValue);
+                if (match) return match.variantId;
+            }
+            if (item.size?.variantId) return item.size.variantId;
+            if (item.size?.size && item.possibleSizes) {
+                const match = item.possibleSizes.find(s => s.size === item.size!.size);
+                return match ? match.variantId : null;
+            }
+            return null;
+        }
+        if (item.productType === "perfume") {
+            const selectedVolValue = selectedVolumes[item.id];
+            if (selectedVolValue && item.possibleVolumes && item.possibleVolumes.length > 0) {
+                const match = item.possibleVolumes.find(v => v.ml_volume === selectedVolValue);
+                if (match) return match.variantId;
+            }
+            if (item.ml_volume?.variantId) return item.ml_volume.variantId;
+            if (item.ml_volume?.ml_volume && item.possibleVolumes) {
+                const match = item.possibleVolumes.find(v => v.ml_volume === item.ml_volume!.ml_volume);
+                return match ? match.variantId : null;
+            }
+            return null;
+        }
+        return null;
+    };
+
+    const handleSizeChange = async (item: CartItem, newSize: string) => {
+        setSelectedSizes(prev => ({ ...prev, [item.id]: newSize }));
+        const match = (item.possibleSizes ?? []).find(s => s.size === newSize);
+        if (match) {
+            await updateCartItem(item.id, { productVariantId: match.variantId, quantity: getCurrentQuantity(item) });
+        }
+    };
+
+    const handleVolumeChange = async (item: CartItem, newVolume: string) => {
+        setSelectedVolumes(prev => ({ ...prev, [item.id]: newVolume }));
+        const match = (item.possibleVolumes ?? []).find(v => v.ml_volume === newVolume);
+        if (match) {
+            await updateCartItem(item.id, { productVariantId: match.variantId, quantity: getCurrentQuantity(item) });
+        }
+    };
+
+    const handleQuantityChange = async (item: CartItem, newQuantity: number) => {
+        const qty = Number(newQuantity);
+        setSelectedQuantities(prev => ({ ...prev, [item.id]: qty }));
+        const variantId = getCurrentVariantId(item);
+        if (variantId) {
+            await updateCartItem(item.id, { productVariantId: variantId, quantity: qty });
+        }
+    };
+
+    const bagTotal = cartItems.reduce((total, item: CartItem) => {
+        const price = Number(item.price) || 0;
+        const qty = getCurrentQuantity(item);
+        return total + price * qty;
+    }, 0);
+    const shipping = 0; 
     const payableAmount = bagTotal + shipping;
 
     return (
@@ -86,12 +120,12 @@ export default function ShoppingCartPage() {
                             {/* Header */}
                             <div className="flex items-center gap-3 p-6 border-b">
                                 <ShoppingBag className="w-5 h-5" />
-                                <h1 className="text-lg font-semibold">MY SHOPPING BAG (1)</h1>
+                                <h1 className="text-lg font-semibold">MY SHOPPING BAG ({count})</h1>
                             </div>
 
                             {/* Cart Items */}
                             <div className="p-6 flex flex-col gap-4">
-                                {cartItems.map((item) => (
+                                {cartItems.map((item: CartItem) => (
                                     <div key={item.id} className="flex gap-4">
                                         {/* Product Image */}
                                         <div className="w-32 h-40 flex-shrink-0">
@@ -106,41 +140,61 @@ export default function ShoppingCartPage() {
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start mb-2">
                                                 <div>
-                                                    <h3 className="font-semibold text-sm text-gray-900 mb-1">{item.brand}</h3>
-                                                    <p className="text-sm text-gray-700 leading-tight">{item.name}</p>
+                                                    <p className="text-sm text-gray-900 font-semibold leading-tight">{item.name}</p>
+                                                    <p className="text-xs text-gray-600 leading-tight">{item.description}</p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-lg font-semibold">₹ {item.price.toLocaleString()}</p>
+                                                    <p className="text-lg font-semibold">₹ {Number(item.price).toLocaleString()}</p>
                                                 </div>
                                             </div>
 
                                             {/* Size and Quantity Selectors */}
                                             <div className="flex gap-4 mt-2 mb-2">
-                                                <div>
-                                                    <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">SIZE</label>
-                                                    <div className="relative">
-                                                        <select
-                                                            className="w-20 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                            value={selectedSizes[item.id] || item.size}
-                                                            onChange={(e) => updateSize(item.id, e.target.value)}
-                                                        >
-                                                            {item.possibleSizes.map(size => (
-                                                                <option key={size} value={size}>{size}</option>
-                                                            ))}
-                                                        </select>
-                                                        <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                {item.productType === "clothing" && (
+                                                    <div>
+                                                        <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">SIZE</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                className="w-20 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                value={selectedSizes[item.id] ?? item.size?.size ?? ""}
+                                                                onChange={(e) => handleSizeChange(item, e.target.value)}
+                                                            >
+                                                                {(item.possibleSizes ?? []).map((s: { size: string; variantId: string }) => (
+                                                                    <option key={s.variantId} value={s.size}>{s.size}</option>
+                                                                ))}
+                                                            </select>
+                                                            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                )}
+
+                                                {item.productType === "perfume" && (
+                                                    <div>
+                                                        <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">VOLUME</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                className="w-24 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                value={selectedVolumes[item.id] ?? item.ml_volume?.ml_volume ?? ""}
+                                                                onChange={(e) => handleVolumeChange(item, e.target.value)}
+                                                            >
+                                                                {(item.possibleVolumes ?? []).map((v: { ml_volume: string; variantId: string }) => (
+                                                                    <option key={v.variantId} value={v.ml_volume}>{v.ml_volume}</option>
+                                                                ))}
+                                                            </select>
+                                                            <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                        </div>
+                                                    </div>
+                                                )}
 
                                                 <div>
                                                     <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">QUANTITY</label>
                                                     <div className="relative">
                                                         <select
                                                             className="w-16 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                                            value={selectedQuantities[item.id] || item.quantity}
-                                                            onChange={(e) => updateQuantity(item.id, parseInt(e.target.value))}
+                                                            value={selectedQuantities[item.id] ?? item.quantity}
+                                                            onChange={(e) => handleQuantityChange(item, parseInt(e.target.value))}
                                                         >
-                                                            {[1, 2, 3, 4, 5].map(qty => (
+                                                            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(qty => (
                                                                 <option key={qty} value={qty}>{qty}</option>
                                                             ))}
                                                         </select>
@@ -159,7 +213,7 @@ export default function ShoppingCartPage() {
                                                     MOVE TO WISHLIST
                                                 </button>
                                                 <button
-                                                    onClick={() => removeItem(item.id)}
+                                                    onClick={() => removeFromCart(item.id)}
                                                     className="flex items-center gap-2 px-3 py-2 border border-gray-300 bg-white hover:bg-red-50 hover:border-red-300 text-gray-700 hover:text-red-600 transition-colors cursor-pointer"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
@@ -186,7 +240,7 @@ export default function ShoppingCartPage() {
                             <div className="p-6">
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-gray-700">Bag Total (1)</span>
+                                        <span className="text-gray-700">Bag Total ({count})</span>
                                         <span className="font-medium">₹ {bagTotal.toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
@@ -207,7 +261,7 @@ export default function ShoppingCartPage() {
 
                                 {/* Checkout Button */}
                                 <button className="w-full bg-black text-white py-3  font-medium text-sm hover:bg-gray-800 transition-colors mb-4">
-                                    CHECKOUT (1)
+                                    CHECKOUT ({count})
                                 </button>
 
 
