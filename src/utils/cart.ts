@@ -15,7 +15,10 @@ const setCookie = (name: string, value: string, days: number = 30): void => {
 export const addToCart = async (
   args: AddToCartArgs,
   token: string | null = null
-): Promise<boolean> => {
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
   try {
     let sessionId = null;
     if (!token) {
@@ -31,10 +34,10 @@ export const addToCart = async (
       ? { headers: { "x-session-id": sessionId } }
       : {};
     await axios.post(`${baseUrl}/cart/items`, args, headers);
-    return true;
-  } catch (error) {
+    return { success: true, message: "Item added to cart successfully" };
+  } catch (error: any) {
     console.error("Error adding to cart:", error);
-    return false;
+    return { success: false, message: error.message as string | "Failed to add item to cart" };
   }
 };
 
@@ -65,13 +68,16 @@ export const getCart = async (
 export const removeFromCart = async (
   itemId: string,
   token: string | null = null
-): Promise<boolean> => {
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
   try {
     let sessionId = null;
     if (!token) {
       sessionId = getCookie("sessionId");
       if (!sessionId) {
-        return false;
+        return { success: false, message: "Session ID is required" };
       }
     }
     const headers = token
@@ -80,10 +86,10 @@ export const removeFromCart = async (
       ? { headers: { "x-session-id": sessionId } }
       : {};
     await axios.delete(`${baseUrl}/cart/${itemId}`, headers);
-    return true;
-  } catch (error) {
+    return { success: true, message: "Item removed from cart successfully" };
+  } catch (error: any) {
     console.error("Error removing from cart:", error);
-    return false;
+    return { success: false, message: error.message as string | "Failed to remove item from cart" };
   }
 };
 
@@ -91,13 +97,16 @@ export const updateCartItem = async (
   itemId: string,
   args: AddToCartArgs,
   token: string | null = null
-): Promise<boolean> => {
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
   try {
     let sessionId = null;
     if (!token) {
       sessionId = getCookie("sessionId");
       if (!sessionId) {
-        return false;
+        return { success: false, message: "Session ID is required" };
       }
     }
     const headers = token
@@ -106,10 +115,10 @@ export const updateCartItem = async (
       ? { headers: { "x-session-id": sessionId } }
       : {};
     await axios.put(`${baseUrl}/cart/${itemId}`, args, headers);
-    return true;
-  } catch (error) {
+    return { success: true, message: "Item updated in cart successfully" };
+  } catch (error: any) {
     console.error("Error updating cart item:", error);
-    return false;
+    return { success: false, message: error.message as string | "Failed to update item in cart" };
   }
 };
 

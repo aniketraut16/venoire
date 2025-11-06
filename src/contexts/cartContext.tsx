@@ -5,6 +5,7 @@ import { AddToCartArgs, CartItem } from "@/types/cart";
 import { addToCart as addToCartApi, getCart as getCartApi, removeFromCart as removeFromCartApi, updateCartItem as updateCartItemApi, mergeCartAfterLogin as mergeCartAfterLoginApi } from "@/utils/cart";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "./LoadingContext";
+import toast from "react-hot-toast";
 
 type CartContextType = {
   items: CartItem[];
@@ -39,11 +40,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async (args: AddToCartArgs): Promise<boolean> => {
       startLoading();
       const ok = await addToCartApi(args, token ?? null);
-      if (ok) {
+      if (ok.success) {
         await refresh();
+        toast.success(ok.message);
+      } else {
+        toast.error(ok.message);
       }
       stopLoading();
-      return ok;
+      return ok.success;
     },
     [token, refresh]
   );
@@ -52,11 +56,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async (itemId: string): Promise<boolean> => {
       startLoading();
       const ok = await removeFromCartApi(itemId, token ?? null);
-      if (ok) {
+      if (ok.success) {
         await refresh();
+        toast.success(ok.message);
+      } else {
+        toast.error(ok.message);
       }
       stopLoading();
-      return ok;
+      return ok.success;
     },
     [token, refresh]
   );
@@ -65,11 +72,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     async (itemId: string, args: AddToCartArgs): Promise<boolean> => {
       startLoading();
       const ok = await updateCartItemApi(itemId, args, token ?? null);
-      if (ok) {
+      if (ok.success) {
         await refresh();
+        toast.success(ok.message);
+      } else {
+        toast.error(ok.message);
       }
       stopLoading();
-      return ok;
+      return ok.success;
     },
     [token, refresh]
   );
