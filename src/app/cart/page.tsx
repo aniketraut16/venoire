@@ -3,13 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Heart, Trash2, ChevronDown, Shield, Package, Truck, Info } from 'lucide-react';
 import { useCart } from '@/contexts/cartContext';
 import { CartItem } from '@/types/cart';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 export default function ShoppingCartPage() {
     const { items: cartItems, removeFromCart, updateCartItem, count } = useCart();
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
-
+    const { user, needsCompleteSetup } = useAuth()
+    const router = useRouter();
     const moveToWishlist = (itemId: string) => {
         // Handle move to wishlist logic
         console.log('Move to wishlist:', itemId);
@@ -109,6 +113,20 @@ export default function ShoppingCartPage() {
     }, 0);
     const shipping = 0; 
     const payableAmount = bagTotal + shipping;
+
+
+    const handleCheckout = () => {
+        if (!user) {
+            toast.error('Please login to checkout');
+            router.push('/auth?redirect=/checkout');
+        } else if (needsCompleteSetup) {
+            toast.error('Please complete your profile to checkout');
+            router.push('/complete-profile?redirect=/checkout');
+        } else {
+            toast.success('Redirecting to checkout...');
+            router.push('/checkout');
+        }
+    }
 
     return (
         <div className="min-h-screen bg-gray-50 pt-35">
@@ -260,7 +278,7 @@ export default function ShoppingCartPage() {
                                 </div>
 
                                 {/* Checkout Button */}
-                                <button className="w-full bg-black text-white py-3  font-medium text-sm hover:bg-gray-800 transition-colors mb-4">
+                                <button onClick={handleCheckout} className="w-full bg-black text-white py-3  font-medium text-sm hover:bg-gray-800 transition-colors mb-4">
                                     CHECKOUT ({count})
                                 </button>
 
