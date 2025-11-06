@@ -10,6 +10,7 @@ import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/cartContext";
 import Script from "next/script";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "Venoire",
@@ -28,6 +29,10 @@ export default function RootLayout({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </head>
       <body>
+      <Toaster
+       position="top-center"
+       reverseOrder={true}
+      />
         <AuthProvider>
           <LoadingWrapper>
             <CartProvider>
