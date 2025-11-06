@@ -146,7 +146,7 @@ export default function ShoppingCartPage() {
                                 {cartItems.map((item: CartItem) => (
                                     <div key={item.id} className="flex gap-4">
                                         {/* Product Image */}
-                                        <div className="w-32 h-40 flex-shrink-0">
+                                        <div className="md:w-32 w-0 h-40 flex-shrink-0">
                                             <img
                                                 src={item.image}
                                                 alt={item.name}

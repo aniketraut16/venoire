@@ -226,13 +226,14 @@ export default function CheckoutPage() {
                                 <h2 className="text-lg font-semibold">ORDER SUMMARY</h2>
                             </div>
                             <div className="p-6">
-                                {/* Items (Table) */}
-                                <div className="mb-6 max-h-64 overflow-y-auto pr-1">
+                                {/* Items (Responsive) */}
+                                <div className="mb-6 md:max-h-64 max-h-none overflow-y-auto pr-1">
                                     {cartItems.length === 0 ? (
                                         <p className="text-sm text-gray-600">Your cart is empty.</p>
                                     ) : (
                                         <div className="border border-gray-200">
-                                            <div className="grid grid-cols-12 bg-gray-50 text-xs font-semibold text-gray-900">
+                                            {/* Header (desktop) */}
+                                            <div className="hidden md:grid grid-cols-12 bg-gray-50 text-xs font-semibold text-gray-900">
                                                 <div className="px-3 py-2 col-span-5">Name</div>
                                                 <div className="px-3 py-2 text-right col-span-2">Qty</div>
                                                 <div className="px-3 py-2 text-right col-span-2">Price</div>
@@ -243,24 +244,48 @@ export default function CheckoutPage() {
                                                 const qty = Number(item.quantity) || 1;
                                                 const subtotal = price * qty;
                                                 return (
-                                                    <div key={item.id} className="grid grid-cols-12 text-sm border-t border-gray-200">
-                                                        <div className="px-3 py-2 col-span-5 break-words whitespace-normal" title={item.name}>
-                                                            <div className="flex flex-col gap-1">
-                                                                <span>{item.name}</span>
-                                                                <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 w-fit">
-                                                                    {item.productType === 'clothing' ? item.size?.size : item.ml_volume?.ml_volume}
-                                                                </span>
+                                                    <>
+                                                        {/* Row (desktop) */}
+                                                        <div key={`d-${item.id}`} className="hidden md:grid grid-cols-12 text-sm border-t border-gray-200">
+                                                            <div className="px-3 py-2 col-span-5 break-words whitespace-normal" title={item.name}>
+                                                                <div className="flex flex-col gap-1">
+                                                                    <span>{item.name}</span>
+                                                                    <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 w-fit">
+                                                                        {item.productType === 'clothing' ? item.size?.size : item.ml_volume?.ml_volume}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                            <div className="px-3 py-2 text-right col-span-2">{qty}</div>
+                                                            <div className="px-3 py-2 text-right col-span-2">₹ {price.toLocaleString()}</div>
+                                                            <div className="px-3 py-2 text-right col-span-3">₹ {subtotal.toLocaleString()}</div>
+                                                        </div>
+                                                        {/* Card (mobile) */}
+                                                        <div key={`m-${item.id}`} className="md:hidden border-t border-gray-200 px-3 py-3 text-sm">
+                                                            <div className="font-semibold text-gray-900 mb-2 break-words whitespace-normal" title={item.name}>{item.name}</div>
+                                                            <div className="grid grid-cols-2 gap-y-2 text-gray-800">
+                                                                <div className="text-gray-600">Variant</div>
+                                                                <div className="text-right">{item.productType === 'clothing' ? item.size?.size : item.ml_volume?.ml_volume}</div>
+                                                                <div className="text-gray-600">Quantity</div>
+                                                                <div className="text-right">{qty}</div>
+                                                                <div className="text-gray-600">Price</div>
+                                                                <div className="text-right">₹ {price.toLocaleString()}</div>
+                                                            </div>
+                                                            <div className="mt-3 pt-2 border-t flex items-center justify-between">
+                                                                <span className="font-medium">Subtotal</span>
+                                                                <span className="font-semibold">₹ {subtotal.toLocaleString()}</span>
                                                             </div>
                                                         </div>
-                                                        <div className="px-3 py-2 text-right col-span-2">{qty}</div>
-                                                        <div className="px-3 py-2 text-right col-span-2">₹ {price.toLocaleString()}</div>
-                                                        <div className="px-3 py-2 text-right col-span-3">₹ {subtotal.toLocaleString()}</div>
-                                                    </div>
+                                                    </>
                                                 );
                                             })}
-                                            <div className="grid grid-cols-12 border-t border-gray-300 bg-gray-50 text-sm font-semibold">
+                                            {/* Total row */}
+                                            <div className="hidden md:grid grid-cols-12 border-t border-gray-300 bg-gray-50 text-sm font-semibold">
                                                 <div className="px-3 py-2 col-span-8 text-right">Total</div>
                                                 <div className="px-3 py-2 text-right col-span-4">₹ {bagTotal.toLocaleString()}</div>
+                                            </div>
+                                            <div className="md:hidden border-t border-gray-300 bg-gray-50 text-sm font-semibold px-3 py-2 flex items-center justify-between">
+                                                <div>Total</div>
+                                                <div>₹ {bagTotal.toLocaleString()}</div>
                                             </div>
                                         </div>
                                     )}
