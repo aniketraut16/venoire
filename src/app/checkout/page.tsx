@@ -7,10 +7,14 @@ import { deleteAddress, getAddresses } from '@/utils/address';
 import AddressForm from '@/components/Address/AddressForm';
 import toast from 'react-hot-toast';
 import { ChevronDown, Package, Shield, Truck, Trash2, Pencil, Plus } from 'lucide-react';
+import { getCartId } from '@/utils/cart';
+import { intiateOrder, MOCK_ORDER_CALLBACK } from '@/utils/orders';
+import MockPaymentGateway from '@/components/PaymentGateway/MockPaymentGateway';
+import OrderSuccess from '@/components/Order/OrderSuccess';
 
 export default function CheckoutPage() {
     const { user, dbUser, token } = useAuth();
-    const { items: cartItems, count } = useCart();
+    const { items: cartItems, cartId } = useCart();
 
     const [addresses, setAddresses] = useState<AddressType[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -19,6 +23,16 @@ export default function CheckoutPage() {
 
     const [couponCode, setCouponCode] = useState<string>("");
     const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+
+    const [showPaymentGateway, setShowPaymentGateway] = useState(false);
+    const [currentOrderId, setCurrentOrderId] = useState<string | null>(null);
+    const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+    
+    const [orderSuccess, setOrderSuccess] = useState<{
+        orderId: string;
+        transactionId: string;
+        amount: number;
+    } | null>(null);
 
     useEffect(() => {
         const loadAddresses = async () => {
@@ -113,7 +127,7 @@ export default function CheckoutPage() {
         setShowAddressForm({ method: 'update', addressId: addr.id, defaultValues: defaults });
     };
 
-    const handlePay = () => {
+    const handlePay = async () => {
         if (!user) {
             toast.error('Please login to proceed');
             return;
@@ -122,7 +136,101 @@ export default function CheckoutPage() {
             toast.error('Select a delivery address');
             return;
         }
-        toast.success('Payment feature coming soon');
+        if (!token) {
+            toast.error('Authentication required');
+            return;
+        }
+        if (cartItems.length === 0) {
+            toast.error('Your cart is empty');
+            return;
+        }
+
+        setIsProcessingPayment(true);
+
+        try {
+            if (!cartId) {
+                toast.error('Unable to retrieve cart information');
+                setIsProcessingPayment(false);
+                return;
+            }
+
+            const orderData = {
+                cartId: cartId,
+                shippingAddressId: selectedAddressId,
+                billingAddressId: selectedAddressId,
+                couponCode: appliedCoupon || '',
+                notes: ''
+            };
+
+            const result = await intiateOrder(orderData, token);
+
+            if (result.success && result.orderId) {
+                setCurrentOrderId(result.orderId);
+                setShowPaymentGateway(true);
+                toast.success('Order initiated successfully');
+            } else {
+                toast.error(result.message || 'Failed to initiate order');
+            }
+        } catch (error) {
+            console.error('Error initiating order:', error);
+            toast.error('An error occurred while processing your order');
+        } finally {
+            setIsProcessingPayment(false);
+        }
+    };
+
+    const handlePaymentCompleted = async (
+        status: "success" | "failed",
+        transactionId: string,
+        amount: number,
+        paymentMethod: "credit_card" | "debit_card" | "netbanking" | "wallet" | "upi",
+        gatewayResponse: JSON | null
+    ) => {
+        setShowPaymentGateway(false);
+
+        if (status === 'failed') {
+            toast.error('Payment failed. Please try again.');
+            return;
+        }
+
+        if (!currentOrderId) {
+            toast.error('Order ID not found');
+            return;
+        }
+
+        try {
+            const callbackData = {
+                orderId: currentOrderId,
+                transactionId: transactionId,
+                paymentStatus: status,
+                amount: amount,
+                paymentMethod: paymentMethod,
+                gatewayResponse: gatewayResponse
+            };
+
+            const success = await MOCK_ORDER_CALLBACK(callbackData);
+
+            if (success) {
+                setOrderSuccess({
+                    orderId: currentOrderId,
+                    transactionId: transactionId,
+                    amount: amount
+                });
+                toast.success('Order placed successfully!');
+            } else {
+                toast.error('Failed to complete order. Please contact support.');
+            }
+        } catch (error) {
+            console.error('Error completing order:', error);
+            toast.error('An error occurred while completing your order');
+        }
+    };
+
+    const closeOrderSuccess = () => {
+        setOrderSuccess(null);
+        setCurrentOrderId(null);
+        setAppliedCoupon(null);
+        setCouponCode('');
     };
 
     const userName = user?.displayName || dbUser?.first_name + ' ' + dbUser?.last_name || '—';
@@ -336,8 +444,12 @@ export default function CheckoutPage() {
                                     </div>
                                 </div>
 
-                                <button onClick={handlePay} className="w-full bg-black text-white py-3 font-medium text-sm hover:bg-gray-800 transition-colors mb-2">
-                                    PAY NOW
+                                <button 
+                                    onClick={handlePay} 
+                                    disabled={isProcessingPayment || cartItems.length === 0}
+                                    className="w-full bg-black text-white py-3 font-medium text-sm hover:bg-gray-800 transition-colors mb-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isProcessingPayment ? 'Processing...' : 'PAY NOW'}
                                 </button>
                             </div>
                         </div>
@@ -372,6 +484,22 @@ export default function CheckoutPage() {
                     addressId={showAddressForm.addressId}
                     defaultValues={showAddressForm.defaultValues}
                     onCancel={() => setShowAddressForm(null)}
+                />
+            )}
+
+            {showPaymentGateway && (
+                <MockPaymentGateway
+                    amount={payableAmount}
+                    onPaymentCompleted={handlePaymentCompleted}
+                />
+            )}
+
+            {orderSuccess && (
+                <OrderSuccess
+                    orderId={orderSuccess.orderId}
+                    transactionId={orderSuccess.transactionId}
+                    amount={orderSuccess.amount}
+                    onClose={closeOrderSuccess}
                 />
             )}
         </div>

@@ -9,6 +9,7 @@ import toast from "react-hot-toast";
 
 type CartContextType = {
   items: CartItem[];
+  cartId: string;
   count: number;
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
   removeFromCart: (itemId: string) => Promise<boolean>;
@@ -20,6 +21,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const { token } = useAuth();
   const [items, setItems] = useState<CartItem[]>([]);
+  const [cartId, setCartId] = useState<string>("");
   const {  startLoading, stopLoading } = useLoading();
 
   const computeCount = useCallback((list: CartItem[]) => {
@@ -30,7 +32,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     try {
       startLoading();
       const fetched = await getCartApi(token ?? null);
-      setItems(fetched);
+      if (fetched.success) {
+        setItems(fetched.items);
+        setCartId(fetched.cartId);
+      } else {
+        toast.error(fetched.message);
+      }
     } finally {
       stopLoading();
     }
@@ -102,6 +109,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const value = useMemo<CartContextType>(() => ({
     items,
     count: computeCount(items),
+    cartId,
     addToCart,
     removeFromCart,
     updateCartItem,

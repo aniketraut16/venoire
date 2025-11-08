@@ -43,13 +43,13 @@ export const addToCart = async (
 
 export const getCart = async (
   token: string | null = null
-): Promise<CartItem[]> => {
+): Promise<{success: boolean, message: string, items: CartItem[],cartId: string}> => {
   try {
     let sessionId = null;
     if (!token) {
       sessionId = getCookie("sessionId");
       if (!sessionId) {
-        return [];
+        return { success: false, message: "Session ID is required", items: [], cartId: "" };
       }
     }
     const headers = token
@@ -58,10 +58,10 @@ export const getCart = async (
       ? { headers: { "x-session-id": sessionId } }
       : {};
     const response = await axios.get(`${baseUrl}/cart`, headers);
-    return response.data.data as CartItem[];
+    return { success: true, message: "Cart fetched successfully", items: response.data.data as CartItem[], cartId: response.data.cartId as string };
   } catch (error) {
     console.error("Error getting cart:", error);
-    return [];
+    return { success: false, message: "Failed to fetch cart", items: [], cartId: "" };
   }
 };
 
@@ -141,5 +141,29 @@ export const mergeCartAfterLogin = async (token: string): Promise<void> => {
   } catch (error) {
     console.error("Error merging cart after login:", error);
     return;
+  }
+};
+
+export const getCartId = async (
+  token: string | null = null
+): Promise<string | null> => {
+  try {
+    let sessionId = null;
+    if (!token) {
+      sessionId = getCookie("sessionId");
+      if (!sessionId) {
+        return null;
+      }
+    }
+    const headers = token
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : sessionId
+      ? { headers: { "x-session-id": sessionId } }
+      : {};
+    const response = await axios.get(`${baseUrl}/cart/id`, headers);
+    return response.data.data.cartId as string;
+  } catch (error) {
+    console.error("Error getting cart ID:", error);
+    return null;
   }
 };
