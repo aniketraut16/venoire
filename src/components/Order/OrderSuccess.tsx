@@ -13,7 +13,7 @@ function OrderSuccess({ orderId, transactionId, amount, onClose }: OrderSuccessP
   const router = useRouter();
 
   const handleViewOrders = () => {
-    router.push('/orders');
+    router.push('/profile/my-orders');
     onClose();
   };
 

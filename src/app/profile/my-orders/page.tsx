@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getOrders, getOrder, cancelOrder, trackOrder } from "@/utils/orders";
 import { Order, DetailedOrder, TrackOrderResponse } from "@/types/orders";
 import {
@@ -21,23 +22,51 @@ import { useLoading } from "@/contexts/LoadingContext";
 
 export default function MyOrders() {
   const { token } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const { startLoading, stopLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [selectedOrder, setSelectedOrder] = useState<DetailedOrder | null>(null);
-  const [showOrderModal, setShowOrderModal] = useState(false);
   const [trackingData, setTrackingData] = useState<TrackOrderResponse | null>(null);
-  const [showTrackingModal, setShowTrackingModal] = useState(false);
-  const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelComments, setCancelComments] = useState("");
+
+  const modalType = searchParams.get("modal");
+  const orderId = searchParams.get("id");
 
   useEffect(() => {
     if (token) {
       fetchOrders();
     }
   }, [token, statusFilter]);
+
+  useEffect(() => {
+    if (token && orderId && modalType) {
+      handleModalFromUrl(modalType, orderId);
+    }
+  }, [token, orderId, modalType]);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && modalType) {
+        closeModal();
+      }
+    };
+
+    if (modalType) {
+      document.addEventListener("keydown", handleEscape);
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [modalType]);
 
   const fetchOrders = async () => {
     if (!token) return;
@@ -57,26 +86,56 @@ export default function MyOrders() {
     stopLoading();
   };
 
-  const handleViewOrder = async (orderId: string) => {
+  const handleModalFromUrl = async (modal: string, id: string) => {
     if (!token) return;
-    startLoading();
-    const response = await getOrder(orderId, token);
-    if (response.success && response.data) {
-      setSelectedOrder(response.data);
-      setShowOrderModal(true);
+    
+    if (modal === "detail") {
+      startLoading();
+      const response = await getOrder(id, token);
+      if (response.success && response.data) {
+        setSelectedOrder(response.data);
+      }
+      stopLoading();
+    } else if (modal === "tracking") {
+      startLoading();
+      const trackResponse = await trackOrder(id, token);
+      if (trackResponse.success && trackResponse.data) {
+        setTrackingData(trackResponse.data);
+      }
+      stopLoading();
+    } else if (modal === "cancel") {
+      startLoading();
+      const response = await getOrder(id, token);
+      if (response.success && response.data) {
+        setSelectedOrder(response.data);
+      }
+      stopLoading();
     }
-    stopLoading();
   };
 
-  const handleTrackOrder = async (orderId: string) => {
-    if (!token) return;
-    startLoading();
-    const response = await trackOrder(orderId, token);
-    if (response.success && response.data) {
-      setTrackingData(response.data);
-      setShowTrackingModal(true);
-    }
-    stopLoading();
+  const openModal = (type: "detail" | "tracking" | "cancel", id: string) => {
+    router.push(`/profile/my-orders?modal=${type}&id=${id}`, { scroll: false });
+  };
+
+  const closeModal = () => {
+    router.push("/profile/my-orders", { scroll: false });
+    setSelectedOrder(null);
+    setTrackingData(null);
+    setCancelReason("");
+    setCancelComments("");
+  };
+
+  const handleViewOrder = (orderId: string) => {
+    openModal("detail", orderId);
+  };
+
+  const handleTrackOrder = (orderId: string) => {
+    openModal("tracking", orderId);
+  };
+
+  const handleOpenCancelModal = () => {
+    if (!selectedOrder) return;
+    openModal("cancel", selectedOrder.id);
   };
 
   const handleCancelOrder = async () => {
@@ -87,10 +146,7 @@ export default function MyOrders() {
       comments: cancelComments,
     });
     if (response.success) {
-      setShowCancelModal(false);
-      setShowOrderModal(false);
-      setCancelReason("");
-      setCancelComments("");
+      closeModal();
       fetchOrders();
     }
     stopLoading();
@@ -263,41 +319,34 @@ export default function MyOrders() {
         )}
       </div>
 
-      {showOrderModal && selectedOrder && (
+      {modalType === "detail" && selectedOrder && (
         <OrderDetailsModal
           order={selectedOrder}
-          onClose={() => setShowOrderModal(false)}
-          onCancel={() => setShowCancelModal(true)}
-          onTrack={() => {
-            setShowOrderModal(false);
-            handleTrackOrder(selectedOrder.id);
-          }}
+          onClose={closeModal}
+          onCancel={handleOpenCancelModal}
+          onTrack={() => handleTrackOrder(selectedOrder.id)}
           getStatusColor={getStatusColor}
           getStatusIcon={getStatusIcon}
         />
       )}
 
-      {showTrackingModal && trackingData && (
+      {modalType === "tracking" && trackingData && (
         <TrackingModal
           tracking={trackingData}
-          onClose={() => setShowTrackingModal(false)}
+          onClose={closeModal}
           getStatusColor={getStatusColor}
           getStatusIcon={getStatusIcon}
         />
       )}
 
-      {showCancelModal && selectedOrder && (
+      {modalType === "cancel" && selectedOrder && (
         <CancelOrderModal
           orderNumber={selectedOrder.order_number}
           reason={cancelReason}
           comments={cancelComments}
           onReasonChange={setCancelReason}
           onCommentsChange={setCancelComments}
-          onCancel={() => {
-            setShowCancelModal(false);
-            setCancelReason("");
-            setCancelComments("");
-          }}
+          onCancel={closeModal}
           onConfirm={handleCancelOrder}
         />
       )}
@@ -324,7 +373,13 @@ function OrderDetailsModal({
   const canTrack = ["confirmed", "processing", "shipped"].includes(order.status);
 
   return (
-    <div data-lenis-prevent="true" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      data-lenis-prevent="true" 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
           <div>
@@ -532,7 +587,13 @@ function TrackingModal({
   getStatusIcon: (status: string) => React.ReactNode;
 }) {
   return (
-    <div data-lenis-prevent="true" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      data-lenis-prevent="true" 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
       <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
           <div>
@@ -638,7 +699,12 @@ function CancelOrderModal({
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
       <div className="bg-white max-w-md w-full">
         <div className="border-b border-gray-200 p-6">
           <h3 className="text-xl font-light tracking-wide uppercase">Cancel Order</h3>
