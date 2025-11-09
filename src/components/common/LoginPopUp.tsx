@@ -1,7 +1,6 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { X } from 'lucide-react'
-import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 
 interface LoginPopUpProps {
   isOpen: boolean
@@ -12,23 +11,7 @@ interface LoginPopUpProps {
 export default function LoginPopUp({ isOpen, onClose, onLogin }: LoginPopUpProps) {
   const [mobileNumber, setMobileNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
 
-  // Handle body scroll and smooth scrolling when popup opens/closes
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-      disableSmoothScroll()
-    } else {
-      document.body.style.overflow = 'unset'
-      enableSmoothScroll()
-    }
-
-    return () => {
-      document.body.style.overflow = 'unset'
-      enableSmoothScroll()
-    }
-  }, [isOpen, disableSmoothScroll, enableSmoothScroll])
 
   const handleGetOTP = async () => {
     if (mobileNumber.length !== 10) {
@@ -71,12 +54,13 @@ export default function LoginPopUp({ isOpen, onClose, onLogin }: LoginPopUpProps
     <>
       {/* Overlay */}
       <div 
+        data-lenis-prevent="true"
         className="fixed inset-0 bg-black/50 z-[9998] transition-opacity duration-300"
         onClick={onClose}
       />
       
       {/* Login Modal */}
-      <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+      <div data-lenis-prevent="true" className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
         <div 
           className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-hidden animate-in slide-in-from-top-4 duration-300"
           onClick={(e) => e.stopPropagation()}

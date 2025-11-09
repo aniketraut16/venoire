@@ -2,9 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import Link from 'next/link'
-import { getProducts } from '@/utils/products'
 import { getPerfumesByCollection } from '@/utils/perfume'
-import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 
 interface SearchResult {
   id: string
@@ -27,7 +25,6 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
   const [isLoading, setIsLoading] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
-  const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
 
   // Top searches data
   const topSearches = [
@@ -40,30 +37,6 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     'Formal Dress Shirt',
     'Jasmine Nights'
   ]
-
-  // Focus input when popup opens and handle body scroll and smooth scrolling
-  useEffect(() => {
-    if (isOpen) {
-      // Focus input
-      if (searchInputRef.current) {
-        searchInputRef.current.focus()
-      }
-      
-      // Disable body scroll and smooth scrolling
-      document.body.style.overflow = 'hidden'
-      disableSmoothScroll()
-    } else {
-      // Re-enable body scroll and smooth scrolling
-      document.body.style.overflow = 'unset'
-      enableSmoothScroll()
-    }
-
-    // Cleanup function to ensure scroll and smooth scrolling are re-enabled
-    return () => {
-      document.body.style.overflow = 'unset'
-      enableSmoothScroll()
-    }
-  }, [isOpen, disableSmoothScroll, enableSmoothScroll])
 
   // Handle search with debouncing
   useEffect(() => {
@@ -137,6 +110,7 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     <>
       {/* Overlay */}
       <div 
+        data-lenis-prevent="true"
         className="fixed inset-0 bg-black/50 z-[9998] transition-opacity duration-300"
         onClick={onClose}
       />

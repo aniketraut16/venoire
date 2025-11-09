@@ -1,18 +1,13 @@
 "use client";
 import React, { PropsWithChildren, useEffect, useRef } from "react";
 import Lenis from "lenis";
-import { useSmoothScroll } from "@/contexts/SmoothScrollContext";
 
 const SmoothScrolling = ({ children }: PropsWithChildren) => {
   const lenisRef = useRef<Lenis | null>(null);
   const rafRef = useRef<number | null>(null);
-  const { isEnabled } = useSmoothScroll();
 
   // Initialize and control Lenis based on isEnabled
   useEffect(() => {
-    if (!isEnabled) {
-      return;
-    }
     const lenis = new Lenis({
       lerp: 0.1,
       duration: 1.5,
@@ -39,7 +34,7 @@ const SmoothScrolling = ({ children }: PropsWithChildren) => {
         lenisRef.current = null;
       }
     };
-  }, [isEnabled]);
+  }, []);
 
   return <>{children}</>;
 };

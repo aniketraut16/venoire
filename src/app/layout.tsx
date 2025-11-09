@@ -4,7 +4,6 @@ import "./globals.css";
 import Navbar from "@/components/common/Navbar";
 import Footer from "@/components/common/Footer";
 import SmoothScrolling from "@/components/common/SmoothScrolling";
-import { SmoothScrollProvider } from "@/contexts/SmoothScrollContext";
 import { LoadingWrapper } from "@/components/common/LoadingWrapper";
 import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -36,12 +35,10 @@ export default function RootLayout({
         <AuthProvider>
           <LoadingWrapper>
             <CartProvider>
-              <SmoothScrollProvider>
                 <Navbar />
                 <SmoothScrolling>{children}</SmoothScrolling>
                 <Footer />
                 <LoginPopupWrapper />
-              </SmoothScrollProvider>
             </CartProvider>
           </LoadingWrapper>
         </AuthProvider>

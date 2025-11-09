@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { Search, User, ShoppingBag, Menu, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import SearchPopup from './SearchPopup'
-import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
 import { getNavbarContent } from '@/utils/homepage'
 import { MenuItem } from '@/types/homepage'
 import { useAuth } from '@/contexts/AuthContext'
@@ -18,7 +17,6 @@ export default function Navbar() {
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [menuItems, setMenuItems] = useState<MenuItem[]>([])
     const pathname = usePathname()
-    const { disableSmoothScroll, enableSmoothScroll } = useSmoothScroll()
     const { user , needsCompleteSetup } = useAuth()
     const { count } = useCart()
     useEffect(() => {
@@ -29,22 +27,6 @@ export default function Navbar() {
         window.addEventListener('scroll', handleScroll, { passive: true })
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
-
-    // Handle body scroll and smooth scrolling for mobile menu
-    useEffect(() => {
-        if (isMobileMenuOpen) {
-            document.body.style.overflow = 'hidden'
-            disableSmoothScroll()
-        } else {
-            document.body.style.overflow = 'unset'
-            enableSmoothScroll()
-        }
-
-        return () => {
-            document.body.style.overflow = 'unset'
-            enableSmoothScroll()
-        }
-    }, [isMobileMenuOpen, disableSmoothScroll, enableSmoothScroll])
 
     // Check if we're on home page or perfume pages
     const isHomePage = pathname === '/'
@@ -250,6 +232,7 @@ export default function Navbar() {
 
             {/* Mobile Sidebar Menu */}
             <div
+                data-lenis-prevent="true"
                 className={`fixed inset-0 bg-white transform transition-transform duration-300 ease-in-out z-[9999] md:hidden overflow-y-auto overscroll-contain ${
                     isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
@@ -434,8 +417,6 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
-
-            {/* Mobile Menu Overlay - Not needed since sidebar is full screen */}
 
             {/* Search Popup */}
             <SearchPopup 
