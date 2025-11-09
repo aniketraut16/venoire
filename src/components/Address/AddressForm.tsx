@@ -63,21 +63,21 @@ export default function AddressForm(props: {
     
     return (
         <div 
-        data-lenis-prevent="true"
-            className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 backdrop-blur-sm"
+            data-lenis-prevent="true"
+            className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4"
             onClick={props.onCancel}
         >
             <div 
-                className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+                className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex justify-between items-center rounded-t-2xl">
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl font-bold text-black">
+                        <h2 className="text-2xl font-light tracking-wide uppercase text-black">
                             {props.method === 'create' ? 'Add New Address' : 'Update Address'}
                         </h2>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-600 mt-1">
                             {props.method === 'create' 
                                 ? 'Fill in the details below to add a new delivery address' 
                                 : 'Update your delivery address information'}
@@ -85,7 +85,7 @@ export default function AddressForm(props: {
                     </div>
                     <button
                         onClick={props.onCancel}
-                        className="text-gray-400 hover:text-black transition-colors p-2 hover:bg-gray-100 rounded-full"
+                        className="text-gray-400 hover:text-gray-600 transition-colors"
                         type="button"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,8 +99,8 @@ export default function AddressForm(props: {
                     <div className="space-y-6">
                         {/* Address Line 1 */}
                         <div>
-                            <label htmlFor="address_line1" className="block text-sm font-semibold text-black mb-2">
-                                Address Line 1 <span className="text-red-500">*</span>
+                            <label htmlFor="address_line1" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                Address Line 1 <span className="text-red-600">*</span>
                             </label>
                             <input
                                 type="text"
@@ -109,14 +109,14 @@ export default function AddressForm(props: {
                                 value={formData.address_line1}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
+                                className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                 placeholder="Street address, P.O. box, company name"
                             />
                         </div>
 
                         {/* Address Line 2 */}
                         <div>
-                            <label htmlFor="address_line2" className="block text-sm font-semibold text-black mb-2">
+                            <label htmlFor="address_line2" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
                                 Address Line 2
                             </label>
                             <input
@@ -125,7 +125,7 @@ export default function AddressForm(props: {
                                 name="address_line2"
                                 value={formData.address_line2}
                                 onChange={handleChange}
-                                className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
+                                className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                 placeholder="Apartment, suite, unit, building, floor, etc."
                             />
                         </div>
@@ -133,8 +133,8 @@ export default function AddressForm(props: {
                         {/* City and Postal Code */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label htmlFor="city" className="block text-sm font-semibold text-black mb-2">
-                                    City <span className="text-red-500">*</span>
+                                <label htmlFor="city" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                    City <span className="text-red-600">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -143,13 +143,13 @@ export default function AddressForm(props: {
                                     value={formData.city}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
+                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                     placeholder="Enter city"
                                 />
                             </div>
                             <div>
-                                <label htmlFor="postal_code" className="block text-sm font-semibold text-black mb-2">
-                                    Postal Code <span className="text-red-500">*</span>
+                                <label htmlFor="postal_code" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                    Postal Code <span className="text-red-600">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -158,7 +158,7 @@ export default function AddressForm(props: {
                                     value={formData.postal_code}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
+                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                     placeholder="ZIP / Postal code"
                                 />
                             </div>
@@ -167,8 +167,8 @@ export default function AddressForm(props: {
                         {/* State and Country */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label htmlFor="state" className="block text-sm font-semibold text-black mb-2">
-                                    State / Province <span className="text-red-500">*</span>
+                                <label htmlFor="state" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                    State / Province <span className="text-red-600">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -177,13 +177,13 @@ export default function AddressForm(props: {
                                     value={formData.state}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
+                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                     placeholder="Enter state"
                                 />
                             </div>
                             <div>
-                                <label htmlFor="country" className="block text-sm font-semibold text-black mb-2">
-                                    Country <span className="text-red-500">*</span>
+                                <label htmlFor="country" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                    Country <span className="text-red-600">*</span>
                                 </label>
                                 <input
                                     type="text"
@@ -192,7 +192,7 @@ export default function AddressForm(props: {
                                     value={formData.country}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
+                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                     placeholder="Enter country"
                                 />
                             </div>
@@ -206,20 +206,20 @@ export default function AddressForm(props: {
                                 name="is_default"
                                 checked={formData.is_default}
                                 onChange={handleChange}
-                                className="w-5 h-5 border-2 border-gray-300 rounded focus:ring-2 focus:ring-black focus:ring-offset-2 text-black cursor-pointer"
+                                className="w-4 h-4 border border-gray-300 text-black focus:ring-2 focus:ring-black cursor-pointer"
                             />
-                            <label htmlFor="is_default" className="text-sm font-medium text-black cursor-pointer">
+                            <label htmlFor="is_default" className="text-sm font-medium text-gray-900 cursor-pointer">
                                 Set as default address
                             </label>
                         </div>
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="flex justify-end gap-4 mt-8 pt-6 border-t border-gray-200">
+                    <div className="flex justify-end gap-3 mt-8 pt-6 border-t border-gray-200">
                         <button
                             type="button"
                             onClick={props.onCancel}
-                            className="px-6 py-3 border-2 border-gray-200 text-black font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                            className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors uppercase tracking-wider text-sm font-medium"
                             disabled={isLoading}
                         >
                             Cancel
@@ -228,11 +228,11 @@ export default function AddressForm(props: {
                             type="button"
                             onClick={handleSubmit}
                             disabled={isLoading}
-                            className="px-6 py-3 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            className="px-6 py-3 bg-black text-white hover:bg-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 uppercase tracking-wider text-sm font-medium"
                         >
                             {isLoading ? (
                                 <>
-                                    <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                                    <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
