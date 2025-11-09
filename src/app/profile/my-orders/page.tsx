@@ -17,6 +17,7 @@ import {
   Search,
   Filter,
   RefreshCw,
+  ChevronLeft,
 } from "lucide-react";
 import { useLoading } from "@/contexts/LoadingContext";
 
@@ -28,6 +29,15 @@ export default function MyOrders() {
   const { startLoading, stopLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_orders: 0,
+    per_page: 10,
+    has_next: false,
+    has_prev: false,
+  });
   const [selectedOrder, setSelectedOrder] = useState<DetailedOrder | null>(null);
   const [trackingData, setTrackingData] = useState<TrackOrderResponse | null>(null);
   const [cancelReason, setCancelReason] = useState("");
@@ -38,9 +48,17 @@ export default function MyOrders() {
 
   useEffect(() => {
     if (token) {
-      fetchOrders();
+      setCurrentPage(1);
+      fetchOrders(1);
     }
   }, [token, statusFilter]);
+
+  useEffect(() => {
+    if (token && currentPage > 1) {
+      fetchOrders(currentPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentPage]);
 
   useEffect(() => {
     if (token && orderId && modalType) {
@@ -68,11 +86,12 @@ export default function MyOrders() {
     };
   }, [modalType]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page: number = 1) => {
     if (!token) return;
     startLoading();
     const params: any = {
-      limit: 50,
+      page,
+      limit: 5,
       sort: "created_at",
       order: "desc",
     };
@@ -82,6 +101,7 @@ export default function MyOrders() {
     const response = await getOrders(token, params);
     if (response.success) {
       setOrders(response.data);
+      setPagination(response.pagination);
     }
     stopLoading();
   };
@@ -188,7 +208,7 @@ export default function MyOrders() {
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl font-light tracking-wide uppercase">My Orders</h2>
           <button
-            onClick={fetchOrders}
+            onClick={() => fetchOrders(currentPage)}
             className="flex items-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200"
           >
             <RefreshCw size={16} />
@@ -315,6 +335,67 @@ export default function MyOrders() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {filteredOrders.length > 0 && pagination.total_pages > 1 && (
+          <div className="mt-8 flex items-center justify-between border-t border-gray-200 pt-6">
+            <div className="text-sm text-gray-600">
+              Showing page {pagination.current_page} of {pagination.total_pages} ({pagination.total_orders} total orders)
+            </div>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                disabled={!pagination.has_prev}
+                className="flex items-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+              >
+                <ChevronLeft size={16} />
+                <span className="text-sm uppercase tracking-wider">Previous</span>
+              </button>
+
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: pagination.total_pages }, (_, i) => i + 1)
+                  .filter((page) => {
+                    const current = pagination.current_page;
+                    return (
+                      page === 1 ||
+                      page === pagination.total_pages ||
+                      (page >= current - 1 && page <= current + 1)
+                    );
+                  })
+                  .map((page, index, array) => {
+                    const prevPage = array[index - 1];
+                    const showEllipsis = prevPage && page - prevPage > 1;
+
+                    return (
+                      <React.Fragment key={page}>
+                        {showEllipsis && (
+                          <span className="px-3 py-2 text-gray-400">...</span>
+                        )}
+                        <button
+                          onClick={() => setCurrentPage(page)}
+                          className={`min-w-[40px] px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                            page === pagination.current_page
+                              ? "bg-black text-white"
+                              : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      </React.Fragment>
+                    );
+                  })}
+              </div>
+
+              <button
+                onClick={() => setCurrentPage((prev) => prev + 1)}
+                disabled={!pagination.has_next}
+                className="flex items-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+              >
+                <span className="text-sm uppercase tracking-wider">Next</span>
+                <ChevronRight size={16} />
+              </button>
+            </div>
           </div>
         )}
       </div>

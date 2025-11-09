@@ -61,7 +61,16 @@ export const getOrders = async (
     date_from?: string;
     date_to?: string;
   }
-): Promise<{ success: boolean; data: Order[] }> => {
+): Promise<{ success: boolean; data: Order[];
+  pagination: {
+    current_page: number,
+    total_pages: number,
+    total_orders: number,
+    per_page: number,
+    has_next: boolean,
+    has_prev: boolean
+}
+ }> => {
   try {
     const queryParams = new URLSearchParams();
     
@@ -80,10 +89,10 @@ export const getOrders = async (
     const response = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return { success: true, data: response.data.data.orders as Order[] };
+    return { success: true, data: response.data.data.orders as Order[] ,pagination: response.data.data.pagination };
   } catch (error) {
     console.error("Error getting orders:", error);
-    return { success: false, data: [] as Order[] };
+    return { success: false, data: [] as Order[] ,pagination: { current_page: 1, total_pages: 1, total_orders: 0, per_page: 10, has_next: false, has_prev: false } };
   }
 };
 
