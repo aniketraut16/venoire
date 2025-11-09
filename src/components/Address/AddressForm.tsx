@@ -63,6 +63,7 @@ export default function AddressForm(props: {
     
     return (
         <div 
+        data-lenis-prevent="true"
             className="fixed inset-0 bg-black/60 flex justify-center items-center z-50 p-4 backdrop-blur-sm"
             onClick={props.onCancel}
         >
