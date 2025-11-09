@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Search, User, ShoppingBag, Menu, X } from 'lucide-react'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import SearchPopup from './SearchPopup'
 import { useSmoothScroll } from '@/contexts/SmoothScrollContext'
@@ -143,7 +142,7 @@ export default function Navbar() {
                         {/* LOGO SECTION - Centered on Desktop, Centered on Mobile */}
                         <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2">
                             <Link href="/" className="flex items-center">
-                                <Image 
+                                <img
                                     src="/logo.png" 
                                     alt="Venoire" 
                                     width={180} 
@@ -258,7 +257,7 @@ export default function Navbar() {
             >
                 {/* Header Section */}
                 <div className="sticky top-0 bg-white flex items-center justify-between p-4 border-b border-gray-200">
-                    <Image 
+                    <img
                         src="/logo.png" 
                         alt="Venoire" 
                         width={140} 

@@ -35,8 +35,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (fetched.success) {
         setItems(fetched.items);
         setCartId(fetched.cartId);
-      } else {
-        toast.error(fetched.message);
       }
     } finally {
       stopLoading();
