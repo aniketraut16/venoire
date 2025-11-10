@@ -4,12 +4,14 @@ import React from "react";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
 import { Perfume } from "@/types/perfume";
+import { useRouter } from "next/navigation";
 
 interface OnePerfumecardProps {
   perfume: Perfume;
 }
 
 export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
+  const router = useRouter();
   const lowestPrice = Math.min(...perfume.price.map((p) => p.price));
   const lowestOriginalPrice = Math.min(
     ...perfume.price.map((p) => p.originalPrice)
@@ -30,17 +32,17 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
       {/* Badges */}
       <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
         {perfume.gender === "Unisex" && (
-          <span className="bg-gray-800 text-white text-xs font-medium px-3 py-1 rounded-full">
+          <span className="bg-purple-100 text-purple-700 text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
             Unisex
           </span>
         )}
-        {perfume.gender === "Men" && (
-          <span className="bg-blue-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+        {perfume.gender === "Mens" && (
+          <span className="bg-blue-100 text-blue-700 text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
             Men
           </span>
         )}
-        {perfume.gender === "Women" && (
-          <span className="bg-pink-600 text-white text-xs font-medium px-3 py-1 rounded-full">
+        {perfume.gender === "Womens" && (
+          <span className="bg-pink-100 text-pink-700 text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
             Women
           </span>
         )}
@@ -60,11 +62,12 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
           <button 
             onClick={(e) => {
               e.preventDefault();
+              router.push(`/perfume/${perfume.slug}`);
               // Add to cart logic here
             }}
-            className="bg-white border-2 border-red-500 text-red-500 font-semibold px-8 py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 uppercase text-sm transform scale-90 group-hover:scale-100 w-full"
+            className="bg-white border-2 border-red-500 text-red-500 font-semibold px-8 py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 uppercase text-sm transform scale-90 group-hover:scale-100 w-full cursor-pointer"
           >
-            Add to Cart
+            Buy Now
           </button>
         </div>
       </div>

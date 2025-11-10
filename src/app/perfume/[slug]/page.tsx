@@ -1,14 +1,14 @@
 import OnePerfumePage from "@/pagesview/OnePerfumePage";
-import { perfumeslugcdn } from "@/utils/perfume";
+import { getPerfumes } from "@/utils/perfume";
 
 export async function generateStaticParams() {
     try {
-        const perfumes = await perfumeslugcdn();
+        const perfumes = await getPerfumes();
         if (!perfumes || !Array.isArray(perfumes)) {
             return [];
         }
         return perfumes
-            .filter((perfume: any) => perfume.slug && typeof perfume.slug === 'string')
+            .filter((perfume) => perfume.slug && typeof perfume.slug === 'string')
             .map(perfume => ({
                 slug: perfume.slug,
             }));

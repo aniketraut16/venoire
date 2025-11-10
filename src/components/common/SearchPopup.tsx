@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import Link from 'next/link'
-import { getPerfumesByCollection } from '@/utils/perfume'
+import { getPerfumes } from '@/utils/perfume'
 
 interface SearchResult {
   id: string
@@ -63,31 +63,23 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     }
   }, [searchQuery])
 
-  const performSearch = (query: string) => {
+  const performSearch = async (query: string) => {
     const searchTerm = query.toLowerCase().trim()
     const results: SearchResult[] = []
 
-
-    // Search perfumes
-    const perfumeCollection = getPerfumesByCollection('c0') // All perfumes
-    if (perfumeCollection) {
-      const matchingPerfumes = perfumeCollection.perfumes.filter(perfume =>
-        perfume.name.toLowerCase().includes(searchTerm) ||
-        perfume.fragrance.toLowerCase().includes(searchTerm) ||
-        perfume.description.toLowerCase().includes(searchTerm)
-      )
-
-      matchingPerfumes.forEach(perfume => {
-        results.push({
-          id: perfume.id,
-          name: perfume.name,
-          slug: perfume.slug,
-          thumbnail: perfume.coverImage,
-          type: 'perfume',
-          category: perfume.fragrance
-        })
+    // Search perfumes using API
+    const perfumes = await getPerfumes({ search: searchTerm })
+    
+    perfumes.forEach(perfume => {
+      results.push({
+        id: perfume.id,
+        name: perfume.name,
+        slug: perfume.slug,
+        thumbnail: perfume.coverImage,
+        type: 'perfume',
+        category: perfume.fragrance
       })
-    }
+    })
 
     // Limit results to 8 items
     setSearchResults(results.slice(0, 8))

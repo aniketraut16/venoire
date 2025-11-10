@@ -1,25 +1,43 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation';
-import { getPerfumeBySlug } from '@/utils/perfume';
-import { Perfume } from '@/types/perfume';
+import { getDetailedPerfume } from '@/utils/perfume';
+import { DetailedPerfume } from '@/types/perfume';
 import { FiMinus, FiPlus, FiPackage, FiTruck, FiRefreshCw } from 'react-icons/fi';
+import { useCart } from '@/contexts/cartContext';
 
 export default function OnePerfumePage() {
     const params = useParams();
     const slug = params?.slug as string;
-    const [perfume, setPerfume] = useState<Perfume | null>(null);
+    const [perfume, setPerfume] = useState<DetailedPerfume | null>(null);
     const [selectedSize, setSelectedSize] = useState<number>(0);
+    const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
+    const [isLoading, setIsLoading] = useState(true);
+    const { addToCart } = useCart();
 
     useEffect(() => {
-        const perfumeData = getPerfumeBySlug(slug);
-        if (perfumeData) {
-            setPerfume(perfumeData);
-        }
+        const fetchPerfume = async () => {
+            setIsLoading(true);
+            const perfumeData = await getDetailedPerfume(slug);
+            if (perfumeData) {
+                setPerfume(perfumeData);
+                setSelectedSizeId(perfumeData.price[selectedSize].id);
+            }
+            setIsLoading(false);
+        };
+        fetchPerfume();
     }, [slug]);
 
-    if (!perfume) {
+    const handleQuantityDecrease = () => {
+        if (quantity > 1) setQuantity(quantity - 1);
+    };
+
+    const handleQuantityIncrease = () => {
+        setQuantity(quantity + 1);
+    };
+
+    if (isLoading || !perfume) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
@@ -33,17 +51,11 @@ export default function OnePerfumePage() {
     const selectedPrice = perfume.price[selectedSize];
     const totalPrice = selectedPrice.price * quantity;
     const totalOriginalPrice = selectedPrice.originalPrice * quantity;
-    const discount = Math.round(
-        ((selectedPrice.originalPrice - selectedPrice.price) / selectedPrice.originalPrice) * 100
-    );
 
-    const handleQuantityDecrease = () => {
-        if (quantity > 1) setQuantity(quantity - 1);
-    };
-
-    const handleQuantityIncrease = () => {
-        setQuantity(quantity + 1);
-    };
+    const handleAddToCart = async () => {
+        if (!selectedSizeId) return;
+ await addToCart({ productVariantId: selectedSizeId, quantity: quantity });
+    }
 
   return (
         <div className="min-h-screen bg-gray-50">
@@ -94,7 +106,10 @@ export default function OnePerfumePage() {
                                         {perfume.price.map((priceOption, index) => (
                                             <button
                                                 key={index}
-                                                onClick={() => setSelectedSize(index)}
+                                                onClick={() => {
+                                                    setSelectedSize(index);
+                                                    setSelectedSizeId(perfume.price[index].id);
+                                                }}
                                                 className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                                                     selectedSize === index
                                                         ? 'bg-white text-orange-600 shadow-lg'
@@ -132,7 +147,7 @@ export default function OnePerfumePage() {
 
                             {/* Add to Cart Button */}
                             <div className="pt-2">
-                                <button className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg uppercase text-sm tracking-wide">
+                                <button onClick={handleAddToCart} className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg uppercase text-sm tracking-wide">
                                     Add to Cart
                                 </button>
                             </div>
@@ -227,12 +242,20 @@ export default function OnePerfumePage() {
                                 <h2 className="text-xl font-bold text-gray-900">Fragrance Notes</h2>
                             </div>
                             <div className="space-y-3 text-sm">
-                                {perfume.ingredients.split(';').map((note, index) => (
-                                    <div key={index} className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                                
+                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
                                         <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
-                                        <p className="text-gray-700 flex-1">{note.trim()}</p>
+                                        <p className="text-gray-700 flex-1">{perfume.top_notes}</p>
                                     </div>
-                                ))}
+                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
+                                        <p className="text-gray-700 flex-1">{perfume.middle_notes}</p>
+                                    </div>
+                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
+                                        <p className="text-gray-700 flex-1">{perfume.base_notes}</p>
+                                    </div>
+                                
                             </div>
                         </div>
 

@@ -31,7 +31,7 @@ export const intiateOrder = async (
     console.error("Error intiating order:", error);
     return {
       success: false,
-      message: "Failed to intiate order",
+      message: (error as any)?.response?.data?.error as string,
       orderId: "",
     };
   }
