@@ -6,7 +6,7 @@ import { addToCart as addToCartApi, getCart as getCartApi, removeFromCart as rem
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "./LoadingContext";
 import toast from "react-hot-toast";
-
+import { addOrRemoveFromWishlist } from "@/utils/wishlist";
 type CartContextType = {
   items: CartItem[];
   cartId: string;
@@ -14,6 +14,9 @@ type CartContextType = {
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
   removeFromCart: (itemId: string) => Promise<boolean>;
   updateCartItem: (itemId: string, args: AddToCartArgs) => Promise<boolean>;
+  moveToWishlist: (productId: string) => Promise<void>;
+  removeFromWishlist: (productId: string) => Promise<void>;
+  addToWishlist: (productId: string) => Promise<void>;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -73,6 +76,63 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [token, refresh]
   );
 
+  const moveToWishlist = useCallback(
+    async (productId: string): Promise<void> => {
+      if (!token) {
+        toast.error("Please login to move to wishlist");
+        return;
+      }
+      startLoading();
+      const ok = await addOrRemoveFromWishlist(token, productId, "add");
+      if (ok.success) {
+        await removeFromCart(productId);
+        await refresh();
+        toast.success(ok.message);
+      } else {
+        toast.error(ok.message);
+      }
+      stopLoading();
+      return;
+    },
+    [token, removeFromCart]
+  );
+
+  const removeFromWishlist = useCallback(
+    async (productId: string): Promise<void> => {
+      if (!token) {
+        toast.error("Please login to remove from wishlist");
+        return;
+      }
+      startLoading();
+      const ok = await addOrRemoveFromWishlist(token, productId, "remove");
+      if (ok.success) {
+        toast.success(ok.message);
+      } else {
+        toast.error(ok.message);
+      }
+      stopLoading();
+      return;
+    },
+    [token]
+  );
+  const addToWishlist = useCallback(
+    async (productId: string): Promise<void> => {
+      if (!token) {
+        toast.error("Please login to add to wishlist");
+        return;
+      }
+      startLoading();
+      const ok = await addOrRemoveFromWishlist(token, productId, "add");
+      if (ok.success) {
+        toast.success(ok.message);
+      } else {
+        toast.error(ok.message);
+      }
+      stopLoading();
+      return;
+    },
+    [token]
+  );
   const updateCartItem = useCallback(
     async (itemId: string, args: AddToCartArgs): Promise<boolean> => {
       startLoading();
@@ -111,6 +171,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
     addToCart,
     removeFromCart,
     updateCartItem,
+    moveToWishlist,
+    removeFromWishlist,
+    addToWishlist,
   }), [items, refresh, addToCart, removeFromCart, updateCartItem, computeCount]);
 
   return (

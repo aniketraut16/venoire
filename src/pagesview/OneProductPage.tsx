@@ -21,7 +21,7 @@ export default function OneProductPage() {
   const [showImageModal, setShowImageModal] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const { startLoading, stopLoading } = useLoading();
-  const { addToCart } = useCart();
+  const { addToCart, addToWishlist } = useCart();
 
 
   useEffect(() => {
@@ -180,7 +180,7 @@ export default function OneProductPage() {
                   </button>
 
                   <button
-                    onClick={toggleWishlist}
+                    onClick={() => addToWishlist(product.id)}
                     className={`w-full py-3 px-4 lato-bold uppercase tracking-wide transition-colors border flex items-center justify-center gap-2 text-sm ${
                       isWishlisted
                         ? 'border-red-500 bg-red-50 text-red-600'
