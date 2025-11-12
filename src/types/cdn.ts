@@ -15,5 +15,8 @@ export interface CdnResponse {
         products: {
             slug: string;
         }[];
+        perfumes: {
+            slug: string;
+        }[];
     }
 }

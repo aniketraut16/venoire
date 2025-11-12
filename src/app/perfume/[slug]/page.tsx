@@ -1,22 +1,23 @@
 import OnePerfumePage from "@/pagesview/OnePerfumePage";
-import { getPerfumes } from "@/utils/perfume";
+import { getCdn } from "@/utils/cdn";
 
 export async function generateStaticParams() {
-    try {
-        const perfumes = await getPerfumes();
-        if (!perfumes || !Array.isArray(perfumes)) {
-            return [];
-        }
-        return perfumes
-            .filter((perfume) => perfume.slug && typeof perfume.slug === 'string')
-            .map(perfume => ({
-                slug: perfume.slug,
-            }));
-    } catch (error) {
-        console.error("Error generating static params for perfumes:", error);
-        return [];
+  try {
+    const perfumes = await getCdn("perfumes");
+    if (!perfumes.success || !perfumes.data?.perfumes) {
+      return [];
     }
+    return perfumes.data.perfumes
+      .filter((slug: any) => slug && typeof slug === 'string')
+      .map((slug: { slug: string }) => ({
+        slug: slug,
+      }));
+  } catch (error) {
+    console.error("Error generating static params for perfumes:", error);
+    return [];
+  }
 }
+
 export default function OnePerfumePageContent() {
-    return <OnePerfumePage />;
+  return <OnePerfumePage />;
 }

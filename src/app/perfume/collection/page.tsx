@@ -22,6 +22,10 @@ const CollectionPageContent = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       const collections = await getPerfumeCollections();

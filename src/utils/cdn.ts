@@ -3,7 +3,7 @@ import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getCdn = async (
-    type: "categories" | "collections" | "tags" | "products"
+    type: "categories" | "collections" | "tags" | "products" | "perfumes"
 ): Promise<CdnResponse> => {
   try {
     const response = await axios.get(`${baseUrl}/cdn?type=${type}`);
@@ -13,7 +13,7 @@ export const getCdn = async (
     return {
       success: false,
       message: "Failed to fetch CDN",
-      data: { categories: [], collections: [], tags: [], products: [] },
+      data: { categories: [], collections: [], tags: [], products: [], perfumes: [] },
     };
   }
 };

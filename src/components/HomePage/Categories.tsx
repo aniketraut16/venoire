@@ -7,6 +7,10 @@ import { CategoryorCollection } from '@/types/homepage'
 export default function Categories({ categories }: { categories: CategoryorCollection[] }) {
     const router = useRouter()
         const handleCategoryClick = (slug: string) => {
+            if(slug.includes('perfume')) {
+                router.push(`/perfume/collection`)
+                return
+            }
         router.push(`/c/${slug}`)
     }
 

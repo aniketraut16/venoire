@@ -61,6 +61,12 @@ export default function AllProductsPage(props: {
   const debouncedMinPrice = useDebounce(minPrice, 500);
   const debouncedMaxPrice = useDebounce(maxPrice, 500);
 
+
+  
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+  
   // Fetch products and attributes on component mount and when filters change
   useEffect(() => {
     const fetchData = async () => {

@@ -621,6 +621,72 @@ function OrderDetailsModal({
             </div>
           </div>
 
+          {order.status === "cancelled" && order.refund && (
+            <div>
+              <h4 className="text-sm font-medium uppercase tracking-wider mb-3">Refund Information</h4>
+              <div className="bg-red-50 p-4 border-l-2 border-red-600 space-y-3">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Status</p>
+                    <p className="text-sm text-gray-900 capitalize">
+                      {order.refund.refund_status.replace(/_/g, " ")}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Amount</p>
+                    <p className="text-sm text-gray-900 font-medium">
+                      ₹{parseFloat(order.refund.refund_amount).toFixed(2)}
+                    </p>
+                  </div>
+                  {order.refund.refund_transaction_id && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Transaction ID</p>
+                      <p className="text-sm text-gray-900 font-mono">{order.refund.refund_transaction_id}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Initiated At</p>
+                    <p className="text-sm text-gray-900">
+                      {new Date(order.refund.refund_initiated_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  {order.refund.refund_completed_at && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Completed At</p>
+                      <p className="text-sm text-gray-900">
+                        {new Date(order.refund.refund_completed_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  )}
+                </div>
+                {order.refund.refund_reason && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Reason</p>
+                    <p className="text-sm text-gray-900">{order.refund.refund_reason}</p>
+                  </div>
+                )}
+                {order.refund.refund_notes && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Notes</p>
+                    <p className="text-sm text-gray-900">{order.refund.refund_notes}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           {order.notes && (
             <div>
               <h4 className="text-sm font-medium uppercase tracking-wider mb-3">Order Notes</h4>

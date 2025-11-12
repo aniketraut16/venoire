@@ -105,7 +105,20 @@ export type DetailedOrder = {
   billing_address: Address;
   payment: Payment;
   coupon: Coupon;
+  refund: Refund;
 };
+
+export type Refund = {
+  id: string;
+  refund_status: "pending_refund" | "refund_initiated" | "refund_completed" | "refund_failed";
+  refund_amount: string;
+  refund_transaction_id: string;
+  refund_initiated_at: string;
+  refund_completed_at: string | null;
+  refund_reason: string;
+  refund_notes: string;
+} | null;
+
 
 export type CancelOrderArgs = {
   reason: string;
