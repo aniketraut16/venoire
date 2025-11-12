@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getOrders, getOrder, cancelOrder, trackOrder } from "@/utils/orders";
@@ -21,7 +21,16 @@ import {
 } from "lucide-react";
 import { useLoading } from "@/contexts/LoadingContext";
 
-export default function MyOrders() {
+export default function MyOrdersPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <MyOrders />
+    </Suspense>
+  );
+}
+
+
+function MyOrders() {
   const { token } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();

@@ -6,7 +6,7 @@ export default function FeaturedProduct() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
           {/* Image */}
-          <div className="relative aspect-[4/5] overflow-hidden rounded-lg">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
             <img
               src="/perfume/perfume-personlize.png"
               alt="Create Your Signature Scent"
@@ -16,41 +16,23 @@ export default function FeaturedProduct() {
 
           {/* Content */}
           <div className="space-y-6">
-            <h2 className="text-3xl md:text-4xl font-heading text-[#121212]">
-              Create Your Signature Scent
+            <h2 className="text-4xl md:text-5xl font-heading text-[#121212]">
+            Signature Scents That Define You
             </h2>
 
-            <div className="space-y-2">
-              <div className="flex items-baseline gap-3">
-                <span className="text-2xl font-semibold text-[#121212]">
-                  Rs. 1,599.00
-                </span>
-                <span className="px-3 py-1 text-sm bg-[#ff5900] text-white rounded">
-                  Sale
-                </span>
-              </div>
-              <p className="text-sm text-gray-600">
-                Taxes included.{' '}
-                <Link href="/policies/shipping" className="underline">
-                  Shipping
-                </Link>{' '}
-                calculated at checkout.
-              </p>
-            </div>
+            
 
             <p className="text-base leading-relaxed text-gray-700">
-              Design your own luxury perfume with a personalized touch! Choose
-              your fragrance notes and give it a name that's as unique as you
-              are. Craft a scent that tells your story and carry it with you
-              wherever you go.
+            Each Venoire perfume captures a moment — the warmth of twilight, the calm of rain, the spark of desire.
+Crafted for those who see fragrance as an expression, not an accessory — a quiet reflection of the self.
             </p>
 
             <div className="flex gap-4">
               <Link
-                href="/products/create-your-signature-scent"
+                href="/perfume/collection"
                 className="inline-flex items-center px-6 py-3 bg-[#121212] text-white rounded hover:bg-[#ff5900] transition-colors"
               >
-                View full details
+                Find Your Scent
                 <svg
                   className="w-4 h-4 ml-2"
                   fill="none"

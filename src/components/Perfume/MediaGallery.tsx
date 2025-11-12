@@ -43,11 +43,10 @@ export default function MediaGallery() {
       <div className="max-w-[1410px] mx-auto px-6 md:px-20">
         <div className="text-center mt-6 mb-12">
           <h2 className="text-2xl md:text-4xl font-heading text-[#ff5900] mb-2 leading-tight">
-            Explore the Collections on Perfumes
+          What Makes Our Perfumes Unique
           </h2>
           <p className="max-w-2xl mx-auto text-base md:text-lg text-[#242424] opacity-95">
-            Discover a wide range of perfumes and find the perfect fragrance just for you.<br />
-            From timeless classics to unique modern blends, our collection offers something special for every taste and occasion.<br />
+          Discover the art and ethics behind every bottle — from handcrafted blends to personalized touches, each perfume reflects our commitment to quality, creativity, and conscious luxury.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

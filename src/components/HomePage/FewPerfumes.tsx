@@ -64,7 +64,7 @@ export default function FewPerfumes() {
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.4 }}
         >
           <Link
-            href="/perfume"
+            href="/perfume/collection"
             className="inline-block px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-black text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors duration-300"
           >
             Explore Collection
