@@ -13,11 +13,8 @@ export default function ShoppingCartPage() {
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
     const { user, needsCompleteSetup } = useAuth()
+    const { moveToWishlist } = useCart();
     const router = useRouter();
-    const moveToWishlist = (itemId: string) => {
-        // Handle move to wishlist logic
-        console.log('Move to wishlist:', itemId);
-    };
 
     // Keep local selections in sync when cart items update from server
     useEffect(() => {
@@ -224,7 +221,7 @@ export default function ShoppingCartPage() {
                                             {/* Action Buttons */}
                                             <div className="flex gap-4 items-end justify-end text-sm">
                                                 <button
-                                                    onClick={() => moveToWishlist(item.id)}
+                                                    onClick={() => moveToWishlist(item)}
                                                     className="flex items-center gap-2 px-3 py-2 border border-gray-300 bg-white hover:bg-pink-50 hover:border-pink-300 text-gray-700 hover:text-pink-600 transition-colors cursor-pointer"
                                                 >
                                                     <Heart className="w-4 h-4" />

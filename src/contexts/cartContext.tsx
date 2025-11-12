@@ -14,7 +14,7 @@ type CartContextType = {
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
   removeFromCart: (itemId: string) => Promise<boolean>;
   updateCartItem: (itemId: string, args: AddToCartArgs) => Promise<boolean>;
-  moveToWishlist: (productId: string) => Promise<void>;
+  moveToWishlist: (item: CartItem) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   addToWishlist: (productId: string) => Promise<void>;
 };
@@ -77,15 +77,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   const moveToWishlist = useCallback(
-    async (productId: string): Promise<void> => {
+    async (item: CartItem): Promise<void> => {
       if (!token) {
         toast.error("Please login to move to wishlist");
         return;
       }
       startLoading();
-      const ok = await addOrRemoveFromWishlist(token, productId, "add");
+      const ok = await addOrRemoveFromWishlist(token, item.productId, "add");
       if (ok.success) {
-        await removeFromCart(productId);
+        await removeFromCart(item.id);
         await refresh();
         toast.success(ok.message);
       } else {

@@ -12,9 +12,13 @@ export const getWishlist = async (token: string): Promise<Product[]> => {
     }
 }
 
-export const addOrRemoveFromWishlist = async (token: string, productId: string,action: "add" | "remove"): Promise<{ success: boolean, message: string }> => {
+export const addOrRemoveFromWishlist = async (token: string, productId: string, action: "add" | "remove"): Promise<{ success: boolean, message: string }> => {
     try {
-        const response = await axios.post(`${baseUrl}/user/wishlist/${productId}?action=${action}`, { headers: { Authorization: `Bearer ${token}` } });
+        const response = await axios.post(
+            `${baseUrl}/user/wishlist/${productId}?action=${action}`,
+            {},
+            { headers: { Authorization: `Bearer ${token}` } }
+        );
         return response.data as { success: boolean, message: string };
     } catch (error: any) {
         console.error("Error adding to wishlist:", error);

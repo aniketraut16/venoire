@@ -1,11 +1,14 @@
 import { Product } from "@/types/product";
 import React, { useState } from "react";
 import { Heart } from "lucide-react";
+import { useCart } from "@/contexts/cartContext";
 
 export default function ProductCard(product: Product) {
   const [isHovered, setIsHovered] = useState(false);
   const sizes = product.size;
   const mode = product.mode || "dark";
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const { addToWishlist, removeFromWishlist } = useCart();
 
   // Utility to switch text color based on mode
   const getTextColor = (defaultColor: string, lightColor = "text-white") =>
@@ -13,6 +16,18 @@ export default function ProductCard(product: Product) {
 
   const handleProductClick = () => {
     window.open(`/product/${product.slug}`, "_blank");
+  };
+
+  const handleWishlistClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+      setIsWishlisted(false);
+    } else {
+      addToWishlist(product.id);
+      setIsWishlisted(true);
+    }
   };
 
   return (
@@ -41,8 +56,10 @@ export default function ProductCard(product: Product) {
           {product.catalog}
         </div>
 
-        <button className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors duration-200">
-          <Heart className="w-4 h-4 text-gray-600 hover:text-red-500 transition-colors duration-200" />
+        <button 
+        onClick={(e) => handleWishlistClick(e)}
+        className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors duration-200">
+          <Heart className={`w-4 h-4 text-gray-600 hover:text-red-500 transition-colors duration-200 ${isWishlisted ? "text-red-500" : ""}`} />
         </button>
 
         {isHovered && (
