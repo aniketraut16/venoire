@@ -139,7 +139,7 @@ export default function Navbar() {
                         <div className="hidden md:flex items-center gap-6 lg:gap-8 flex-1 justify-end">
                             {/* Explore Links */}
                             <Link 
-                                href="/collections" 
+                                href="/t/new-arrival" 
                                 className={`text-xs font-medium tracking-widest transition-colors uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
                             >
                                 NEW ARRIVALS
@@ -383,7 +383,7 @@ export default function Navbar() {
                         </button>
                         
                         <Link
-                            href="/collections"
+                            href="/t/new-arrival"
                             className="flex items-center gap-4 py-3 text-black hover:text-gray-600 transition-colors"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
