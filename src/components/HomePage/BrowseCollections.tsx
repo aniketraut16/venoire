@@ -10,11 +10,12 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { CategoryorCollection } from "@/types/homepage";
+import { useRouter } from "next/navigation";
 
 export default function BrowseCollections({ collections }: { collections: CategoryorCollection[] }) {
   const collectionsSwiperRef = useRef<SwiperType | null>(null);
   const productsSwiperRef = useRef<SwiperType | null>(null);
-
+  const router = useRouter();
     return (
     <div className="w-full bg-white">
       {/* Header Section */}
@@ -72,6 +73,7 @@ export default function BrowseCollections({ collections }: { collections: Catego
           {collections.map((collection: CategoryorCollection, index: number) => (
             <SwiperSlide key={index}>
               <motion.div 
+                onClick={() => router.push(`/d/${collection.slug}`)}
                 className="relative overflow-hidden rounded-none group cursor-pointer"
                 initial={{ opacity: 0, scale: 0.9 }}
                 whileInView={{ opacity: 1, scale: 1 }}

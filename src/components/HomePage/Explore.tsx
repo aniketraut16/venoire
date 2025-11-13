@@ -1,8 +1,10 @@
 'use client'
 import React from 'react'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation';
 
 export default function Explore() {
+    const router = useRouter();
     return (
         <div className="flex flex-col-reverse md:flex-row justify-between max-w-7xl mx-auto mb-6 sm:mb-8 md:mb-10 mt-0 sm:mt-8 md:mt-10 overflow-hidden px-4 sm:px-6 md:px-0">
             {/* Left Column - Text Content */}
@@ -20,7 +22,9 @@ export default function Explore() {
                     <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed">
                         Designed to dress the world in quiet confidence and curated luxury, our collection embodies effortless refinement for every occasion.
                     </p>
-                    <button className="px-6 sm:px-8 py-2.5 sm:py-3 border border-gray-900 text-gray-900 text-sm sm:text-base uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors duration-300 w-full sm:w-auto">
+                    <button 
+                    onClick={() => router.push('/collection')}
+                    className="px-6 sm:px-8 py-2.5 sm:py-3 border border-gray-900 text-gray-900 text-sm sm:text-base uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors duration-300 w-full sm:w-auto">
                         Shop Collection
                     </button>
                 </div>

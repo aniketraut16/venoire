@@ -103,14 +103,14 @@ export default function MyProfilePage() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-8">
+    <div className="bg-white border border-gray-200 p-4 md:p-8">
       <div className="max-w-3xl">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-2xl font-light tracking-wide uppercase">My Profile</h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8 gap-4">
+          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Profile</h2>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center space-x-2 bg-black text-white px-6 py-2 hover:bg-gray-900 transition-colors duration-200"
+              className="flex items-center justify-center space-x-2 bg-black text-white px-4 md:px-6 py-2 hover:bg-gray-900 transition-colors duration-200 w-full sm:w-auto"
             >
               <Edit2 size={16} />
               <span className="text-sm font-medium tracking-wider uppercase">Edit</span>
@@ -118,9 +118,9 @@ export default function MyProfilePage() {
           )}
         </div>
 
-        <div className="mb-8 flex items-start space-x-8">
-          <div className="relative">
-            <div className="w-32 h-32 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-100">
+        <div className="mb-6 md:mb-8 flex flex-col md:flex-row items-center md:items-start space-y-4 md:space-y-0 md:space-x-8">
+          <div className="relative flex flex-col items-center">
+            <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-100">
               {imagePreview ? (
                 <img
                   src={imagePreview}
@@ -144,8 +144,8 @@ export default function MyProfilePage() {
               )}
             </div>
             {isEditing && (
-              <div className="mt-4 flex space-x-2">
-                <label className="cursor-pointer bg-gray-900 text-white px-4 py-2 text-xs hover:bg-black transition-colors duration-200 flex items-center space-x-2">
+              <div className="mt-4 flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
+                <label className="cursor-pointer bg-gray-900 text-white px-4 py-2 text-xs hover:bg-black transition-colors duration-200 flex items-center justify-center space-x-2">
                   <Camera size={14} />
                   <span className="uppercase tracking-wider">Change</span>
                   <input
@@ -269,10 +269,10 @@ export default function MyProfilePage() {
                   </select>
                 </div>
 
-                <div className="flex space-x-3 pt-4">
+                <div className="flex flex-col sm:flex-row gap-3 pt-4">
                   <button
                     onClick={handleSaveProfile}
-                    className="flex items-center space-x-2 bg-black text-white px-6 py-3 hover:bg-gray-900 transition-colors duration-200 disabled:bg-gray-400"
+                    className="flex items-center justify-center space-x-2 bg-black text-white px-6 py-3 hover:bg-gray-900 transition-colors duration-200 disabled:bg-gray-400"
                   >
                     <Save size={16} />
                     <span className="text-sm font-medium tracking-wider uppercase">
@@ -281,7 +281,7 @@ export default function MyProfilePage() {
                   </button>
                   <button
                     onClick={handleCancelEdit}
-                    className="flex items-center space-x-2 border border-gray-300 text-gray-700 px-6 py-3 hover:bg-gray-100 transition-colors duration-200"
+                    className="flex items-center justify-center space-x-2 border border-gray-300 text-gray-700 px-6 py-3 hover:bg-gray-100 transition-colors duration-200"
                   >
                     <X size={16} />
                     <span className="text-sm font-medium tracking-wider uppercase">Cancel</span>
@@ -293,11 +293,11 @@ export default function MyProfilePage() {
         </div>
 
         {!isEditing && (
-          <div className="mt-8 pt-8 border-t border-gray-200">
+          <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-200">
             <h3 className="text-sm font-medium tracking-wider uppercase text-gray-900 mb-4">
               Account Information
             </h3>
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="bg-gray-50 p-4 border-l-2 border-black">
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   Account Status
@@ -310,7 +310,7 @@ export default function MyProfilePage() {
                 <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">
                   Member Since
                 </p>
-                <p className="text-gray-900">
+                <p className="text-gray-900 text-sm md:text-base">
                   {profile?.created_at
                     ? new Date(profile.created_at).toLocaleDateString("en-US", {
                         year: "numeric",
