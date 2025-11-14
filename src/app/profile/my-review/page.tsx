@@ -252,7 +252,7 @@ function MyReviews() {
           productName={
             order.items.find(
               (item) =>
-                (item.product_variants?.products?.id || item.product_variant_id) ===
+                (item.product_id || item.product_variant_id) ===
                 selectedProductForReview
             )?.name || ""
           }
