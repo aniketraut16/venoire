@@ -18,6 +18,7 @@ import {
   Filter,
   RefreshCw,
   ChevronLeft,
+  Star,
 } from "lucide-react";
 import { useLoading } from "@/contexts/LoadingContext";
 
@@ -340,6 +341,15 @@ function MyOrders() {
                       >
                         <Truck size={16} />
                         <span className="text-sm uppercase tracking-wider">Track Order</span>
+                      </button>
+                    )}
+                    {order.status === "delivered" && (
+                      <button
+                        onClick={() => router.push(`/profile/my-review?orderId=${order.id}`)}
+                        className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
+                      >
+                        <Star size={16} />
+                        <span className="text-sm uppercase tracking-wider">Write Review</span>
                       </button>
                     )}
                   </div>
@@ -715,6 +725,15 @@ function OrderDetailsModal({
               >
                 <Truck size={16} />
                 <span className="text-sm uppercase tracking-wider">Track Order</span>
+              </button>
+            )}
+            {order.status === "delivered" && (
+              <button
+                onClick={() => window.location.href = `/profile/my-review?orderId=${order.id}`}
+                className="flex-1 border border-gray-300 text-gray-700 px-4 md:px-6 py-2 md:py-3 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
+              >
+                <Star size={16} />
+                <span className="text-sm uppercase tracking-wider">Write Review</span>
               </button>
             )}
             {canCancel && (

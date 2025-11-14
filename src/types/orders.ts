@@ -46,6 +46,7 @@ export type Order = {
 export type OrderItem = SimpleOrderItem & {
   id: string;
   product_variant_id: string;
+  product_id?: string;
   quantity: number;
   unit_price: number;
   total_price: number;
@@ -148,3 +149,45 @@ export type TrackOrderResponse = {
         message: string;
     }[];
 }
+
+export type Review = {
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_slug: string;
+  product_thumbnail: string | null;
+  rating: number;
+  comment: string | null;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type GetOrderReviewsResponse = {
+  success: boolean;
+  data: {
+    order_id: string;
+    reviews: Review[];
+    can_review: boolean;
+  };
+};
+
+export type CreateReviewArgs = {
+  product_id: string;
+  rating: number;
+  comment?: string;
+};
+
+export type CreateReviewResponse = {
+  success: boolean;
+  message: string;
+  data: {
+    review_id: string;
+    product_id: string;
+    product_name: string;
+    rating: number;
+    comment: string | null;
+    is_approved: boolean;
+    created_at: string;
+  };
+};

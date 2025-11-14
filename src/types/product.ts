@@ -29,6 +29,21 @@ export interface ProductAttribute {
   value: string;
 }
 
+export type PerfumeGender = "Mens" | "Womens" | "Unisex";
+
+export interface PerfumeDetails {
+  fragrance_family: string | null;
+  gender: PerfumeGender | null;
+  description: string | null;
+  scent_story: string | null;
+  top_notes: string | null;
+  middle_notes: string | null;
+  base_notes: string | null;
+  usage_tips: string | null;
+  brand_info: string | null;
+  concentration: string | null;
+}
+
 export interface DetailProduct {
   id: string;
   slug: string;
@@ -40,6 +55,7 @@ export interface DetailProduct {
   images: string[];
   description: string | null;
   attributes: ProductAttribute[];
+  perfumeDetails?: PerfumeDetails | null;
 }
 
 export interface DetailProductResponse {

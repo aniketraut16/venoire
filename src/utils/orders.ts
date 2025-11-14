@@ -6,6 +6,9 @@ import {
   MOCK_ORDER_CALLBACK_Args,
   Order,
   TrackOrderResponse,
+  GetOrderReviewsResponse,
+  CreateReviewArgs,
+  CreateReviewResponse,
 } from "@/types/orders";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -137,4 +140,58 @@ export const trackOrder = async (orderId: string, token: string): Promise<{ succ
     console.error("Error tracking order:", error);
     return { success: false, data: null };
   }
-}
+};
+
+export const getOrderReviews = async (
+  orderId: string,
+  token: string
+): Promise<GetOrderReviewsResponse> => {
+  try {
+    const response = await axios.get(`${baseUrl}/user/orders/${orderId}/reviews`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data as GetOrderReviewsResponse;
+  } catch (error) {
+    console.error("Error getting order reviews:", error);
+    return {
+      success: false,
+      data: {
+        order_id: orderId,
+        reviews: [],
+        can_review: false,
+      },
+    };
+  }
+};
+
+export const createOrderReview = async (
+  orderId: string,
+  token: string,
+  reviewData: CreateReviewArgs
+): Promise<CreateReviewResponse> => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/user/orders/${orderId}/reviews`,
+      reviewData,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data as CreateReviewResponse;
+  } catch (error: any) {
+    console.error("Error creating review:", error);
+    return {
+      success: false,
+      message: error?.response?.data?.error?.message || "Failed to submit review",
+      data: {
+        review_id: "",
+        product_id: reviewData.product_id,
+        product_name: "",
+        rating: reviewData.rating,
+        comment: reviewData.comment || null,
+        is_approved: false,
+        created_at: new Date().toISOString(),
+      },
+    };
+  }
+};
