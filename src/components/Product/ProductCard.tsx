@@ -50,8 +50,8 @@ export default function ProductCard(product: Product) {
         />
 
         <div
-          className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold border border-black
-                    ${getTextColor("text-black")}`}
+          className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold border border-black bg-white
+                    ${getTextColor("text-black", "text-black")}`}
         >
           {product.catalog}
         </div>

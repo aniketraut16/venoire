@@ -277,7 +277,7 @@ export default function Navbar() {
                         <Link
                             href="/luxury"
                             onClick={() => setIsMobileMenuOpen(false)}
-                            className="relative block w-full text-white py-5 px-8 text-center font-bold tracking-wider uppercase shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 rounded-lg overflow-hidden group"
+                            className="relative block w-full text-white py-3 px-4 text-center text-sm font-medium tracking-wide uppercase shadow-2xl hover:shadow-3xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 rounded-lg overflow-hidden group"
                             style={{
                                 background: 'linear-gradient(135deg, #8B4513 0%, #B8860B 25%, #DAA520 50%, #FFD700 75%, #FFF8DC 100%)',
                                 boxShadow: '0 8px 32px rgba(218, 165, 32, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
@@ -289,15 +289,15 @@ export default function Navbar() {
                             {/* Crown icon and text */}
                             <div className="relative flex items-center justify-center gap-3">
                                 <svg 
-                                    width="24" 
-                                    height="24" 
+                                    width="19" 
+                                    height="19" 
                                     viewBox="0 0 24 24" 
                                     fill="currentColor" 
                                     className="drop-shadow-lg"
                                 >
                                     <path d="M5 16L3 6l5.5 4L12 4l3.5 6L21 6l-2 10H5zm2.7-2h8.6l.9-4.4L14 12l-2-4-2 4-3.2-2.4L7.7 14z"/>
                                 </svg>
-                                <span className="text-lg font-black tracking-[0.2em] drop-shadow-lg">
+                                <span className="text-sm font-medium tracking-wide drop-shadow-lg">
                                     Explore Luxury
                                 </span>
                             </div>

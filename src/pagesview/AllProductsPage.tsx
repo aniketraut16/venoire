@@ -653,7 +653,7 @@ export default function AllProductsPage(props: {
           className="flex-1 bg-black text-white py-3 px-4 font-semibold text-center"
           style={{ borderRadius: 0 }}
         >
-          Filter by Color, Fits, etc
+          Filter
         </button>
         <button
           onClick={() => setIsSortModalOpen(true)}
