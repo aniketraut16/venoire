@@ -1,6 +1,9 @@
 'use client'
 import { HelpCircle, MailIcon, MessageCircle, Package, Menu, X } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { submitInquiry } from '@/utils/contact';
+import { useAuth } from '@/contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 interface AccordionProps {
     title: string;
@@ -37,6 +40,15 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
 export default function ContactPage() {
     const [activeTab, setActiveTab] = useState('message');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { token } = useAuth();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+    });
 
     useEffect(() => {
         // Get the hash from URL on initial load
@@ -58,6 +70,70 @@ export default function ContactPage() {
         setActiveTab(tabKey);
         window.history.replaceState(null, '', `#${tabKey}`);
         setIsMobileMenuOpen(false);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmitInquiry = async () => {
+        if (!formData.name.trim()) {
+            toast.error('Please enter your name');
+            return;
+        }
+        
+        if (!formData.email.trim()) {
+            toast.error('Please enter your email');
+            return;
+        }
+        
+        if (!formData.subject.trim()) {
+            toast.error('Please enter a subject');
+            return;
+        }
+        
+        if (!formData.message.trim()) {
+            toast.error('Please enter your message');
+            return;
+        }
+
+        setIsSubmitting(true);
+
+        try {
+            const response = await submitInquiry({
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message
+            }, token || undefined);
+
+            if (response.success) {
+                toast.success(response.message || 'Inquiry submitted successfully!');
+                setFormData({
+                    name: '',
+                    email: '',
+                    subject: '',
+                    message: ''
+                });
+            } else {
+                if (response.errors && response.errors.length > 0) {
+                    response.errors.forEach(err => {
+                        toast.error(err.message);
+                    });
+                } else {
+                    toast.error(response.message || 'Failed to submit inquiry');
+                }
+            }
+        } catch (error) {
+            console.error('Error submitting inquiry:', error);
+            toast.error('An unexpected error occurred. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const renderContent = () => {
@@ -97,6 +173,8 @@ export default function ContactPage() {
                                                 type="text"
                                                 id="name"
                                                 name="name"
+                                                value={formData.name}
+                                                onChange={handleInputChange}
                                                 className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none transition-colors duration-200"
                                                 placeholder="Enter your full name"
                                             />
@@ -109,6 +187,8 @@ export default function ContactPage() {
                                                 type="email"
                                                 id="email"
                                                 name="email"
+                                                value={formData.email}
+                                                onChange={handleInputChange}
                                                 className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none transition-colors duration-200"
                                                 placeholder="Enter your email"
                                             />
@@ -123,6 +203,8 @@ export default function ContactPage() {
                                             type="text"
                                             id="subject"
                                             name="subject"
+                                            value={formData.subject}
+                                            onChange={handleInputChange}
                                             className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none transition-colors duration-200"
                                             placeholder="What is this regarding?"
                                         />
@@ -135,6 +217,8 @@ export default function ContactPage() {
                                         <textarea
                                             id="message"
                                             name="message"
+                                            value={formData.message}
+                                            onChange={handleInputChange}
                                             rows={6}
                                             className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none transition-colors duration-200 resize-none"
                                             placeholder="Write your message here..."
@@ -142,10 +226,11 @@ export default function ContactPage() {
                                     </div>
 
                                     <button
-                                        onClick={() => alert('Message would be sent!')}
-                                        className="bg-black text-white px-8 py-4 hover:bg-gray-900 transition-colors duration-200 text-sm font-medium tracking-wider uppercase w-full md:w-auto"
+                                        onClick={handleSubmitInquiry}
+                                        disabled={isSubmitting}
+                                        className="bg-black text-white px-8 py-4 hover:bg-gray-900 transition-colors duration-200 text-sm font-medium tracking-wider uppercase w-full md:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
-                                        Send Message
+                                        {isSubmitting ? 'Sending...' : 'Send Message'}
                                     </button>
                                 </div>
                             </div>

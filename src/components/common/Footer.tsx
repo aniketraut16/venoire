@@ -1,9 +1,53 @@
-import React from 'react'
+'use client'
+import React, { useState } from 'react'
 import { Shield, Truck, RefreshCw, Instagram, X } from 'lucide-react'
 import { FaFacebook, FaXTwitter, FaYoutube } from 'react-icons/fa6'
 import Link from 'next/link';
+import { subscribeNewsletter } from '@/utils/contact';
+import { useAuth } from '@/contexts/AuthContext';
+import toast from 'react-hot-toast';
 
 export default function Footer() {
+    const [email, setEmail] = useState('');
+    const [isSubscribing, setIsSubscribing] = useState(false);
+    const { token } = useAuth();
+
+    const handleNewsletterSubscribe = async () => {
+        if (!email.trim()) {
+            toast.error('Please enter your email address');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            toast.error('Please enter a valid email address');
+            return;
+        }
+
+        setIsSubscribing(true);
+
+        try {
+            const response = await subscribeNewsletter({ email }, token || undefined);
+
+            if (response.success) {
+                toast.success(response.message || 'Successfully subscribed to newsletter!');
+                setEmail('');
+            } else {
+                if (response.errors && response.errors.length > 0) {
+                    response.errors.forEach(err => {
+                        toast.error(err.message);
+                    });
+                } else {
+                    toast.error(response.message || 'Failed to subscribe');
+                }
+            }
+        } catch (error) {
+            console.error('Error subscribing to newsletter:', error);
+            toast.error('An unexpected error occurred. Please try again.');
+        } finally {
+            setIsSubscribing(false);
+        }
+    };
     return (
         <footer className="bg-black text-white">
             {/* Newsletter and Trust Badges Section */}
@@ -20,11 +64,23 @@ export default function Footer() {
                             <div className="flex flex-col sm:flex-row gap-2 sm:gap-2">
                                 <input
                                     type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter' && !isSubscribing) {
+                                            handleNewsletterSubscribe();
+                                        }
+                                    }}
                                     placeholder="Enter your email address"
                                     className="w-full sm:flex-1 bg-transparent border border-gray-700 px-3 sm:px-4 py-2 sm:py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-gray-600 rounded-sm"
+                                    disabled={isSubscribing}
                                 />
-                                <button className="w-full sm:w-auto bg-gray-700 text-white px-4 sm:px-6 py-2 sm:py-2.5 text-sm font-medium hover:bg-gray-600 transition-colors whitespace-nowrap rounded-sm">
-                                    SUBSCRIBE
+                                <button 
+                                    onClick={handleNewsletterSubscribe}
+                                    disabled={isSubscribing}
+                                    className="w-full sm:w-auto bg-gray-700 text-white px-4 sm:px-6 py-2 sm:py-2.5 text-sm font-medium hover:bg-gray-600 transition-colors whitespace-nowrap rounded-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {isSubscribing ? 'SUBSCRIBING...' : 'SUBSCRIBE'}
                                 </button>
                             </div>
                         </div>
