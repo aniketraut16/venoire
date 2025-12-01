@@ -104,7 +104,7 @@ export default function ProfileLayout({
               <div className="bg-gray-900 text-white p-6 text-center">
                 <h3 className="text-sm font-medium tracking-wider uppercase mb-2">Need Help?</h3>
                 <p className="text-xs text-gray-300 mb-4">Contact our support team</p>
-                <p className="text-lg font-light">support@venoire.com</p>
+                <p className="text-lg font-light">care.itsvenoire@gmail.com</p>
               </div>
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function ProfileLayout({
               <div className="bg-gray-900 text-white p-6 text-center">
                 <h3 className="text-sm font-medium tracking-wider uppercase mb-2">Need Help?</h3>
                 <p className="text-xs text-gray-300 mb-4">Contact our support team</p>
-                <p className="text-base font-light">support@venoire.com</p>
+                <p className="text-base font-light">care.itsvenoire@gmail.com</p>
               </div>
             </div>
           </div>

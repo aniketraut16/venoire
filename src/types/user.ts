@@ -16,3 +16,33 @@ export type UserSignInArgs = {
     phone: string;
     gender: 'male' | 'female' | 'other' | null;
 };
+
+export type SendOTPArgs = {
+    email: string;
+};
+
+export type SendOTPResponse = {
+    success: boolean;
+    message: string;
+    data?: {
+        token: string;
+        expiresIn: number;
+    };
+};
+
+export type VerifyOTPArgs = {
+    token: string;
+    otp: string;
+};
+
+export type VerifyOTPResponse = {
+    success: boolean;
+    message: string;
+    data?: {
+        customToken: string;
+        userExists: boolean;
+        user?: DBUser;
+        email?: string;
+        uid?: string;
+    };
+};

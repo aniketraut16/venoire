@@ -11,6 +11,7 @@ import {
     GoogleAuthProvider,
     signInWithPopup,
     sendPasswordResetEmail,
+    signInWithCustomToken,
     User
 } from "firebase/auth";
 import { auth } from "@/firebase/firebaseConfig";
@@ -24,6 +25,7 @@ type AuthContextType = {
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
     loginWithGoogle: () => Promise<void>;
+    loginWithOTP: (customToken: string) => Promise<void>;
     logout: () => Promise<void>;
     register: (name: string, email: string, password: string) => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
@@ -103,6 +105,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    // Login with OTP (using custom token from backend)
+    const loginWithOTP = async (customToken: string): Promise<void> => {
+        try {
+            await signInWithCustomToken(auth, customToken);
+        } catch (error) {
+            console.error("OTP login failed:", error);
+            throw error;
+        }
+    };
 
     // Logout function
     const logout = async () => {
@@ -133,6 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 token,
                 login,
                 loginWithGoogle,
+                loginWithOTP,
                 logout,
                 register,
                 resetPassword,
