@@ -1,5 +1,6 @@
 'use client'
 import React from 'react';
+import { config } from '@/variables/config';
 
 export default function TermsAndConditionsPage() {
     return (
@@ -141,8 +142,8 @@ export default function TermsAndConditionsPage() {
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">12. Contact Information</h2>
                                 <p className="text-gray-700 leading-relaxed">
                                     If you have any questions or concerns about these Terms, you can reach us at:{' '}
-                                    <a href="mailto:care.itsvenoire@gmail.com" className="text-black underline hover:text-gray-700">
-                                        care.itsvenoire@gmail.com
+                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {config.EMAIL}
                                     </a>
                                 </p>
                             </section>

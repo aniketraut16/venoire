@@ -1,5 +1,6 @@
 'use client'
 import React from 'react';
+import { config } from '@/variables/config';
 
 export default function ShippingPolicyPage() {
     return (
@@ -68,8 +69,8 @@ export default function ShippingPolicyPage() {
                                 </p>
                                 <p className="text-gray-700 leading-relaxed">
                                     If you do not receive tracking details within 24 hours of dispatch, you can contact us at{' '}
-                                    <a href="mailto:care.itsvenoire@gmail.com" className="text-black underline hover:text-gray-700">
-                                        care.itsvenoire@gmail.com
+                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {config.EMAIL}
                                     </a>
                                     .
                                 </p>

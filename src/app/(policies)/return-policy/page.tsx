@@ -1,5 +1,6 @@
 'use client'
 import React from 'react';
+import { config } from '@/variables/config';
 
 export default function ReturnPolicyPage() {
     return (
@@ -38,8 +39,8 @@ export default function ReturnPolicyPage() {
                                 </ul>
                                 <p className="text-gray-700 leading-relaxed">
                                     Email all required proof to{' '}
-                                    <a href="mailto:care.itsvenoire@gmail.com" className="text-black underline hover:text-gray-700">
-                                        care.itsvenoire@gmail.com
+                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {config.EMAIL}
                                     </a>
                                     , and our team will assist you promptly.
                                 </p>
@@ -64,8 +65,8 @@ export default function ReturnPolicyPage() {
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">What Should I Do If the Package Looks Tampered or Damaged at Delivery?</h2>
                                 <p className="text-gray-700 leading-relaxed mb-4">
                                     If the package you receive appears tampered, opened, or visibly damaged, please refuse to accept it from the delivery partner. Immediately report the issue to{' '}
-                                    <a href="mailto:care.itsvenoire@gmail.com" className="text-black underline hover:text-gray-700">
-                                        care.itsvenoire@gmail.com
+                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {config.EMAIL}
                                     </a>
                                     {' '}with photos so we can take it up with the courier service.
                                 </p>

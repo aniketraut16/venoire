@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { submitInquiry } from '@/utils/contact';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { config } from '@/variables/config';
 
 interface AccordionProps {
     title: string;
@@ -150,10 +151,10 @@ export default function ContactPage() {
                                     <h3 className="text-xs md:text-sm font-medium tracking-wider uppercase text-gray-900 mb-3">Contact Information</h3>
                                     <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2">
                                         <p className="text-sm md:text-base text-gray-700 break-words">
-                                            <span className="font-medium">Email:</span> care.itsvenoire@gmail.com
+                                            <span className="font-medium">Email:</span> {config.EMAIL}
                                         </p>
                                         <p className="text-sm md:text-base text-gray-700">
-                                            <span className="font-medium">Phone:</span> +91 7410720297
+                                            <span className="font-medium">Phone:</span> {config.PHONE}
                                         </p>
                                     </div>
                                 </div>
@@ -377,7 +378,7 @@ export default function ContactPage() {
                             <div className="bg-gray-900 text-white p-6 text-center">
                                 <h3 className="text-sm font-medium tracking-wider uppercase mb-2">Need Immediate Help?</h3>
                                 <p className="text-xs text-gray-300 mb-4">Call our customer service</p>
-                                <p className="text-lg font-light">+91 7410720297</p>
+                                <p className="text-lg font-light">{config.PHONE}</p>
                             </div>
                         </div>
                     </div>
@@ -423,7 +424,7 @@ export default function ContactPage() {
                             <div className="bg-gray-900 text-white p-6 text-center">
                                 <h3 className="text-sm font-medium tracking-wider uppercase mb-2">Need Immediate Help?</h3>
                                 <p className="text-xs text-gray-300 mb-4">Call our customer service</p>
-                                <p className="text-base font-light">+91 7410720297</p>
+                                <p className="text-base font-light">{config.PHONE}</p>
                             </div>
                         </div>
                     </div>

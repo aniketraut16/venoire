@@ -1,5 +1,6 @@
 'use client'
 import React from 'react';
+import { config } from '@/variables/config';
 
 export default function RefundPolicyPage() {
     return (
@@ -29,8 +30,8 @@ export default function RefundPolicyPage() {
                                 </ul>
                                 <p className="text-gray-700 leading-relaxed">
                                     Send these details to{' '}
-                                    <a href="mailto:care.itsvenoire@gmail.com" className="text-black underline hover:text-gray-700">
-                                        care.itsvenoire@gmail.com
+                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {config.EMAIL}
                                     </a>
                                     , and our support team will assist you promptly.
                                 </p>

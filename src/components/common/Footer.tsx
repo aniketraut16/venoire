@@ -1,16 +1,45 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Shield, Truck, RefreshCw, Instagram, X } from 'lucide-react'
 import { FaFacebook, FaXTwitter, FaYoutube } from 'react-icons/fa6'
 import Link from 'next/link';
 import { subscribeNewsletter } from '@/utils/contact';
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { getNavbarContent } from '@/utils/homepage';
+import { MenuItem } from '@/types/homepage';
+
 
 export default function Footer() {
     const [email, setEmail] = useState('');
     const [isSubscribing, setIsSubscribing] = useState(false);
+    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const { token } = useAuth();
+
+    const hrefGenerator = (type: string, slug: string) => {
+        switch (type) {
+            case 'collection':
+                return `/d/${slug}`
+            case 'category':
+                return `/c/${slug}`
+            case 'tag':
+                return `/t/${slug}`
+            case 'offer':
+                return `/o/${slug}`
+            default:
+                return '#'
+        }
+    }
+
+    useEffect(() => {
+        const fetchNavbarContent = async () => {
+            const response = await getNavbarContent()
+            if (response.success) {
+                setMenuItems(response.data?.menuItems || [])
+            }
+        }
+        fetchNavbarContent()
+    }, [])
 
     const handleNewsletterSubscribe = async () => {
         if (!email.trim()) {
@@ -113,43 +142,52 @@ export default function Footer() {
             {/* Main Footer Links */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
-                    {/* Mens */}
-                    <div>
-                        <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">MENS</h3>
-                        <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                            <li><a href="#" className="hover:text-white transition-colors block">T-Shirts</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Shirts</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Jeans</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Shoes</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Watches</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Accessories</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Womens */}
-                    <div>
-                        <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">WOMENS</h3>
-                        <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                            <li><a href="#" className="hover:text-white transition-colors block">Dresses</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Tops</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Handbags</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Shoes</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Jewellery</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Beauty</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Kids */}
-                    <div>
-                        <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">KIDS</h3>
-                        <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                            <li><a href="#" className="hover:text-white transition-colors block">Boys Clothing</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Girls Clothing</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Footwear</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Toys</a></li>
-                            <li><a href="#" className="hover:text-white transition-colors block">Accessories</a></li>
-                        </ul>
-                    </div>
+                    {/* Dynamic Menu Items - Show first 3 menus */}
+                    {menuItems.length > 0 ? (
+                        menuItems.slice(0, 3).map((menu) => (
+                            <div key={menu.name}>
+                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">{menu.name.toUpperCase()}</h3>
+                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
+                                    {menu.sections[0]?.subsections && menu.sections[0].subsections.length > 0 ? (
+                                        menu.sections[0].subsections.slice(0, 6).map((subsection, idx) => (
+                                            <li key={idx}>
+                                                <Link 
+                                                    href={hrefGenerator(subsection.type, subsection.slug || '')} 
+                                                    className="hover:text-white transition-colors block"
+                                                >
+                                                    {subsection.name}
+                                                </Link>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li className="text-gray-500 italic">Coming Soon</li>
+                                    )}
+                                </ul>
+                            </div>
+                        ))
+                    ) : (
+                        // Fallback when no menu items are loaded
+                        <>
+                            <div>
+                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">MENS</h3>
+                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
+                                    <li className="text-gray-500 italic">Coming Soon</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">WOMENS</h3>
+                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
+                                    <li className="text-gray-500 italic">Coming Soon</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">KIDS</h3>
+                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
+                                    <li className="text-gray-500 italic">Coming Soon</li>
+                                </ul>
+                            </div>
+                        </>
+                    )}
 
                     {/* Useful Links */}
                     <div>
@@ -157,7 +195,7 @@ export default function Footer() {
                         <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
                             <li><Link href="/contact#message" className="hover:text-white transition-colors block">Contact Us</Link></li>
                             <li><Link href="/contact#faqs" className="hover:text-white transition-colors block">FAQ</Link></li>
-                            <li><Link href="#" className="hover:text-white transition-colors block">About Us</Link></li>
+                            <li><Link href="/aboutus" className="hover:text-white transition-colors block">About Us</Link></li>
                         </ul>
                     </div>
 
