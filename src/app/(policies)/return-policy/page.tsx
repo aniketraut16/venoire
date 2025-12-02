@@ -12,9 +12,22 @@ export default function ReturnPolicyPage() {
 
                         <div className="prose prose-sm max-w-none space-y-8">
                             <section className="mb-8">
+                                <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Overview</h2>
+                                <p className="text-gray-700 leading-relaxed mb-4">
+                                    For clothing items, the following options are available: return, exchange, replacement, and refund. Please review the timelines and conditions below:
+                                </p>
+                                <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-4">
+                                    <li>Return requests must be initiated within 7 days of delivery</li>
+                                    <li>Exchange requests must be initiated within 7 days of delivery</li>
+                                    <li>Replacement requests must be initiated within 7 days of delivery</li>
+                                    <li>Order cancellations must be requested within 7 days of placing the order</li>
+                                </ul>
+                            </section>
+
+                            <section className="mb-8">
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Eligibility for Returns</h2>
                                 <p className="text-gray-700 leading-relaxed mb-4">
-                                    At Venoire, only clothing items are eligible for return. All other product categories — including accessories, beauty products, lifestyle items, or any non-clothing merchandise — are not eligible for return or exchange under any circumstances.
+                                    At Venoire, only clothing items are eligible for return, exchange, replacement, or refund. All other product categories - including accessories, beauty products, lifestyle items, or any non-clothing merchandise - are not eligible for return or exchange under any circumstances.
                                 </p>
                                 <p className="text-gray-700 leading-relaxed mb-4">Before requesting a return for clothing, please ensure the item is:</p>
                                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
@@ -86,13 +99,20 @@ export default function ReturnPolicyPage() {
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Return Process for Clothing</h2>
                                 <p className="text-gray-700 leading-relaxed mb-4">If your clothing item qualifies for return:</p>
                                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
-                                    <li>You must inform us within 24 hours of delivery.</li>
+                                    <li>You must initiate your return request within 7 days of delivery.</li>
                                     <li>After approval, you need to ship the item back to us in its original condition.</li>
                                     <li>Once we receive the returned item, it goes through a quality inspection.</li>
-                                    <li>If it passes inspection, your refund will be processed in 3–5 business days to your original payment method.</li>
+                                    <li>If it passes inspection, your refund will be processed within 7 days to your original payment method.</li>
                                 </ul>
                                 <p className="text-gray-700 leading-relaxed mt-4">
                                     Items that fail inspection (worn, washed, stained, or without tags) will not be eligible for refund.
+                                </p>
+                            </section>
+
+                            <section className="mb-8">
+                                <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Cancellation Policy</h2>
+                                <p className="text-gray-700 leading-relaxed mb-4">
+                                    If you wish to cancel your order, you may do so within 7 days of placing the order, provided the item has not yet been shipped. Once the order is dispatched, cancellation requests cannot be processed, and you will need to follow the return process after delivery.
                                 </p>
                             </section>
                         </div>

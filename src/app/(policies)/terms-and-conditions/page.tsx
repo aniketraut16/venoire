@@ -139,7 +139,14 @@ export default function TermsAndConditionsPage() {
                             </section>
 
                             <section className="mb-8">
-                                <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">12. Contact Information</h2>
+                                <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">12. Proprietorship</h2>
+                                <p className="text-gray-700 leading-relaxed">
+                                    Venoire is a sole proprietorship owned and operated by Neeti Akhilkumar Shukla.
+                                </p>
+                            </section>
+
+                            <section className="mb-8">
+                                <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">13. Contact Information</h2>
                                 <p className="text-gray-700 leading-relaxed">
                                     If you have any questions or concerns about these Terms, you can reach us at:{' '}
                                     <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">

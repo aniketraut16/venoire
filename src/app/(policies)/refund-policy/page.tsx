@@ -55,7 +55,7 @@ export default function RefundPolicyPage() {
                             <section className="mb-8">
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Refund Timeline</h2>
                                 <p className="text-gray-700 leading-relaxed">
-                                    Once the returned clothing item successfully clears inspection, the refund will be processed within 3–5 business days. The amount will be credited back to your original payment method.
+                                    Once the return request is approved and the returned clothing item successfully clears inspection, the refund will be credited within 7 days to your original payment method.
                                 </p>
                             </section>
 
