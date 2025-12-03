@@ -107,8 +107,8 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
 
         {/* Fragrance Notes */}
         <div className="flex flex-wrap gap-1.5 pt-2">
-          <span className="text-sm text-red-300">
-            {perfume.fragrance}
+          <span className="text-sm text-red-500">
+            {perfume.price[0].quantity} ml
           </span>
         </div>
       </div>

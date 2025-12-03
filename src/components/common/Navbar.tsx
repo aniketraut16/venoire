@@ -314,44 +314,66 @@ export default function Navbar() {
                     <div className="p-4 space-y-2">
                         {menuItems.map((item) => (
                             <div key={item.name} className="border-b border-gray-100 last:border-b-0">
-                                <button
-                                    onClick={() => setExpandedMobileMenu(expandedMobileMenu === item.name ? null : item.name)}
-                                    className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
-                                >
-                                    <span className="font-medium text-sm tracking-wider uppercase">{item.name}</span>
-                                    <svg 
-                                        className={`w-5 h-5 transition-transform duration-200 ${expandedMobileMenu === item.name ? 'rotate-180' : ''}`}
-                                        fill="none" 
-                                        stroke="currentColor" 
-                                        viewBox="0 0 24 24"
+                                {item.slug?.includes('perfume') ? (
+                                    // Direct link for perfume items (no accordion)
+                                    <Link
+                                        href="/perfume"
+                                        onClick={() => setIsMobileMenuOpen(false)}
+                                        className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
                                     >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
-                                </button>
-                                
-                                {expandedMobileMenu === item.name && (
-                                    <div className="pb-4 pl-4 space-y-3">
-                                        {item.sections.map((section, idx) => (
-                                            <div key={idx}>
-                                                <h4 className="text-xs font-semibold mb-2 text-gray-900 tracking-wide uppercase">
-                                                    {section.title}
-                                                </h4>
-                                                <ul className="space-y-2 pl-2">
-                                                    {section.subsections.map((subsection, subIdx) => (
-                                                        <li key={subIdx}>
-                                                            <Link
-                                                                href={hrefGenerator(subsection.type, subsection.slug || '')}
-                                                                className="text-sm text-gray-600 hover:text-black transition-colors block py-1"
-                                                                onClick={() => setIsMobileMenuOpen(false)}
-                                                            >
-                                                                {subsection.name}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                        <span className="font-medium text-sm tracking-wider uppercase">{item.name}</span>
+                                        <svg 
+                                            className="w-5 h-5"
+                                            fill="none" 
+                                            stroke="currentColor" 
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </Link>
+                                ) : (
+                                    // Accordion for other items
+                                    <>
+                                        <button
+                                            onClick={() => setExpandedMobileMenu(expandedMobileMenu === item.name ? null : item.name)}
+                                            className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
+                                        >
+                                            <span className="font-medium text-sm tracking-wider uppercase">{item.name}</span>
+                                            <svg 
+                                                className={`w-5 h-5 transition-transform duration-200 ${expandedMobileMenu === item.name ? 'rotate-180' : ''}`}
+                                                fill="none" 
+                                                stroke="currentColor" 
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                        
+                                        {expandedMobileMenu === item.name && (
+                                            <div className="pb-4 pl-4 space-y-3">
+                                                {item.sections.map((section, idx) => (
+                                                    <div key={idx}>
+                                                        <h4 className="text-xs font-semibold mb-2 text-gray-900 tracking-wide uppercase">
+                                                            {section.title}
+                                                        </h4>
+                                                        <ul className="space-y-2 pl-2">
+                                                            {section.subsections.map((subsection, subIdx) => (
+                                                                <li key={subIdx}>
+                                                                    <Link
+                                                                        href={hrefGenerator(subsection.type, subsection.slug || '')}
+                                                                        className="text-sm text-gray-600 hover:text-black transition-colors block py-1"
+                                                                        onClick={() => setIsMobileMenuOpen(false)}
+                                                                    >
+                                                                        {subsection.name}
+                                                                    </Link>
+                                                                </li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
+                                        )}
+                                    </>
                                 )}
                             </div>
                         ))}

@@ -155,7 +155,7 @@ const CollectionPageContent = () => {
       )}
 
       {/* Collection Tabs */}
-      <div className=" top-0 z-40 max-w-7xl mx-auto py-5">
+      <div className=" top-0 z-40 max-w-7xl mx-auto py-5 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center overflow-x-auto scrollbar-hide py-1 gap-2">
             {collectionList.map((col) => (
@@ -180,7 +180,7 @@ const CollectionPageContent = () => {
       </div>
 
       {/* Search and Filter Bar */}
-      <div className="bg-gray-900 py-6  top-[57px] z-30 shadow-lg max-w-7xl mx-auto rounded-xl">
+      <div className="bg-gray-900 py-6  top-[57px] z-30 shadow-lg max-w-7xl mx-4 md:mx-auto rounded-xl">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
@@ -199,8 +199,8 @@ const CollectionPageContent = () => {
             </div>
 
 
-            {/* Sort Dropdown */}
-            <div className="flex items-center gap-3 text-white">
+            {/* Sort Dropdown - Hidden on Mobile */}
+            <div className="hidden md:flex items-center gap-3 text-white">
               <label className="text-sm font-medium whitespace-nowrap">Sort by:</label>
               <select
                 value={sortBy}

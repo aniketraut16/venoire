@@ -230,7 +230,7 @@ export default function OneProductPage() {
                     <div>
                       <h4 className="lato-bold text-gray-900">7 Days Free Return & Exchange*</h4>
                       <p className="text-sm text-gray-600 lato-regular">
-                        Easy returns within 7 days
+                        Replacement delivery for any exchanged product will be delivered within 7-10 days
                       </p>
                     </div>
                   </div>

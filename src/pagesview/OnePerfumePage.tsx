@@ -98,7 +98,7 @@ export default function OnePerfumePage() {
                                 </div>
 
                                 {/* Size & Quantity Row */}
-                                <div className="flex flex-col md:flex-row gap-4 pt-2">
+                                <div className="flex flex-wrap gap-4 pt-2">
                                     {/* Size Selection */}
                                     <div className="space-y-2">
                                         <label className="text-xs font-medium uppercase tracking-wider opacity-90">
@@ -129,7 +129,7 @@ export default function OnePerfumePage() {
                                         <label className="text-xs font-medium uppercase tracking-wider opacity-90">
                                             Quantity
                                         </label>
-                                        <div className="flex items-center bg-black/30 backdrop-blur-sm rounded-lg border border-white/20">
+                                        <div className="flex items-center bg-black/30 backdrop-blur-sm rounded-lg border border-white/20 w-fit">
                                             <button
                                                 onClick={handleQuantityDecrease}
                                                 className="p-2 hover:bg-white/10 transition-colors rounded-l-lg"
@@ -207,7 +207,7 @@ export default function OnePerfumePage() {
                             </div>
                             <div>
                                 <h4 className="font-semibold text-gray-900 text-sm">Easy Returns</h4>
-                                <p className="text-xs text-gray-600">7-day return policy</p>
+                                <p className="text-xs text-gray-600">Replacement delivery for any exchanged product will be delivered within 7-10 days</p>
                             </div>
                         </div>
                     </div>
@@ -218,8 +218,8 @@ export default function OnePerfumePage() {
             <div className="bg-gradient-to-b from-purple-50/30 to-white py-16">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Product Description Card */}
-                        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
+                        {/* Product Description Card - Order 2 on mobile, 1 on desktop */}
+                        <div className="order-2 lg:order-1 lg:col-span-2 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
                             <div className="flex items-center gap-3 mb-4">
                                 <div className="w-1 h-8 bg-gradient-to-b from-[#0f182c] to-[#1a2438] rounded-full"></div>
                                 <h2 className="text-xl font-bold text-gray-900">Product Description</h2>
@@ -237,8 +237,8 @@ export default function OnePerfumePage() {
                             </div>
                         </div>
 
-                        {/* Product Gallery */}
-                        <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-6 border border-gray-100">
+                        {/* Product Gallery - Order 1 on mobile, 2 on desktop */}
+                        <div className="order-1 lg:order-2 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-6 border border-gray-100">
                             <h3 className="text-lg font-bold text-gray-900 mb-4">Product Gallery</h3>
                             <div className="grid grid-cols-1 gap-3">
                                 {perfume.images.slice(0, 3).map((image, index) => (
