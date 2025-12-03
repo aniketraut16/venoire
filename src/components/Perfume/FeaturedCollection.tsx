@@ -32,7 +32,7 @@ export default function FeaturedCollection() {
       <section className="py-12 bg-[#fcf9ee]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-[#ff5900]">BEST SELLERS</h2>
+            <h2 className="text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
             <p className="text-md text-gray-700">Inspired Versions</p>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -49,11 +49,11 @@ export default function FeaturedCollection() {
     <section className="py-12 bg-[#fcf9ee]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[#ff5900]">BEST SELLERS</h2>
+          <h2 className="text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
           <p className="text-md text-gray-700">Inspired Versions</p>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {perfumes.map((product) => (
+          {perfumes.slice(0, 4).map((product) => (
            <OnePerfumecard key={product.id} perfume={product} />
           ))}
         </div>
@@ -62,7 +62,7 @@ export default function FeaturedCollection() {
         <div className="text-center mt-12">
           <Link 
             href={`/perfume/collection${firstCollectionSlug ? `?slug=${firstCollectionSlug}` : ''}`}
-            className="inline-block bg-[#ff5900] hover:bg-[#ff6b1a] text-white font-bold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="inline-block bg-black hover:bg-[#1a2438] text-white font-bold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             View All Collections
           </Link>

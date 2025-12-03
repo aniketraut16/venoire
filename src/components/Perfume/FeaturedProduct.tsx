@@ -30,7 +30,7 @@ Crafted for those who see fragrance as an expression, not an accessory — a qui
             <div className="flex gap-4">
               <Link
                 href="/perfume/collection"
-                className="inline-flex items-center px-6 py-3 bg-[#121212] text-white rounded hover:bg-[#ff5900] transition-colors"
+                className="inline-flex items-center px-6 py-3 bg-[#121212] text-white rounded hover:bg-[#0f182c] transition-colors"
               >
                 Find Your Scent
                 <svg

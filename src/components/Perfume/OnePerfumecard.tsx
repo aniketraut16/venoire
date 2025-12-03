@@ -65,7 +65,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
               router.push(`/perfume/${perfume.slug}`);
               // Add to cart logic here
             }}
-            className="bg-white border-2 border-red-500 text-red-500 font-semibold px-8 py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 uppercase text-sm transform scale-90 group-hover:scale-100 w-full cursor-pointer"
+            className="bg-white border-2 border-[#1a2438] text-[#1a2438] font-semibold px-8 py-3 rounded-xl hover:bg-[#1a2438] hover:text-white transition-all duration-300 uppercase text-sm transform scale-90 group-hover:scale-100 w-full cursor-pointer"
           >
             Buy Now
           </button>
@@ -76,7 +76,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
       <div className="p-5 space-y-3">
 
         {/* Product Name */}
-        <h3 className="font-bold text-lg text-gray-800 group-hover:text-red-500 transition-colors line-clamp-1">
+        <h3 className="font-bold text-lg text-gray-800 group-hover:text-[#1a2438] transition-colors line-clamp-1">
           {perfume.name}
         </h3>
 

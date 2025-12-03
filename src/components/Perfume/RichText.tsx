@@ -21,8 +21,8 @@ export default function RichText({
   title,
   description,
   descriptionParts,
-  titleColor = '#242424',
-  textColor = '#242424',
+  titleColor = '#0f182c',
+  textColor = '#0f182c',
   bgColor = '#fcf9ee',
 }: RichTextProps) {
   return (
@@ -52,7 +52,7 @@ export default function RichText({
                       >
                         <path
                           d="M2,8 Q20,13 35,8 Q50,3 65,8 Q80,13 98,8"
-                          stroke={part.color || '#ff5900'}
+                          stroke={part.color || '#0f182c'}
                           strokeWidth="3"
                           fill="none"
                           strokeLinecap="round"

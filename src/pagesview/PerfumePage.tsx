@@ -12,7 +12,7 @@ export default function PerfumePage() {
       <RichText
         titleParts={[
           { text: "VENOIRE", color: "#242424" },
-          { text: "REDEFINES", color: "#ff5900" },
+          { text: "REDEFINES", color: "#0f182c" },
           { text: "MODERN LUXURY", color: "#242424", underline: true },
         ]}
         descriptionParts={[
@@ -20,15 +20,15 @@ export default function PerfumePage() {
             text: "At Venoire, we believe fragrance is more than scent — ",
             color: "#242424",
           },
-          { text: "it’s identity distilled into art.", color: "#ff5900" },
+          { text: "it’s identity distilled into art.", color: "#0f182c" },
           {
             text: "\nEach creation is hand-blended in small ateliers, using ",
             color: "#242424",
           },
-          { text: "meticulously sourced essences", color: "#ff5900" },
+          { text: "meticulously sourced essences", color: "#0f182c" },
           { text: " from across the world.", color: "#242424" },
           { text: "\nEvery drop is an ode to ", color: "#242424" },
-          { text: "individuality", color: "#ff5900" },
+          { text: "individuality", color: "#0f182c" },
           { text: " — no two wearings unfold the same.", color: "#242424" },
           {
             text: "\nNotes of amber, cedar, and midnight florals linger like secrets, ",
@@ -36,10 +36,10 @@ export default function PerfumePage() {
           },
           {
             text: "crafted for those who leave an impression without trying.",
-            color: "#ff5900",
+            color: "#0f182c",
           },
           { text: "\nDiscover ", color: "#242424" },
-          { text: "Venoire — your silent signature.", color: "#ff5900" },
+          { text: "Venoire — your silent signature.", color: "#0f182c" },
         ]}
       />
 
