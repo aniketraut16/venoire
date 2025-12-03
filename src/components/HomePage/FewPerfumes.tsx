@@ -2,35 +2,35 @@
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { getPerfumes } from "@/utils/perfume";
+import { Perfume } from "@/types/perfume";
 
-const perfumeQualities = [
-  {
-    title: "Artisan Craftsmanship",
-    description: "Each fragrance is meticulously crafted by master perfumers using traditional techniques passed down through generations. Our artisanal approach ensures every bottle captures the essence of luxury.",
-    image: "/perfume/artisan-blend.png",
-    color: "from-amber-50 to-orange-50"
-  },
-  {
-    title: "Rare & Niche Ingredients",
-    description: "We source the finest and rarest ingredients from around the world. From Bulgarian rose to Indonesian oud, each component is carefully selected for its exceptional quality and unique character.",
-    image: "/perfume/niche-ingredients.png",
-    color: "from-rose-50 to-pink-50"
-  },
-  {
-    title: "Sustainable & Cruelty-Free",
-    description: "Our commitment to ethical luxury means all our fragrances are cruelty-free and sustainably sourced. We believe in creating beauty without compromise, respecting both nature and all living beings.",
-    image: "/perfume/cruelty-free.png",
-    color: "from-emerald-50 to-teal-50"
-  },
-  {
-    title: "Personalized Experience",
-    description: "Every individual is unique, and so should be their fragrance journey. Our expert consultants provide personalized recommendations to help you discover your perfect scent signature.",
-    image: "/perfume/personalization.png",
-    color: "from-violet-50 to-purple-50"
-  }
+const gradientColors = [
+  "from-amber-50 to-orange-50",
+  "from-rose-50 to-pink-50",
+  "from-emerald-50 to-teal-50",
+  "from-violet-50 to-purple-50"
 ];
 
 export default function FewPerfumes() {
+  const [perfumes, setPerfumes] = useState<Perfume[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchPerfumes = async () => {
+      try {
+        const data = await getPerfumes();
+        // Get only first 4 perfumes
+        setPerfumes(data.slice(0, 4));
+      } catch (error) {
+        console.error("Error fetching perfumes:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPerfumes();
+  }, []);
   return (
     <section className="w-full py-8 sm:py-12 md:py-16 bg-gradient-to-b from-white to-gray-50">
       {/* Header Section */}
@@ -42,9 +42,9 @@ export default function FewPerfumes() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          The Art of
+          Featured
           <span className="block font-serif italic text-5xl xl:text-6xl mt-1 sm:mt-2">
-            Perfumery
+            Perfumes
           </span>
         </motion.h2>
         <motion.p 
@@ -54,8 +54,8 @@ export default function FewPerfumes() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
         >
-          Discover the exceptional qualities that make our fragrances a testament to luxury, 
-          craftsmanship, and timeless elegance. Each bottle tells a unique story.
+          Explore our handpicked selection of exquisite fragrances, each crafted to perfection. 
+          Discover scents that define luxury, elegance, and your unique personality.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -74,47 +74,75 @@ export default function FewPerfumes() {
 
       {/* ScrollStack Section */}
       <div className="w-full">
-        <ScrollStack 
-          useWindowScroll={true}
-          itemDistance={80}
-          itemScale={0.04}
-          itemStackDistance={20}
-          stackPosition="25%"
-          scaleEndPosition="10%"
-          baseScale={0.92}
-          onStackComplete={() => console.log('Stack complete')}
-        >
-          {perfumeQualities.map((quality, index) => (
-            <ScrollStackItem key={index} itemClassName={`bg-gradient-to-br ${quality.color}`}>
-              <div className="flex flex-col md:flex-row items-center justify-between h-full gap-4 sm:gap-6 md:gap-8 p-4 sm:p-6 md:p-8">
-                {/* Text Content */}
-                <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
-                  <div className="inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 bg-black/5 rounded-full">
-                    <span className="text-sm font-medium tracking-wider uppercase text-gray-700">
-                      Quality {index + 1}
-                    </span>
+        {loading ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">Loading perfumes...</p>
+          </div>
+        ) : perfumes.length === 0 ? (
+          <div className="text-center py-20">
+            <p className="text-gray-500 text-lg">No perfumes available at the moment.</p>
+          </div>
+        ) : (
+          <ScrollStack 
+            useWindowScroll={true}
+            itemDistance={80}
+            itemScale={0.04}
+            itemStackDistance={20}
+            stackPosition="25%"
+            scaleEndPosition="10%"
+            baseScale={0.92}
+            onStackComplete={() => console.log('Stack complete')}
+          >
+            {perfumes.map((perfume, index) => (
+              <ScrollStackItem key={perfume.id} itemClassName={`bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`}>
+                <div className="flex flex-col md:flex-row items-center justify-between h-full gap-4 sm:gap-6 md:gap-8 p-4 sm:p-6 md:p-8">
+                  {/* Text Content */}
+                  <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
+                    <div className="inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 bg-black/5 rounded-full">
+                      <span className="text-sm font-medium tracking-wider uppercase text-gray-700">
+                        {perfume.gender}
+                      </span>
+                    </div>
+                    <h3 className="text-3xl lg:text-4xl font-light tracking-tight text-gray-900">
+                      {perfume.name}
+                    </h3>
+                    <p className="text-base md:text-lg text-gray-600 leading-relaxed">
+                      {perfume.fragrance}
+                    </p>
+                    <div className="pt-2">
+                      <span className="text-2xl font-semibold text-gray-900">
+                        ₹{perfume.price[0]?.price.toLocaleString()}
+                      </span>
+                      {perfume.price[0]?.originalPrice > perfume.price[0]?.price && (
+                        <span className="ml-3 text-lg text-gray-500 line-through">
+                          ₹{perfume.price[0]?.originalPrice.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
+                    <div className="pt-4">
+                      <Link
+                        href={`/perfume/${perfume.slug}`}
+                        className="inline-block px-6 py-2.5 bg-black text-white text-sm font-medium tracking-widest uppercase hover:bg-gray-800 transition-all duration-300"
+                      >
+                        View
+                      </Link>
+                    </div>
                   </div>
-                  <h3 className="text-3xl lg:text-4xl font-light tracking-tight text-gray-900">
-                    {quality.title}
-                  </h3>
-                  <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                    {quality.description}
-                  </p>
-                </div>
 
-                {/* Image */}
-                <div className="flex-shrink-0 w-full sm:w-56 md:w-64 h-40 sm:h-48 md:h-64 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-2xl"></div>
-                  <img
-                    src={quality.image}
-                    alt={quality.title}
-                    className="object-cover w-full h-full p-4 sm:p-5 md:p-6 drop-shadow-2xl object-center rounded-2xl overflow-hidden"
-                  />
+                  {/* Image */}
+                  <div className="flex-shrink-0 w-full sm:w-56 md:w-64 h-40 sm:h-48 md:h-64 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-2xl"></div>
+                    <img
+                      src={perfume.coverImage}
+                      alt={perfume.name}
+                      className="object-cover w-full h-full p-4 sm:p-5 md:p-6 drop-shadow-2xl object-center rounded-2xl overflow-hidden"
+                    />
+                  </div>
                 </div>
-              </div>
-            </ScrollStackItem>
-          ))}
-        </ScrollStack>
+              </ScrollStackItem>
+            ))}
+          </ScrollStack>
+        )}
       </div>
 
     </section>

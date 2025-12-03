@@ -1,6 +1,7 @@
 "use client";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function HeroSlideshow() {
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -69,6 +70,12 @@ export default function HeroSlideshow() {
             <h1 className="text-[2rem] md:text-[4rem] leading-tight font-heading text-white mb-6">
               DISCOVER YOUR SIGNATURE SCENT
             </h1>
+            <Link
+              href="/perfume/collection?slug=all"
+              className="inline-block px-8 py-3.5 bg-white text-black text-sm font-medium tracking-widest uppercase hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl"
+            >
+              Explore Collection
+            </Link>
           </div>
         </div>
 

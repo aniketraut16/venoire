@@ -52,8 +52,8 @@ export default function Categories({ categories }: { categories: CategoryorColle
                 </div>
             </div>
 
-            {/* Desktop: Grid Layout */}
-            <div className="hidden md:grid grid-cols-4 gap-8 max-w-7xl mx-auto">
+            {/* Desktop: Flex Layout - Centered */}
+            <div className="hidden md:flex flex-wrap justify-center gap-8 max-w-7xl mx-auto">
                 {categories.map((category: CategoryorCollection, index: number) => (
                     <motion.div
                         key={category.slug}
