@@ -163,6 +163,8 @@ export default function ContactPage() {
                                     <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2 flex-grow">
                                         <p className="text-sm md:text-base text-gray-700 break-words">
                                             <span className="font-medium">Address:</span> {config.ADDRESS}
+                                            <span className="block"></span>
+                                            <span className="font-medium">Business Name:</span> {config.BUSINESS_NAME}
                                         </p>
                                     </div>
                                 </div>
