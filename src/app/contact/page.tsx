@@ -146,15 +146,23 @@ export default function ContactPage() {
                             <h2 className="text-xl md:text-2xl font-light tracking-wide mb-6 md:mb-8 uppercase">Get In Touch</h2>
 
 
-                            <div className="mb-8 md:mb-12">
-                                <div className="max-w-md">
+                            <div className="flex flex-col md:flex-row md:gap-8 mb-8 md:mb-12">
+                                <div className="w-full mb-8 md:mb-0 flex flex-col">
                                     <h3 className="text-xs md:text-sm font-medium tracking-wider uppercase text-gray-900 mb-3">Contact Information</h3>
-                                    <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2">
+                                    <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2 flex-grow">
                                         <p className="text-sm md:text-base text-gray-700 break-words">
                                             <span className="font-medium">Email:</span> {config.EMAIL}
                                         </p>
                                         <p className="text-sm md:text-base text-gray-700">
                                             <span className="font-medium">Phone:</span> {config.PHONE}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="w-full flex flex-col">
+                                    <h3 className="text-xs md:text-sm font-medium tracking-wider uppercase text-gray-900 mb-3">Registered Office</h3>
+                                    <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2 flex-grow">
+                                        <p className="text-sm md:text-base text-gray-700 break-words">
+                                            <span className="font-medium">Address:</span> {config.ADDRESS}
                                         </p>
                                     </div>
                                 </div>

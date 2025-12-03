@@ -5,4 +5,5 @@ export const config = {
     "FACEBOOK_URL": "https://www.facebook.com/itsvenoire",
     "EMAIL": "care.itsvenoire@gmail.com",
     "PHONE": "+91 7410720297",
+    "ADDRESS": "Venoire Lifestyle Plot No. 70, Sant Jagnade Nagar, Near Rashtriya School, Tumsar, Bhandara, MH-441912"
 }
