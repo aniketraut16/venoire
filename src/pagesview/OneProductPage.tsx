@@ -86,7 +86,8 @@ export default function OneProductPage() {
             {/* Images */}
             <div className="lg:col-span-3">
               <div className="grid grid-cols-2 gap-4 p-4">
-                {product.images.map((image, index) => (
+                {/* Thumbnail first, then other images */}
+                {[product.thumbnail, ...product.images].filter((img): img is string => !!img).map((image, index) => (
                   <div
                     key={index}
                     className="aspect-square bg-gray-50 overflow-hidden relative group cursor-zoom-in"
@@ -124,11 +125,13 @@ export default function OneProductPage() {
 
                 {/* Pricing */}
                 <div className="flex items-baseline gap-3 mb-3">
-                  <span className="text-2xl lato-black text-gray-900">${displayedPrice}</span>
+                  <span className="text-2xl lato-black text-gray-900">
+                    Rs {displayedPrice.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
+                  </span>
                   {displayedDiscount > 0 && (
                     <>
                       <span className="text-lg text-red-700 line-through lato-regular">
-                        ${displayedOriginalPrice}
+                        Rs {displayedOriginalPrice.toLocaleString('en-IN', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
                       </span>
                       <span className="text-green-600 lato-bold text-sm">
                         Save {displayedDiscount}%
@@ -143,7 +146,11 @@ export default function OneProductPage() {
                 <div className="space-y-3">
                   <h3 className="text-sm lato-bold text-gray-900 uppercase tracking-wide">Size</h3>
                   <div className="flex gap-2 flex-wrap">
-                    {product.pricing.map((variant) => (
+                    {[...product.pricing].sort((a, b) => {
+                      const sizeA = parseInt(a.size ?? '0');
+                      const sizeB = parseInt(b.size ?? '0');
+                      return sizeA - sizeB;
+                    }).map((variant) => (
                       <button
                         key={variant.size}
                         onClick={() => handleSizeSelect(variant.size ?? '')}
@@ -221,9 +228,9 @@ export default function OneProductPage() {
                   <div className="flex items-start gap-3">
                     <Calendar className="h-5 w-5 text-gray-400 mt-1" />
                     <div>
-                      <h4 className="lato-bold text-gray-900">15 Days Free Return & Exchange*</h4>
+                      <h4 className="lato-bold text-gray-900">7 Days Free Return & Exchange*</h4>
                       <p className="text-sm text-gray-600 lato-regular">
-                        Easy returns within 15 days
+                        Easy returns within 7 days
                       </p>
                     </div>
                   </div>

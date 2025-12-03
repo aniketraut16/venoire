@@ -65,7 +65,11 @@ export default function ProductCard(product: Product) {
         {isHovered && (
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
             <div className="flex gap-2">
-              {sizes.map((size) => (
+              {[...sizes].sort((a, b) => {
+                const sizeA = parseInt(a);
+                const sizeB = parseInt(b);
+                return sizeA - sizeB;
+              }).map((size) => (
                 <button
                   key={size}
                   className="w-8 h-8 rounded-md text-sm font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
@@ -103,26 +107,32 @@ export default function ProductCard(product: Product) {
           <span
             className={`text-lg font-bold ${getTextColor("text-gray-900")}`}
           >
+            Rs{" "}
             {product.price.toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
+              minimumFractionDigits: 0,
+              maximumFractionDigits: 0,
             })}
           </span>
-          <span
-            className={`text-sm line-through ${getTextColor("text-gray-500")}`}
-          >
-            {product.originalPrice.toLocaleString("en-IN", {
-              style: "currency",
-              currency: "INR",
-            })}
-          </span>
-          <span
-            className={`text-xs font-medium ${
-              mode === "light" ? "text-pink-300" : "text-red-600"
-            }`}
-          >
-            {product.discount}% OFF
-          </span>
+          {product.originalPrice && (
+            <span
+              className={`text-sm line-through ${getTextColor("text-gray-500")}`}
+            >
+              Rs{" "}
+              {product.originalPrice.toLocaleString("en-IN", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
+            </span>
+          )}
+          {product.discount > 0 && (
+            <span
+              className={`text-xs font-medium ${
+                mode === "light" ? "text-pink-300" : "text-red-600"
+              }`}
+            >
+              {product.discount}% OFF
+            </span>
+          )}
         </div>
       </div>
     </div>

@@ -224,9 +224,9 @@ export default function AllProductsPage(props: {
                           />
                           <span>
                             {option.display_value}{" "}
-                            <span className="text-gray-600">
+                            {/* <span className="text-gray-600">
                               ({option.product_count})
-                            </span>
+                            </span> */}
                           </span>
                         </label>
                       );
@@ -571,9 +571,9 @@ export default function AllProductsPage(props: {
                     />
                     <span>
                       {option.display_value}{" "}
-                      <span className="text-gray-600">
+                      {/* <span className="text-gray-600">
                         ({option.product_count})
-                      </span>
+                      </span> */}
                     </span>
                   </label>
                 );
