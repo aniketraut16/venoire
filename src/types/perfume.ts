@@ -2,6 +2,8 @@ export type Perfume = {
     id: string;
     name: string;
     slug: string;
+    description: string;
+    images: string[];
     fragrance: string;
     coverImage: string;
     gender: "Mens" | "Womens" | "Unisex";
