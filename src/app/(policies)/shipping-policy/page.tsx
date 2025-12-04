@@ -41,7 +41,7 @@ export default function ShippingPolicyPage() {
                             <section className="mb-8">
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Estimated Delivery Time</h2>
                                 <p className="text-gray-700 leading-relaxed mb-4">
-                                    Products will be delivered within 3-5 business days from the date of dispatch. Delivery timelines may vary slightly depending on your delivery location within India. Remote or hard-to-reach areas may experience slightly longer transit times depending on courier service availability.
+                                    Replacement delivery for any exchanged product will be delivered within 7-10 days from the date of approval.
                                 </p>
                                 <p className="text-gray-700 leading-relaxed">
                                     We currently ship only within India and do not deliver internationally.
