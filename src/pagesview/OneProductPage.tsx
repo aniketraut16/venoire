@@ -75,7 +75,7 @@ export default function OneProductPage() {
     <>
       {showImageModal && (
         <OnproductImageView
-          images={product.images}
+          images={[product.thumbnail || '', ...product.images]}
           onClose={() => setShowImageModal(false)}
           initialIndex={currentImageIndex}
         />

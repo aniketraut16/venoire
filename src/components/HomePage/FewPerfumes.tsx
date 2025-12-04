@@ -95,48 +95,93 @@ export default function FewPerfumes() {
           >
             {perfumes.map((perfume, index) => (
               <ScrollStackItem key={perfume.id} itemClassName={`bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`}>
-                <div className="flex flex-col md:flex-row items-center justify-between h-full gap-4 sm:gap-6 md:gap-8 p-4 sm:p-6 md:p-8">
-                  {/* Text Content */}
-                  <div className="flex-1 space-y-3 sm:space-y-4 text-center md:text-left">
-                    <div className="inline-block px-2.5 sm:px-3 py-0.5 sm:py-1 bg-black/5 rounded-full">
-                      <span className="text-sm font-medium tracking-wider uppercase text-gray-700">
-                        {perfume.gender}
-                      </span>
-                    </div>
-                    <h3 className="text-3xl lg:text-4xl font-light tracking-tight text-gray-900">
-                      {perfume.name}
-                    </h3>
-                    <p className="text-base md:text-lg text-gray-600 leading-relaxed">
-                      {perfume.fragrance}
-                    </p>
-                    <div className="pt-2">
-                      <span className="text-2xl font-semibold text-gray-900">
-                        ₹{perfume.price[0]?.price.toLocaleString()}
-                      </span>
-                      {perfume.price[0]?.originalPrice > perfume.price[0]?.price && (
-                        <span className="ml-3 text-lg text-gray-500 line-through">
-                          ₹{perfume.price[0]?.originalPrice.toLocaleString()}
-                        </span>
-                      )}
-                    </div>
-                    <div className="pt-4">
-                      <Link
-                        href={`/perfume/${perfume.slug}`}
-                        className="inline-block px-6 py-2.5 bg-black text-white text-sm font-medium tracking-widest uppercase hover:bg-gray-800 transition-all duration-300"
-                      >
-                        View
-                      </Link>
+                <div className="flex flex-col lg:flex-row items-start justify-between h-full gap-4 md:gap-6 lg:gap-8 p-4 sm:p-6 md:p-6 lg:p-6">
+                  {/* Left Side - Image with Badge */}
+                  <div className="relative flex-shrink-0 w-full lg:w-72 xl:w-80">
+                    {/* Bestseller Badge */}
+                    {index === 0 && (
+                      <div className="absolute top-0 left-0 z-10 bg-red-600 text-white px-4 py-2 text-xs font-bold tracking-wider uppercase">
+                        BESTSELLER
+                      </div>
+                    )}
+                    
+                    {/* Product Image */}
+                    <div className="relative  overflow-hidden">
+                      <img
+                        src={perfume.coverImage}
+                        alt={perfume.name}
+                        className="object-contain max-w-full max-h-full aspect-square"
+                        style={{
+                          mixBlendMode: "multiply",
+                        }}
+                      />
                     </div>
                   </div>
 
-                  {/* Image */}
-                  <div className="flex-shrink-0 w-full sm:w-56 md:w-64 h-40 sm:h-48 md:h-64 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-white/50 backdrop-blur-sm rounded-2xl"></div>
-                    <img
-                      src={perfume.coverImage}
-                      alt={perfume.name}
-                      className="object-cover w-full h-full p-4 sm:p-5 md:p-6 drop-shadow-2xl object-center rounded-2xl overflow-hidden"
-                    />
+                  {/* Right Side - Product Details */}
+                  <div className="flex-1 space-y-2 md:space-y-3">
+                    {/* Title and Gender */}
+                    <div>
+                      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-1">
+                        {perfume.name}
+                      </h3>
+                      <p className="text-lg sm:text-xl text-gray-600 uppercase tracking-wide">
+                        FOR {perfume.gender}
+                      </p>
+                    </div>
+
+                    {/* Rating */}
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className="text-black text-lg">★</span>
+                        ))}
+                      </div>
+                      <span className="text-sm text-gray-600">31 reviews</span>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed max-w-2xl">
+                      Experience a captivating fragrance that speaks volumes with a heady blend of rich notes. A scent that doesn't just command attention—it stirs envy.
+                    </p>
+
+                    {/* Fragrance Notes */}
+                    <div className="hidden sm:grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900 uppercase mb-1">The Introduction:</h4>
+                        <p className="text-xs text-gray-600">{perfume.fragrance.split(',')[0]?.trim() || 'Fresh & Vibrant'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900 uppercase mb-1">The Discovery:</h4>
+                        <p className="text-xs text-gray-600">{perfume.fragrance.split(',')[1]?.trim() || 'Rich & Complex'}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900 uppercase mb-1">The Impression:</h4>
+                        <p className="text-xs text-gray-600">{perfume.fragrance.split(',')[2]?.trim() || 'Lasting & Memorable'}</p>
+                      </div>
+                    </div>
+
+              
+
+                    {/* Add to Cart Button */}
+                    <div className="pt-2">
+                      <Link
+                        href={`/perfume/${perfume.slug}`}
+                        className="w-full flex items-center justify-between bg-black text-white px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition-all duration-300"
+                      >
+                        <span>VIEW {perfume.price[0]?.quantity}ML</span>
+                        <span className="flex items-center gap-3">
+                          {perfume.price[0]?.originalPrice > perfume.price[0]?.price && (
+                            <span className="line-through text-gray-400">
+                              ₹{perfume.price[0]?.originalPrice.toLocaleString()}
+                            </span>
+                          )}
+                          <span className="font-bold">
+                            ₹{perfume.price[0]?.price.toLocaleString()}
+                          </span>
+                        </span>
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </ScrollStackItem>

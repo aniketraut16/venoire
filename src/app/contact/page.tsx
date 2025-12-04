@@ -162,9 +162,9 @@ export default function ContactPage() {
                                     <h3 className="text-xs md:text-sm font-medium tracking-wider uppercase text-gray-900 mb-3">Registered Office</h3>
                                     <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2 flex-grow">
                                         <p className="text-sm md:text-base text-gray-700 break-words">
-                                            <span className="font-medium">Address:</span> {config.ADDRESS}
-                                            <span className="block"></span>
                                             <span className="font-medium">Business Name:</span> {config.BUSINESS_NAME}
+                                            <span className="block"></span>
+                                            <span className="font-medium">Address:</span> {config.ADDRESS}
                                         </p>
                                     </div>
                                 </div>

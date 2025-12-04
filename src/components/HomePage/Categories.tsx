@@ -33,7 +33,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
                                 ease: "easeOut"
                             }}
                         >
-                            <div className="relative w-20 h-20 mx-auto mb-2 rounded-full overflow-hidden border-2 border-gray-200 group-active:border-black transition-all duration-300">
+                            <div className="relative w-24 h-24 mx-auto mb-2 rounded-full overflow-hidden border-2 border-gray-200 group-active:border-black transition-all duration-300">
                                 <img
                                     src={category.image || '/fallback.png'}
                                     alt={category.name}
@@ -44,7 +44,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 pointer-events-none"></div>
                             </div>
-                            <h3 className="text-sm font-semibold text-gray-900 tracking-wide whitespace-nowrap">
+                            <h3 className="text-base font-semibold text-gray-900 tracking-wide whitespace-nowrap">
                                 {category.name}
                             </h3>
                         </motion.div>
@@ -68,7 +68,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
                             ease: "easeOut"
                         }}
                     >
-                        <div className="relative w-44 h-44 mx-auto mb-4 rounded-full overflow-hidden border-3 border-gray-200 group-hover:border-black group-hover:shadow-lg group-hover:shadow-[#D4AF37]/30 transition-all duration-300">
+                        <div className="relative w-52 h-52 mx-auto mb-4 rounded-full overflow-hidden border-3 border-gray-200 group-hover:border-black group-hover:shadow-lg group-hover:shadow-[#D4AF37]/30 transition-all duration-300">
                             <img
                                 src={category.image || '/fallback.png'}
                                 alt={category.name}
@@ -79,7 +79,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
                             />
                             <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 pointer-events-none"></div>
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2 tracking-wide">
+                        <h3 className="text-2xl font-semibold text-gray-900 mb-2 tracking-wide">
                             {category.name}
                         </h3>
                     </motion.div>
