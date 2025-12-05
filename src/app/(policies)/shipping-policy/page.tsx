@@ -41,7 +41,8 @@ export default function ShippingPolicyPage() {
                             <section className="mb-8">
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Estimated Delivery Time</h2>
                                 <p className="text-gray-700 leading-relaxed mb-4">
-                                    Replacement delivery for any exchanged product will be delivered within 7-10 days from the date of approval.
+                                    {/* Replacement delivery for any exchanged  */}
+                                    Product will be delivered within 7-10 days from the date of approval.
                                 </p>
                                 <p className="text-gray-700 leading-relaxed">
                                     We currently ship only within India and do not deliver internationally.
