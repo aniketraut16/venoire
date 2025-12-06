@@ -1,4 +1,4 @@
-import { AddToCartArgs, CartItem } from "@/types/cart";
+import { AddToCartArgs, CartItem, CheckoutPricing } from "@/types/cart";
 import axios from "axios";
 import Cookies from 'js-cookie';
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -31,8 +31,8 @@ export const addToCart = async (
     const headers = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : sessionId
-      ? { headers: { "x-session-id": sessionId } }
-      : {};
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
     await axios.post(`${baseUrl}/cart/items`, args, headers);
     return { success: true, message: "Item added to cart successfully" };
   } catch (error: any) {
@@ -43,7 +43,7 @@ export const addToCart = async (
 
 export const getCart = async (
   token: string | null = null
-): Promise<{success: boolean, message: string, items: CartItem[],cartId: string}> => {
+): Promise<{ success: boolean, message: string, items: CartItem[], cartId: string }> => {
   try {
     let sessionId = null;
     if (!token) {
@@ -55,8 +55,8 @@ export const getCart = async (
     const headers = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : sessionId
-      ? { headers: { "x-session-id": sessionId } }
-      : {};
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
     const response = await axios.get(`${baseUrl}/cart`, headers);
     return { success: true, message: "Cart fetched successfully", items: response.data.data as CartItem[], cartId: response.data.cartId as string };
   } catch (error) {
@@ -83,8 +83,8 @@ export const removeFromCart = async (
     const headers = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : sessionId
-      ? { headers: { "x-session-id": sessionId } }
-      : {};
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
     await axios.delete(`${baseUrl}/cart/${itemId}`, headers);
     return { success: true, message: "Item removed from cart successfully" };
   } catch (error: any) {
@@ -112,8 +112,8 @@ export const updateCartItem = async (
     const headers = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : sessionId
-      ? { headers: { "x-session-id": sessionId } }
-      : {};
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
     await axios.put(`${baseUrl}/cart/${itemId}`, args, headers);
     return { success: true, message: "Item updated in cart successfully" };
   } catch (error: any) {
@@ -158,12 +158,66 @@ export const getCartId = async (
     const headers = token
       ? { headers: { Authorization: `Bearer ${token}` } }
       : sessionId
-      ? { headers: { "x-session-id": sessionId } }
-      : {};
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
     const response = await axios.get(`${baseUrl}/cart/id`, headers);
     return response.data.data.cartId as string;
   } catch (error) {
     console.error("Error getting cart ID:", error);
     return null;
+  }
+};
+
+
+
+export const getCheckoutPricing = async (cartId: string, couponCode: string | null = null): Promise<CheckoutPricing> => {
+  try {
+    if (!cartId) {
+      return {
+        subtotal: 0,
+        discountAmount: {
+          beforeDiscount: 0,
+          afterDiscount: 0,
+          iscountPercentage: 0
+        },
+        taxAmount: {
+          beforeTaxAddition: 0,
+          afterTaxAddition: 0,
+          taxPercentage: 0
+        },
+        shippingAmount: {
+          beforeShippingAddition: 0,
+          afterShippingAddition: 0,
+          shippingAmount: 0
+        },
+        totalAmount: 0
+      };
+    }
+    const response = await axios.post(`${baseUrl}/cart/pricing`, {
+      cartId,
+      couponCode
+    });
+    return response.data.data as CheckoutPricing;
+  } catch (error) {
+    console.error("Error getting checkout pricing:", error);
+    return {
+      subtotal: 0,
+      discountAmount: {
+        beforeDiscount: 0,
+        afterDiscount: 0,
+        iscountPercentage: 0
+      },
+      taxAmount: {
+        beforeTaxAddition: 0,
+        afterTaxAddition: 0,
+        taxPercentage: 0
+      },
+      shippingAmount: {
+        beforeShippingAddition: 0,
+        afterShippingAddition: 0,
+        shippingAmount: 0
+      },
+      totalAmount: 0
+    };
   }
 };

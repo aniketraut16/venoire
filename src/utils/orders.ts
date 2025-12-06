@@ -19,23 +19,23 @@ export const intiateOrder = async (
 ): Promise<{
   success: boolean;
   message: string;
-  orderId: string;
+  checkoutPageUrl: string;
 }> => {
   try {
-    const response = await axios.post(`${baseUrl}/orders/initiate`, args, {
+    const response = await axios.post(`${baseUrl}/pg/initiate`, args, {
       headers: { Authorization: `Bearer ${token}` },
     });
     return {
       success: true,
       message: "Order intiated successfully",
-      orderId: response.data.data.orderId,
+      checkoutPageUrl: response.data.data.checkoutPageUrl,
     };
   } catch (error) {
     console.error("Error intiating order:", error);
     return {
       success: false,
       message: (error as any)?.response?.data?.error as string,
-      orderId: "",
+      checkoutPageUrl: "",
     };
   }
 };
@@ -64,7 +64,8 @@ export const getOrders = async (
     date_from?: string;
     date_to?: string;
   }
-): Promise<{ success: boolean; data: Order[];
+): Promise<{
+  success: boolean; data: Order[];
   pagination: {
     current_page: number,
     total_pages: number,
@@ -72,11 +73,11 @@ export const getOrders = async (
     per_page: number,
     has_next: boolean,
     has_prev: boolean
-}
- }> => {
+  }
+}> => {
   try {
     const queryParams = new URLSearchParams();
-    
+
     if (params?.page) queryParams.append("page", params.page.toString());
     if (params?.limit) queryParams.append("limit", params.limit.toString());
     if (params?.status) queryParams.append("status", params.status);
@@ -85,17 +86,17 @@ export const getOrders = async (
     if (params?.search) queryParams.append("search", params.search);
     if (params?.date_from) queryParams.append("date_from", params.date_from);
     if (params?.date_to) queryParams.append("date_to", params.date_to);
-    
+
     const queryString = queryParams.toString();
     const url = `${baseUrl}/user/orders${queryString ? `?${queryString}` : ""}`;
-    
+
     const response = await axios.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return { success: true, data: response.data.data.orders as Order[] ,pagination: response.data.data.pagination };
+    return { success: true, data: response.data.data.orders as Order[], pagination: response.data.data.pagination };
   } catch (error) {
     console.error("Error getting orders:", error);
-    return { success: false, data: [] as Order[] ,pagination: { current_page: 1, total_pages: 1, total_orders: 0, per_page: 10, has_next: false, has_prev: false } };
+    return { success: false, data: [] as Order[], pagination: { current_page: 1, total_pages: 1, total_orders: 0, per_page: 10, has_next: false, has_prev: false } };
   }
 };
 

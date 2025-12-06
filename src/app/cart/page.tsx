@@ -2,19 +2,22 @@
 import React, { useEffect, useState } from 'react';
 import { ShoppingBag, Heart, Trash2, ChevronDown, Shield, Package, Truck, Info } from 'lucide-react';
 import { useCart } from '@/contexts/cartContext';
-import { CartItem } from '@/types/cart';
+import { CartItem, CheckoutPricing } from '@/types/cart';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { getCheckoutPricing } from '@/utils/cart';
 
 export default function ShoppingCartPage() {
-    const { items: cartItems, removeFromCart, updateCartItem, count } = useCart();
+    const { items: cartItems, removeFromCart, updateCartItem, count, cartId } = useCart();
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
     const { user, needsCompleteSetup } = useAuth()
     const { moveToWishlist } = useCart();
     const router = useRouter();
+    const [pricing, setPricing] = useState<CheckoutPricing | null>(null);
+    const [isLoadingPricing, setIsLoadingPricing] = useState(false);
 
     // Keep local selections in sync when cart items update from server
     useEffect(() => {
@@ -103,13 +106,29 @@ export default function ShoppingCartPage() {
         }
     };
 
-    const bagTotal = cartItems.reduce((total, item: CartItem) => {
-        const price = Number(item.price) || 0;
-        const qty = getCurrentQuantity(item);
-        return total + price * qty;
-    }, 0);
-    const shipping = 0; 
-    const payableAmount = bagTotal + shipping;
+    // Fetch pricing from backend
+    useEffect(() => {
+        const fetchPricing = async () => {
+            if (!cartId) {
+                setPricing(null);
+                return;
+            }
+            setIsLoadingPricing(true);
+            try {
+                const pricingData = await getCheckoutPricing(cartId);
+                setPricing(pricingData);
+            } catch (error) {
+                console.error('Error fetching pricing:', error);
+            } finally {
+                setIsLoadingPricing(false);
+            }
+        };
+        fetchPricing();
+    }, [cartId, cartItems]);
+
+    const bagTotal = pricing?.subtotal || 0;
+    const shipping = pricing?.shippingAmount.shippingAmount || 0;
+    const payableAmount = pricing?.totalAmount || 0;
 
 
     const handleCheckout = () => {
@@ -243,7 +262,7 @@ export default function ShoppingCartPage() {
                     </div>
 
                     {/* Right Side - Order Summary */}
-                    <div className="w-full lg:w-80">
+                    <div className="w-full lg:w-96">
                         <div className="bg-white  shadow-sm">
                             {/* Header */}
                             <div className="flex items-center gap-3 p-6 border-b">
@@ -253,24 +272,55 @@ export default function ShoppingCartPage() {
 
                             {/* Summary Details */}
                             <div className="p-6">
-                                <div className="space-y-3 mb-6">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-700">Bag Total ({count})</span>
-                                        <span className="font-medium">₹ {bagTotal.toLocaleString()}</span>
+                                <div className="space-y-4 mb-6">
+                                    <div className="flex justify-between items-center text-sm gap-4">
+                                        <span className="text-gray-700">Subtotal ({count} items)</span>
+                                        <span className="font-medium whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}
+                                        </span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
+                                    
+                                    {pricing?.discountAmount && (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) > 0 && (
+                                        <div className="flex justify-between items-center text-sm gap-4">
+                                            <span className="text-gray-700">
+                                                Discount ({pricing.discountAmount.iscountPercentage}%)
+                                            </span>
+                                            <span className="font-medium text-green-600 whitespace-nowrap">
+                                                - ₹ {(pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between items-center text-sm gap-4">
+                                        <span className="text-gray-700">
+                                            Tax {pricing?.taxAmount?.taxPercentage ? `(${pricing.taxAmount.taxPercentage}%)` : ''}
+                                        </span>
+                                        <span className="font-medium whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : (
+                                                pricing?.taxAmount ? 
+                                                `₹ ${(pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition).toLocaleString()}` : 
+                                                '₹ 0'
+                                            )}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">Shipping</span>
-                                        <span className="font-medium text-green-600">Free</span>
+                                        <span className="font-medium text-green-600 whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <div className="border-t pt-4 mb-6">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-semibold text-lg">Payable Amount</p>
-                                            <p className="text-xs text-gray-500">(Includes Tax)</p>
+                                            <p className="font-semibold text-lg">Total Amount</p>
+                                            <p className="text-xs text-gray-500">(Inclusive of all taxes)</p>
                                         </div>
-                                        <p className="text-lg font-semibold">₹ {payableAmount.toLocaleString()}</p>
+                                        <p className="text-lg font-semibold whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : `₹ ${payableAmount.toLocaleString()}`}
+                                        </p>
                                     </div>
                                 </div>
 

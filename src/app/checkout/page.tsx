@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/cartContext';
 import { AddressType, CreateAddressArgs } from '@/types/address';
@@ -10,6 +10,8 @@ import { Package, Shield, Truck, Trash2, Pencil, Plus } from 'lucide-react';
 import { intiateOrder, MOCK_ORDER_CALLBACK } from '@/utils/orders';
 import MockPaymentGateway from '@/components/PaymentGateway/MockPaymentGateway';
 import OrderSuccess from '@/components/Order/OrderSuccess';
+import { CheckoutPricing } from '@/types/cart';
+import { getCheckoutPricing } from '@/utils/cart';
 
 export default function CheckoutPage() {
     const { user, dbUser, token } = useAuth();
@@ -32,6 +34,8 @@ export default function CheckoutPage() {
         transactionId: string;
         amount: number;
     } | null>(null);
+    const [pricing, setPricing] = useState<CheckoutPricing | null>(null);
+    const [isLoadingPricing, setIsLoadingPricing] = useState(false);
 
     useEffect(() => {
         const loadAddresses = async () => {
@@ -55,22 +59,30 @@ export default function CheckoutPage() {
         }
     }, [addresses]);
 
-    const bagTotal = useMemo(() => {
-        return cartItems.reduce((sum, item) => sum + (Number(item.price) || 0) * (Number(item.quantity) || 1), 0);
-    }, [cartItems]);
+    // Fetch pricing from backend
+    useEffect(() => {
+        const fetchPricing = async () => {
+            if (!cartId) {
+                setPricing(null);
+                return;
+            }
+            setIsLoadingPricing(true);
+            try {
+                const pricingData = await getCheckoutPricing(cartId, appliedCoupon);
+                setPricing(pricingData);
+            } catch (error) {
+                console.error('Error fetching pricing:', error);
+            } finally {
+                setIsLoadingPricing(false);
+            }
+        };
+        fetchPricing();
+    }, [cartId, cartItems, appliedCoupon]);
 
-    const discount = useMemo(() => {
-        if (!appliedCoupon) return 0;
-        const code = appliedCoupon.trim().toUpperCase();
-        // Simple demo rules: percentage or flat based on code
-        if (code === 'SAVE10') return Math.round(bagTotal * 0.10);
-        if (code === 'WELCOME100') return 100;
-        if (code === 'FREESHIP') return 0; // handled as free shipping by default already
-        return 0;
-    }, [appliedCoupon, bagTotal]);
-
-    const shipping = 0;
-    const payableAmount = Math.max(0, bagTotal - discount + shipping);
+    const bagTotal = pricing?.subtotal || 0;
+    const discount = pricing?.discountAmount.afterDiscount ? (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) : 0;
+    const shipping = pricing?.shippingAmount.shippingAmount || 0;
+    const payableAmount = pricing?.totalAmount || 0;
 
     const applyCoupon = () => {
         const code = couponCode.trim().toUpperCase();
@@ -163,10 +175,8 @@ export default function CheckoutPage() {
 
             const result = await intiateOrder(orderData, token);
 
-            if (result.success && result.orderId) {
-                setCurrentOrderId(result.orderId);
-                setShowPaymentGateway(true);
-                toast.success('Order initiated successfully');
+            if (result.success && result.checkoutPageUrl) {
+                window.location.href = result.checkoutPageUrl;
             } else {
                 toast.error(result.message || 'Failed to initiate order');
             }
@@ -326,7 +336,7 @@ export default function CheckoutPage() {
                     </div>
 
                     {/* Right: Order Summary and Payment */}
-                    <div className="w-full lg:w-104">
+                    <div className="w-full lg:w-[28rem]">
                         <div className="bg-white shadow-sm">
                             <div className="flex items-center gap-3 p-6 border-b">
                                 <Package className="w-5 h-5" />
@@ -334,7 +344,7 @@ export default function CheckoutPage() {
                             </div>
                             <div className="p-6">
                                 {/* Items (Responsive) */}
-                                <div className="mb-6 md:max-h-64 max-h-none overflow-y-auto pr-1">
+                                <div className="mb-6 md:max-h-80 max-h-none overflow-y-auto pr-1">
                                     {cartItems.length === 0 ? (
                                         <p className="text-sm text-gray-600">Your cart is empty.</p>
                                     ) : (
@@ -342,8 +352,8 @@ export default function CheckoutPage() {
                                             {/* Header (desktop) */}
                                             <div className="hidden md:grid grid-cols-12 bg-gray-50 text-xs font-semibold text-gray-900">
                                                 <div className="px-3 py-2 col-span-5">Name</div>
-                                                <div className="px-3 py-2 text-right col-span-2">Qty</div>
-                                                <div className="px-3 py-2 text-right col-span-2">Price</div>
+                                                <div className="px-3 py-2 text-right col-span-1">Qty</div>
+                                                <div className="px-3 py-2 text-right col-span-3">Price</div>
                                                 <div className="px-3 py-2 text-right col-span-3">Subtotal</div>
                                             </div>
                                             {cartItems.map((item) => {
@@ -362,8 +372,8 @@ export default function CheckoutPage() {
                                                                     </span>
                                                                 </div>
                                                             </div>
-                                                            <div className="px-3 py-2 text-right col-span-2">{qty}</div>
-                                                            <div className="px-3 py-2 text-right col-span-2">₹ {price.toLocaleString()}</div>
+                                                            <div className="px-3 py-2 text-right col-span-1">{qty}</div>
+                                                            <div className="px-3 py-2 text-right col-span-3">₹ {price.toLocaleString()}</div>
                                                             <div className="px-3 py-2 text-right col-span-3">₹ {subtotal.toLocaleString()}</div>
                                                         </div>
                                                         {/* Card (mobile) */}
@@ -388,11 +398,13 @@ export default function CheckoutPage() {
                                             {/* Total row */}
                                             <div className="hidden md:grid grid-cols-12 border-t border-gray-300 bg-gray-50 text-sm font-semibold">
                                                 <div className="px-3 py-2 col-span-8 text-right">Total</div>
-                                                <div className="px-3 py-2 text-right col-span-4">₹ {bagTotal.toLocaleString()}</div>
+                                                <div className="px-3 py-2 text-right col-span-4">
+                                                    {isLoadingPricing ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}
+                                                </div>
                                             </div>
                                             <div className="md:hidden border-t border-gray-300 bg-gray-50 text-sm font-semibold px-3 py-2 flex items-center justify-between">
                                                 <div>Total</div>
-                                                <div>₹ {bagTotal.toLocaleString()}</div>
+                                                <div>{isLoadingPricing ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}</div>
                                             </div>
                                         </div>
                                     )}
@@ -422,24 +434,55 @@ export default function CheckoutPage() {
                                 </div>
 
                                 {/* Summary Details (post-table) */}
-                                <div className="space-y-3 mb-6">
-                                    <div className="flex justify-between text-sm">
-                                        <span className="text-gray-700">Discount</span>
-                                        <span className="font-medium text-green-600">- ₹ {discount.toLocaleString()}</span>
+                                <div className="space-y-4 mb-6">
+                                    <div className="flex justify-between items-center text-sm gap-4">
+                                        <span className="text-gray-700">Subtotal</span>
+                                        <span className="font-medium whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}
+                                        </span>
                                     </div>
-                                    <div className="flex justify-between text-sm">
+
+                                    {pricing?.discountAmount && (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) > 0 && (
+                                        <div className="flex justify-between items-center text-sm gap-4">
+                                            <span className="text-gray-700">
+                                                Discount ({pricing.discountAmount.iscountPercentage}%)
+                                            </span>
+                                            <span className="font-medium text-green-600 whitespace-nowrap">
+                                                - ₹ {(pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount).toLocaleString()}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between items-center text-sm gap-4">
+                                        <span className="text-gray-700">
+                                            Tax {pricing?.taxAmount?.taxPercentage ? `(${pricing.taxAmount.taxPercentage}%)` : ''}
+                                        </span>
+                                        <span className="font-medium whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : (
+                                                pricing?.taxAmount ? 
+                                                `₹ ${(pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition).toLocaleString()}` : 
+                                                '₹ 0'
+                                            )}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">Shipping</span>
-                                        <span className="font-medium text-green-600">Free</span>
+                                        <span className="font-medium text-green-600 whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
+                                        </span>
                                     </div>
                                 </div>
 
                                 <div className="border-t pt-4 mb-6">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-semibold text-lg">Payable Amount</p>
-                                            <p className="text-xs text-gray-500">(Includes Tax)</p>
+                                            <p className="font-semibold text-lg">Total Amount</p>
+                                            <p className="text-xs text-gray-500">(Inclusive of all taxes)</p>
                                         </div>
-                                        <p className="text-lg font-semibold">₹ {payableAmount.toLocaleString()}</p>
+                                        <p className="text-lg font-semibold whitespace-nowrap">
+                                            {isLoadingPricing ? 'Loading...' : `₹ ${payableAmount.toLocaleString()}`}
+                                        </p>
                                     </div>
                                 </div>
 
