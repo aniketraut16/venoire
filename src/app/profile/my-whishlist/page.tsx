@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Heart, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Heart, Trash2, ChevronLeft } from "lucide-react";
 import ProductCard from "@/components/Product/ProductCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/cartContext";
@@ -13,6 +14,7 @@ export default function MyWishlist() {
   const { token } = useAuth();
   const { startLoading, stopLoading } = useLoading();
   const { removeFromWishlist } = useCart();
+  const router = useRouter();
 
   const fetchWishlist = async () => {
     if (token) {
@@ -36,8 +38,17 @@ export default function MyWishlist() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-4 md:p-8">
-      <h2 className="text-xl md:text-2xl font-light tracking-wide mb-6 md:mb-8 uppercase">My Wishlist</h2>
+    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
+      <div className="flex items-center gap-3 mb-6 md:mb-8">
+        <button
+          onClick={() => router.push("/profile")}
+          className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
+          aria-label="Back to profile"
+        >
+          <ChevronLeft size={20} />
+        </button>
+        <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Wishlist</h2>
+      </div>
       
       {wishlist.length === 0 ? (
         <div className="text-center py-8 md:py-12">

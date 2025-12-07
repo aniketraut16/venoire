@@ -213,10 +213,19 @@ function MyOrders() {
   );
 
   return (
-    <div className="bg-white border border-gray-200 p-4 md:p-8">
+    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
       <div className="max-w-6xl">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8 gap-3">
-          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Orders</h2>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/profile")}
+              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
+              aria-label="Back to profile"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Orders</h2>
+          </div>
           <button
             onClick={() => fetchOrders(currentPage)}
             className="flex items-center justify-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 w-full sm:w-auto"

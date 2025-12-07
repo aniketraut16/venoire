@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { MapPin, Plus, Pencil, Trash2, Home, Building, MapPinned } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { MapPin, Plus, Pencil, Trash2, Home, Building, MapPinned, ChevronLeft } from "lucide-react";
 import { AddressType, CreateAddressArgs } from "@/types/address";
 import { getAddresses, deleteAddress } from "@/utils/address";
 import AddressForm from "@/components/Address/AddressForm";
@@ -11,6 +12,7 @@ import { useLoading } from "@/contexts/LoadingContext";
 export default function MyAddresses() {
   const { token } = useAuth();
   const { startLoading, stopLoading } = useLoading();
+  const router = useRouter();
   const [addresses, setAddresses] = useState<AddressType[]>([]);
   const [showAddressForm, setShowAddressForm] = useState<null | {
     method: "create" | "update";
@@ -73,12 +75,21 @@ export default function MyAddresses() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 p-4 md:p-8">
+    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
       <div className="max-w-5xl">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 md:mb-8">
-          <div>
-            <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Addresses</h2>
-            <p className="text-xs md:text-sm text-gray-600 mt-1">Manage your delivery addresses</p>
+          <div className="flex items-start gap-3 flex-1">
+            <button
+              onClick={() => router.push("/profile")}
+              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300 mt-0.5 flex-shrink-0"
+              aria-label="Back to profile"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <div>
+              <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Addresses</h2>
+              <p className="text-xs md:text-sm text-gray-600 mt-1">Manage your delivery addresses</p>
+            </div>
           </div>
           <button
             onClick={openCreateAddress}

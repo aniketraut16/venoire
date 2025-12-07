@@ -1,9 +1,10 @@
 "use client";
 import { CreateAddressArgs } from '@/types/address';
 import { createAddress, updateAddress } from '@/utils/address';
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext';
 import toast from 'react-hot-toast';
+import { Country, State, City } from 'country-state-city';
 
 export default function AddressForm(props: {
     method: 'create' | 'update';
@@ -16,16 +17,54 @@ export default function AddressForm(props: {
         address_line2: '',
         city: '',
         postal_code: '',
-        country: '',
+        country: 'India',
         state: '',
         is_default: false,
     });
     const [isLoading, setIsLoading] = useState(false);
     const { token } = useAuth();
     
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, type, checked, value } = e.target;
-        setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+    const indiaCountryCode = 'IN';
+    const [states, setStates] = useState<{ isoCode: string; name: string }[]>([]);
+    const [cities, setCities] = useState<{ name: string }[]>([]);
+    const [selectedStateCode, setSelectedStateCode] = useState<string>('');
+    
+    useEffect(() => {
+        const indianStates = State.getStatesOfCountry(indiaCountryCode);
+        setStates(indianStates);
+        
+        if (props.defaultValues?.state) {
+            const matchedState = indianStates.find(s => s.name === props.defaultValues?.state);
+            if (matchedState) {
+                setSelectedStateCode(matchedState.isoCode);
+                const stateCities = City.getCitiesOfState(indiaCountryCode, matchedState.isoCode);
+                setCities(stateCities);
+            }
+        }
+    }, []);
+    
+    useEffect(() => {
+        if (selectedStateCode) {
+            const stateCities = City.getCitiesOfState(indiaCountryCode, selectedStateCode);
+            setCities(stateCities);
+        } else {
+            setCities([]);
+        }
+    }, [selectedStateCode]);
+    
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, type, value } = e.target;
+        const checked = 'checked' in e.target ? e.target.checked : false;
+        
+        if (name === 'state') {
+            const selectedState = states.find(s => s.name === value);
+            if (selectedState) {
+                setSelectedStateCode(selectedState.isoCode);
+                setFormData({ ...formData, state: value, city: '' });
+            }
+        } else {
+            setFormData({ ...formData, [name]: type === 'checkbox' ? checked : value });
+        }
     }
     
     const handleSubmit = async () => {
@@ -130,22 +169,65 @@ export default function AddressForm(props: {
                             />
                         </div>
 
+                        {/* Country and State */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label htmlFor="country" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                    Country <span className="text-red-600">*</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    id="country"
+                                    name="country"
+                                    value="India"
+                                    readOnly
+                                    className="w-full px-4 py-3 border border-gray-300 bg-gray-100 text-black cursor-not-allowed"
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="state" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
+                                    State / Province <span className="text-red-600">*</span>
+                                </label>
+                                <select
+                                    id="state"
+                                    name="state"
+                                    value={formData.state}
+                                    onChange={handleChange}
+                                    required
+                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black bg-white"
+                                >
+                                    <option value="">Select State</option>
+                                    {states.map((state) => (
+                                        <option key={state.isoCode} value={state.name}>
+                                            {state.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
                         {/* City and Postal Code */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label htmlFor="city" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
                                     City <span className="text-red-600">*</span>
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     id="city"
                                     name="city"
                                     value={formData.city}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
-                                    placeholder="Enter city"
-                                />
+                                    disabled={!selectedStateCode}
+                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                >
+                                    <option value="">Select City</option>
+                                    {cities.map((city) => (
+                                        <option key={city.name} value={city.name}>
+                                            {city.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                             <div>
                                 <label htmlFor="postal_code" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
@@ -160,40 +242,6 @@ export default function AddressForm(props: {
                                     required
                                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                     placeholder="ZIP / Postal code"
-                                />
-                            </div>
-                        </div>
-
-                        {/* State and Country */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label htmlFor="state" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
-                                    State / Province <span className="text-red-600">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="state"
-                                    name="state"
-                                    value={formData.state}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
-                                    placeholder="Enter state"
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="country" className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
-                                    Country <span className="text-red-600">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    id="country"
-                                    name="country"
-                                    value={formData.country}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
-                                    placeholder="Enter country"
                                 />
                             </div>
                         </div>

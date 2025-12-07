@@ -8,7 +8,7 @@ import {
   createOrderReview,
 } from "@/utils/orders";
 import { DetailedOrder, Review, CreateReviewArgs } from "@/types/orders";
-import { Star, X, Package, CheckCircle } from "lucide-react";
+import { Star, X, Package, CheckCircle, ChevronLeft } from "lucide-react";
 import { useLoading } from "@/contexts/LoadingContext";
 
 export default function MyReviewPage() {
@@ -117,7 +117,17 @@ function MyReviews() {
 
   if (!orderId) {
     return (
-      <div className="bg-white border border-gray-200 p-4 md:p-8">
+      <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => router.push("/profile")}
+            className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
+            aria-label="Back to profile"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Reviews</h2>
+        </div>
         <div className="text-center py-12">
           <Package size={48} className="mx-auto text-gray-300 mb-4" />
           <p className="text-gray-600">No order selected</p>
@@ -131,7 +141,17 @@ function MyReviews() {
 
   if (!order) {
     return (
-      <div className="bg-white border border-gray-200 p-4 md:p-8">
+      <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => router.push("/profile")}
+            className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
+            aria-label="Back to profile"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Reviews</h2>
+        </div>
         <div className="text-center py-12">
           <Package size={48} className="mx-auto text-gray-300 mb-4 animate-pulse" />
           <p className="text-gray-600">Loading order details...</p>
@@ -141,12 +161,21 @@ function MyReviews() {
   }
 
   return (
-    <div className="bg-white border border-gray-200 p-4 md:p-8">
+    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
       <div className="max-w-4xl">
         <div className="mb-6 md:mb-8">
-          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
-            Order Reviews
-          </h2>
+          <div className="flex items-center gap-3 mb-2">
+            <button
+              onClick={() => router.push("/profile")}
+              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
+              aria-label="Back to profile"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
+              Order Reviews
+            </h2>
+          </div>
           <p className="text-sm text-gray-600 mt-2">
             Order #{order.order_number}
           </p>
