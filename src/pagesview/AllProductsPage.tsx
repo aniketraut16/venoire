@@ -668,7 +668,7 @@ export default function AllProductsPage(props: {
 
   // Layout: sidebar left, main content right
   return (
-    <div className="max-w-7xl mx-auto min-h-screen bg-white mt-25 flex flex-col">
+    <div className="max-w-7xl mx-auto min-h-screen bg-white mt-20  lg:mt-25 flex flex-col">
       {/* Header */}
       <div className="w-full px-4 lg:px-8 py-6 lg:py-8 bg-white border-b border-gray-300">
         <h1 className="text-2xl lg:text-3xl font-serif text-black tracking-tight">

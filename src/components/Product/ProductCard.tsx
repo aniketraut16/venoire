@@ -50,7 +50,7 @@ export default function ProductCard(product: Product) {
         />
 
         <div
-          className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-semibold border border-black bg-white
+          className={`absolute md:top-3 md:left-3 bottom-2 left-2 px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[10px] md:text-xs font-semibold border border-black bg-white
                     ${getTextColor("text-black", "text-black")}`}
         >
           {product.catalog}
@@ -58,7 +58,7 @@ export default function ProductCard(product: Product) {
 
         <button 
         onClick={(e) => handleWishlistClick(e)}
-        className="absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors duration-200">
+        className="hidden md:block absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors duration-200">
           <Heart className={`w-4 h-4 text-gray-600 hover:text-red-500 transition-colors duration-200 ${isWishlisted ? "text-red-500" : ""}`} />
         </button>
 
@@ -83,10 +83,10 @@ export default function ProductCard(product: Product) {
       </div>
 
       {/* Product Details */}
-      <div className="py-4 space-y-2 pt-serif-regular">
+      <div className="py-3 md:py-4 space-y-1.5 md:space-y-2 pt-serif-regular">
         {/* Category */}
         <p
-          className={`text-sm font-medium uppercase tracking-wide ${getTextColor(
+          className={`text-xs md:text-sm font-medium uppercase tracking-wide ${getTextColor(
             "text-gray-600"
           )}`}
         >
@@ -95,7 +95,7 @@ export default function ProductCard(product: Product) {
 
         {/* Product Name */}
         <h3
-          className={`text-lg font-medium line-clamp-2 ${getTextColor(
+          className={`text-sm md:text-lg font-medium line-clamp-2 ${getTextColor(
             "text-gray-900"
           )}`}
         >
@@ -103,9 +103,9 @@ export default function ProductCard(product: Product) {
         </h3>
 
         {/* Pricing */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 md:gap-2">
           <span
-            className={`text-lg font-bold ${getTextColor("text-gray-900")}`}
+            className={`text-base md:text-lg font-bold ${getTextColor("text-gray-900")}`}
           >
             Rs{" "}
             {product.price.toLocaleString("en-IN", {
@@ -115,7 +115,7 @@ export default function ProductCard(product: Product) {
           </span>
           {product.originalPrice && (
             <span
-              className={`text-sm line-through ${getTextColor("text-gray-500")}`}
+              className={`text-xs md:text-sm line-through ${getTextColor("text-gray-500")}`}
             >
               Rs{" "}
               {product.originalPrice.toLocaleString("en-IN", {
@@ -126,7 +126,7 @@ export default function ProductCard(product: Product) {
           )}
           {product.discount > 0 && (
             <span
-              className={`text-xs font-medium ${
+              className={`text-[10px] md:text-xs font-medium ${
                 mode === "light" ? "text-pink-300" : "text-red-600"
               }`}
             >
