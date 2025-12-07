@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { ShoppingBag, Heart, Trash2, ChevronDown, Shield, Package, Truck, Info } from 'lucide-react';
+import { Heart, Trash2, ChevronDown, Shield, Package, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/cartContext';
 import { CartItem, CheckoutPricing } from '@/types/cart';
 import { useAuth } from '@/contexts/AuthContext';
@@ -129,7 +129,8 @@ export default function ShoppingCartPage() {
     const bagTotal = pricing?.subtotal || 0;
     const shipping = pricing?.shippingAmount.shippingAmount || 0;
     const payableAmount = pricing?.totalAmount || 0;
-
+    const discount = pricing?.discountAmount ? (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) : 0;
+    const tax = pricing?.taxAmount ? (pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition) : 0;
 
     const handleCheckout = () => {
         if (!user) {
@@ -145,28 +146,230 @@ export default function ShoppingCartPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 pt-35">
-            <div className="max-w-7xl mx-auto px-4 py-8">
-                <div className="flex flex-col lg:flex-row gap-8">
+        <div className="min-h-screen bg-gray-50 pt-20 pb-32 md:pb-8">
+            <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
+                {/* Mobile: Cart Items */}
+                <div className="space-y-4 md:hidden">
+                    {cartItems.map((item: CartItem) => (
+                        <div key={item.id} className="bg-white rounded-lg overflow-hidden shadow-sm">
+                            <div className="flex gap-3 p-4">
+                                {/* Product Image */}
+                                <div className="w-32 h-48 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                                    <img
+                                        src={item.image}
+                                        alt={item.name}
+                                        className="w-full h-full object-cover"
+                                    />
+                                </div>
+
+                                {/* Product Details */}
+                                <div className="flex-1 flex flex-col">
+                                    {/* Top Section: Brand, Name, Actions */}
+                                    <div className="flex justify-between items-start mb-2">
+                                        <div className="flex-1 pr-2">
+                                            <p className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-1">
+                                                {item.name.split(' ')[0]}
+                                            </p>
+                                            <p className="text-sm text-gray-800 font-medium leading-tight line-clamp-2">
+                                                {item.description || item.name}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => moveToWishlist(item)}
+                                                className="p-2 hover:bg-pink-50 rounded-full transition-colors"
+                                            >
+                                                <Heart className="w-5 h-5 text-gray-600" />
+                                            </button>
+                                            <button
+                                                onClick={() => removeFromCart(item.id)}
+                                                className="p-2 hover:bg-red-50 rounded-full transition-colors"
+                                            >
+                                                <Trash2 className="w-5 h-5 text-gray-600" />
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Pricing */}
+                                    <div className="flex items-baseline gap-2 mb-3">
+                                        {item.originalPrice && Number(item.originalPrice) > Number(item.price) && (
+                                            <span className="text-xs text-gray-400 line-through">
+                                                ₹ {Number(item.originalPrice).toLocaleString()}
+                                            </span>
+                                        )}
+                                        <span className="text-lg font-bold text-gray-900">
+                                            ₹ {Number(item.price).toLocaleString()}
+                                        </span>
+                                        {item.originalPrice && Number(item.originalPrice) > Number(item.price) && (
+                                            <span className="text-xs font-semibold text-red-600">
+                                                {Math.round((1 - Number(item.price) / Number(item.originalPrice)) * 100)}% Off
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <p className="text-xs text-gray-500 mb-3">Inclusive of GST benefit</p>
+
+                                    {/* Size and Quantity Selectors */}
+                                    <div className="flex gap-3 mt-auto">
+                                        {item.productType === "clothing" && (
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-medium text-gray-700 mb-1">Size:</label>
+                                                <div className="relative">
+                                                    <select
+                                                        className="w-full h-9 px-3 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
+                                                        value={selectedSizes[item.id] ?? item.size?.size ?? ""}
+                                                        onChange={(e) => handleSizeChange(item, e.target.value)}
+                                                    >
+                                                        {(item.possibleSizes ?? []).map((s: { size: string; variantId: string }) => (
+                                                            <option key={s.variantId} value={s.size}>{s.size}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {item.productType === "perfume" && (
+                                            <div className="flex-1">
+                                                <label className="block text-xs font-medium text-gray-700 mb-1">Volume:</label>
+                                                <div className="relative">
+                                                    <select
+                                                        className="w-full h-9 px-3 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
+                                                        value={selectedVolumes[item.id] ?? item.ml_volume?.ml_volume ?? ""}
+                                                        onChange={(e) => handleVolumeChange(item, e.target.value)}
+                                                    >
+                                                        {(item.possibleVolumes ?? []).map((v: { ml_volume: string; variantId: string }) => (
+                                                            <option key={v.variantId} value={v.ml_volume}>{v.ml_volume}</option>
+                                                        ))}
+                                                    </select>
+                                                    <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="flex-1">
+                                            <label className="block text-xs font-medium text-gray-700 mb-1">Qty:</label>
+                                            <div className="relative">
+                                                <select
+                                                    className="w-full h-9 px-3 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
+                                                    value={selectedQuantities[item.id] ?? item.quantity}
+                                                    onChange={(e) => handleQuantityChange(item, parseInt(e.target.value))}
+                                                >
+                                                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(qty => (
+                                                        <option key={qty} value={qty}>{qty}</option>
+                                                    ))}
+                                                </select>
+                                                <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+
+                    {/* Mobile: Order Summary */}
+                    <div className="bg-gray-100 rounded-lg p-4 mt-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Package className="w-5 h-5 text-gray-700" />
+                            <h2 className="text-base font-bold text-gray-900 uppercase tracking-wide">Order Summary</h2>
+                        </div>
+
+                        <div className="space-y-3 mb-4">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-700">Bag Total ({count})</span>
+                                <span className="font-medium text-gray-900">
+                                    {isLoadingPricing ? '...' : `₹ ${bagTotal.toLocaleString()}`}
+                                </span>
+                            </div>
+
+                            {discount > 0 && (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-700">Product Savings:</span>
+                                    <span className="font-medium text-green-600">
+                                        - ₹ {discount.toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
+
+                            {tax > 0 && (
+                                <div className="flex justify-between items-center text-sm">
+                                    <span className="text-gray-700">GST Rate Reduction:</span>
+                                    <span className="font-medium text-green-600">
+                                        - ₹ {tax.toLocaleString()}
+                                    </span>
+                                </div>
+                            )}
+
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-gray-700 flex items-center gap-1">
+                                    Shipping Charges
+                                    <span className="text-xs text-gray-500">(i)</span>
+                                </span>
+                                <span className="font-medium text-green-600">
+                                    {isLoadingPricing ? '...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-gray-300 pt-3 mb-4">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="font-bold text-base text-gray-900">Payable Amount</p>
+                                    <p className="text-xs text-gray-500">(Includes Tax)</p>
+                                </div>
+                                <p className="text-lg font-bold text-gray-900">
+                                    {isLoadingPricing ? '...' : `₹ ${payableAmount.toLocaleString()}`}
+                                </p>
+                            </div>
+                        </div>
+
+                        <button 
+                            onClick={handleCheckout}
+                            className="w-full bg-red-600 text-white py-3 rounded font-medium text-sm hover:bg-red-700 transition-colors mb-3"
+                        >
+                            VIEW COUPONS
+                        </button>
+                    </div>
+
+                    {/* Mobile: Trust Badges */}
+                    <div className="grid grid-cols-3 gap-2 mt-6">
+                        <div className="flex flex-col items-center text-center p-3">
+                            <Shield className="w-10 h-10 text-gray-600 mb-2" />
+                            <p className="text-xs font-medium text-gray-900">Secure</p>
+                        </div>
+                        <div className="flex flex-col items-center text-center p-3">
+                            <Package className="w-10 h-10 text-gray-600 mb-2" />
+                            <p className="text-xs font-medium text-gray-900">Easy Returns</p>
+                        </div>
+                        <div className="flex flex-col items-center text-center p-3">
+                            <Truck className="w-10 h-10 text-gray-600 mb-2" />
+                            <p className="text-xs font-medium text-gray-900">Free Shipping</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Desktop: Original Layout */}
+                <div className="hidden md:flex flex-col lg:flex-row gap-8">
                     {/* Left Side - Shopping Bag */}
                     <div className="flex-1">
-                        <div className="bg-white  shadow-sm">
+                        <div className="bg-white shadow-sm">
                             {/* Header */}
                             <div className="flex items-center gap-3 p-6 border-b">
-                                <ShoppingBag className="w-5 h-5" />
+                                <Package className="w-5 h-5" />
                                 <h1 className="text-lg font-semibold">MY SHOPPING BAG ({count})</h1>
                             </div>
 
                             {/* Cart Items */}
-                            <div className="p-6 flex flex-col gap-4">
+                            <div className="p-6 flex flex-col gap-6">
                                 {cartItems.map((item: CartItem) => (
-                                    <div key={item.id} className="flex gap-4">
+                                    <div key={item.id} className="flex gap-4 pb-6 border-b last:border-b-0">
                                         {/* Product Image */}
-                                        <div className="md:w-32 w-0 h-40 flex-shrink-0">
+                                        <div className="w-32 h-40 flex-shrink-0">
                                             <img
                                                 src={item.image}
                                                 alt={item.name}
-                                                className="w-full h-full object-cover "
+                                                className="w-full h-full object-cover rounded"
                                             />
                                         </div>
 
@@ -189,7 +392,7 @@ export default function ShoppingCartPage() {
                                                         <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">SIZE</label>
                                                         <div className="relative">
                                                             <select
-                                                                className="w-20 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                className="w-20 h-10 px-3 pr-8 border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                                 value={selectedSizes[item.id] ?? item.size?.size ?? ""}
                                                                 onChange={(e) => handleSizeChange(item, e.target.value)}
                                                             >
@@ -207,7 +410,7 @@ export default function ShoppingCartPage() {
                                                         <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">VOLUME</label>
                                                         <div className="relative">
                                                             <select
-                                                                className="w-24 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                                className="w-24 h-10 px-3 pr-8 border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                                 value={selectedVolumes[item.id] ?? item.ml_volume?.ml_volume ?? ""}
                                                                 onChange={(e) => handleVolumeChange(item, e.target.value)}
                                                             >
@@ -224,7 +427,7 @@ export default function ShoppingCartPage() {
                                                     <label className="block text-xs font-semibold text-gray-900 mb-2 tracking-wide">QUANTITY</label>
                                                     <div className="relative">
                                                         <select
-                                                            className="w-16 h-10 px-3 pr-8 border border-gray-300  bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                                            className="w-16 h-10 px-3 pr-8 border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                                                             value={selectedQuantities[item.id] ?? item.quantity}
                                                             onChange={(e) => handleQuantityChange(item, parseInt(e.target.value))}
                                                         >
@@ -263,7 +466,7 @@ export default function ShoppingCartPage() {
 
                     {/* Right Side - Order Summary */}
                     <div className="w-full lg:w-96">
-                        <div className="bg-white  shadow-sm">
+                        <div className="bg-white shadow-sm">
                             {/* Header */}
                             <div className="flex items-center gap-3 p-6 border-b">
                                 <Package className="w-5 h-5" />
@@ -274,7 +477,7 @@ export default function ShoppingCartPage() {
                             <div className="p-6">
                                 <div className="space-y-4 mb-6">
                                     <div className="flex justify-between items-center text-sm gap-4">
-                                        <span className="text-gray-700">Subtotal ({count} items)</span>
+                                        <span className="text-gray-700">Bag Total ({count})</span>
                                         <span className="font-medium whitespace-nowrap">
                                             {isLoadingPricing ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}
                                         </span>
@@ -283,7 +486,7 @@ export default function ShoppingCartPage() {
                                     {pricing?.discountAmount && (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) > 0 && (
                                         <div className="flex justify-between items-center text-sm gap-4">
                                             <span className="text-gray-700">
-                                                Discount ({pricing.discountAmount.iscountPercentage}%)
+                                                Product Savings:
                                             </span>
                                             <span className="font-medium text-green-600 whitespace-nowrap">
                                                 - ₹ {(pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount).toLocaleString()}
@@ -293,19 +496,19 @@ export default function ShoppingCartPage() {
 
                                     <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">
-                                            Tax {pricing?.taxAmount?.taxPercentage ? `(${pricing.taxAmount.taxPercentage}%)` : ''}
+                                            GST Rate Reduction:
                                         </span>
-                                        <span className="font-medium whitespace-nowrap">
+                                        <span className="font-medium text-green-600 whitespace-nowrap">
                                             {isLoadingPricing ? 'Loading...' : (
                                                 pricing?.taxAmount ? 
-                                                `₹ ${(pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition).toLocaleString()}` : 
-                                                '₹ 0'
+                                                `- ₹ ${(pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition).toLocaleString()}` : 
+                                                '- ₹ 237'
                                             )}
                                         </span>
                                     </div>
 
                                     <div className="flex justify-between items-center text-sm gap-4">
-                                        <span className="text-gray-700">Shipping</span>
+                                        <span className="text-gray-700">Shipping Charges</span>
                                         <span className="font-medium text-green-600 whitespace-nowrap">
                                             {isLoadingPricing ? 'Loading...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
                                         </span>
@@ -315,8 +518,8 @@ export default function ShoppingCartPage() {
                                 <div className="border-t pt-4 mb-6">
                                     <div className="flex justify-between items-start">
                                         <div>
-                                            <p className="font-semibold text-lg">Total Amount</p>
-                                            <p className="text-xs text-gray-500">(Inclusive of all taxes)</p>
+                                            <p className="font-semibold text-lg">Payable Amount</p>
+                                            <p className="text-xs text-gray-500">(Includes Tax)</p>
                                         </div>
                                         <p className="text-lg font-semibold whitespace-nowrap">
                                             {isLoadingPricing ? 'Loading...' : `₹ ${payableAmount.toLocaleString()}`}
@@ -325,23 +528,21 @@ export default function ShoppingCartPage() {
                                 </div>
 
                                 {/* Checkout Button */}
-                                <button onClick={handleCheckout} className="w-full bg-black text-white py-3  font-medium text-sm hover:bg-gray-800 transition-colors mb-4">
-                                    CHECKOUT ({count})
+                                <button onClick={handleCheckout} className="w-full bg-black text-white py-3 font-medium text-sm hover:bg-gray-800 transition-colors mb-4">
+                                    CHECK OUT ({count})
                                 </button>
 
-
-
                                 {/* Coupon Link */}
-                                {/* <div className="text-center">
-                                    <button className="text-orange-500 text-sm font-medium hover:text-orange-600 transition-colors">
-                                        LOGIN TO APPLY COUPON
+                                <div className="text-center">
+                                    <button className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors">
+                                        VIEW COUPONS
                                     </button>
-                                </div> */}
+                                </div>
                             </div>
                         </div>
 
                         {/* Trust Badges */}
-                        <div className="mt-6 bg-white  shadow-sm p-6">
+                        <div className="mt-6 bg-white shadow-sm p-6">
                             <div className="grid grid-cols-3 gap-4 text-center">
                                 <div className="flex flex-col items-center">
                                     <Shield className="w-8 h-8 text-gray-600 mb-2" />
@@ -361,6 +562,21 @@ export default function ShoppingCartPage() {
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            {/* Mobile: Sticky Bottom Checkout Bar */}
+            <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-50">
+                <div className="flex items-center justify-between mb-2">
+                    <div>
+                        <p className="text-xs text-gray-500">Total: ₹ {payableAmount.toLocaleString()}</p>
+                    </div>
+                    <button 
+                        onClick={handleCheckout}
+                        className="bg-black text-white px-8 py-3 rounded font-semibold text-sm hover:bg-gray-800 transition-colors"
+                    >
+                        CHECK OUT ({count})
+                    </button>
                 </div>
             </div>
         </div>

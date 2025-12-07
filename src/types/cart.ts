@@ -19,6 +19,7 @@ export type CartItem = {
     variantId: string;
   }[];
   price: number;
+  originalPrice?: number;
   name: string;
   image: string;
   description: string;

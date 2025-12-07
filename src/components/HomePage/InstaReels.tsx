@@ -89,7 +89,7 @@ export default function InstaReels() {
         </div>
 
         {/* Reels Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12 justify-items-center">
           <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DR1FyJSkgoK/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
           <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRep44wknRi/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
           <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRU_cOEDTVm/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
