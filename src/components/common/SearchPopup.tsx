@@ -2,17 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Search, X } from 'lucide-react'
 import Link from 'next/link'
-import { getPerfumes } from '@/utils/perfume'
-
-interface SearchResult {
-  id: string
-  name: string
-  slug: string
-  thumbnail: string
-  type: 'product' | 'perfume'
-  price?: number
-  category?: string
-}
+import { search } from '@/utils/cdn'
+import { SearchResponse } from '@/types/cdn'
 
 interface SearchPopupProps {
   isOpen: boolean
@@ -21,7 +12,7 @@ interface SearchPopupProps {
 
 export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searchResults, setSearchResults] = useState<SearchResponse['data'] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
@@ -45,7 +36,7 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     }
 
     if (searchQuery.trim() === '') {
-      setSearchResults([])
+      setSearchResults(null)
       setIsLoading(false)
       return
     }
@@ -54,7 +45,7 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
 
     debounceRef.current = setTimeout(() => {
       performSearch(searchQuery)
-    }, 200)
+    }, 300)
 
     return () => {
       if (debounceRef.current) {
@@ -64,26 +55,19 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
   }, [searchQuery])
 
   const performSearch = async (query: string) => {
-    const searchTerm = query.toLowerCase().trim()
-    const results: SearchResult[] = []
-
-    // Search perfumes using API
-    const perfumes = await getPerfumes({ search: searchTerm })
-    
-    perfumes.forEach(perfume => {
-      results.push({
-        id: perfume.id,
-        name: perfume.name,
-        slug: perfume.slug,
-        thumbnail: perfume.coverImage,
-        type: 'perfume',
-        category: perfume.fragrance
-      })
-    })
-
-    // Limit results to 8 items
-    setSearchResults(results.slice(0, 8))
-    setIsLoading(false)
+    try {
+      const response = await search(query)
+      if (response.success) {
+        setSearchResults(response.data)
+      } else {
+        setSearchResults({ products: [], categories: [], collections: [] })
+      }
+    } catch (error) {
+      console.error('Search error:', error)
+      setSearchResults({ products: [], categories: [], collections: [] })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleTopSearchClick = (searchTerm: string) => {
@@ -95,6 +79,19 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
       onClose()
     }
   }
+
+  const getCollectionLink = (collection: SearchResponse['data']['collections'][0]) => {
+    if (collection.collection_type === 'perfume') {
+      return `/perfume/collection?slug=${collection.slug}`
+    }
+    return `/d/${collection.slug}`
+  }
+
+  const hasResults = searchResults && (
+    searchResults.products.length > 0 || 
+    searchResults.categories.length > 0 || 
+    searchResults.collections.length > 0
+  )
 
   if (!isOpen) return null
 
@@ -120,11 +117,12 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
               <input
                 ref={searchInputRef}
                 type="text"
-                placeholder="Search products and perfumes..."
+                placeholder="Search products, categories, and collections..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
                 className="w-full pl-10 pr-4 py-3 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                autoFocus
               />
             </div>
             <button
@@ -163,46 +161,101 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
                   <div className="flex items-center justify-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
                   </div>
-                ) : searchResults.length > 0 ? (
-                  <>
-                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                      Search Results ({searchResults.length})
-                    </h3>
-                    <div className="space-y-3">
-                      {searchResults.map((result) => (
-                        <Link
-                          key={`${result.type}-${result.id}`}
-                          href={result.type === 'product' ? `/product/${result.slug}` : `/perfume/${result.slug}`}
-                          onClick={onClose}
-                          className="flex items-center gap-4 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
-                        >
-                          <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                            <img
-                              src={result.thumbnail}
-                              alt={result.name}
-                              className="object-cover group-hover:scale-105 transition-transform duration-200"
-                            />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
-                              {result.name}
-                            </h4>
-                            <p className="text-sm text-gray-500 mt-1">
-                              {result.category}
-                            </p>
-                            {result.price && (
-                              <p className="text-sm font-medium text-gray-900 mt-1">
-                                ₹{result.price}
-                              </p>
-                            )}
-                            <span className="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full mt-2 capitalize">
-                              {result.type}
-                            </span>
-                          </div>
-                        </Link>
-                      ))}
-                    </div>
-                  </>
+                ) : hasResults ? (
+                  <div className="space-y-6">
+                    {/* Products Section */}
+                    {searchResults.products.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                          Products ({searchResults.products.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {searchResults.products.map((product) => (
+                            <Link
+                              key={product.id}
+                              href={`/product/${product.slug}`}
+                              onClick={onClose}
+                              className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
+                                  {product.name}
+                                </h4>
+                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                  {product.description}
+                                </p>
+                                <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full mt-2">
+                                  Product
+                                </span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Categories Section */}
+                    {searchResults.categories.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                          Categories ({searchResults.categories.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {searchResults.categories.map((category) => (
+                            <Link
+                              key={category.id}
+                              href={`/c/${category.slug}`}
+                              onClick={onClose}
+                              className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
+                                  {category.name}
+                                </h4>
+                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                  {category.description}
+                                </p>
+                                <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full mt-2">
+                                  Category
+                                </span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Collections Section */}
+                    {searchResults.collections.length > 0 && (
+                      <div>
+                        <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                          Collections ({searchResults.collections.length})
+                        </h3>
+                        <div className="space-y-2">
+                          {searchResults.collections.map((collection) => (
+                            <Link
+                              key={collection.id}
+                              href={getCollectionLink(collection)}
+                              onClick={onClose}
+                              className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
+                                  {collection.name}
+                                </h4>
+                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                  {collection.description}
+                                </p>
+                                <span className="inline-block px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full mt-2 capitalize">
+                                  {collection.collection_type} Collection
+                                </span>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="text-center py-8">
                     <Search size={48} className="text-gray-300 mx-auto mb-4" />
