@@ -12,6 +12,7 @@ export type Product = {
   size: string[];
   thumbnail: string;
   mode?: "light" | "dark";
+  availabilityStatus?: "in_stock" | "low_stock" | "out_of_stock";
 };
 
 
@@ -22,6 +23,7 @@ export interface ProductPricing {
   discount: number;
   itemsRemaining: number;
   size: string | null;
+  availabilityStatus: "in_stock" | "low_stock" | "out_of_stock";
 }
 
 export interface ProductAttribute {

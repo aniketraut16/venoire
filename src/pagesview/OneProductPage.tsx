@@ -188,37 +188,62 @@ export default function OneProductPage() {
                       const sizeA = parseInt(a.size ?? '0');
                       const sizeB = parseInt(b.size ?? '0');
                       return sizeA - sizeB;
-                    }).map((variant) => (
-                      <button
-                        key={variant.size}
-                        onClick={() => handleSizeSelect(variant.size ?? '')}
-                        className={`px-3 md:px-4 py-2 border transition-colors lato-regular text-xs md:text-sm ${
-                          selectedVariant?.size === variant.size
-                            ? 'border-gray-900 bg-gray-900 text-white'
-                            : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'
-                        }`}
-                      >
-                        {variant.size}
-                      </button>
-                    ))}
+                    }).map((variant) => {
+                      const isOutOfStock = variant.availabilityStatus === 'out_of_stock';
+                      const isLowStock = variant.availabilityStatus === 'low_stock';
+                      const isSelected = selectedVariant?.size === variant.size;
+                      
+                      return (
+                        <button
+                          key={variant.size}
+                          onClick={() => !isOutOfStock && handleSizeSelect(variant.size ?? '')}
+                          disabled={isOutOfStock}
+                          className={`relative px-3 md:px-4 py-2 border transition-colors lato-regular text-xs md:text-sm ${
+                            isOutOfStock
+                              ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed line-through'
+                              : isSelected
+                              ? 'border-gray-900 bg-gray-900 text-white'
+                              : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'
+                          }`}
+                        >
+                          {variant.size}
+                          {isLowStock && !isOutOfStock && (
+                            <span className="absolute -top-1 -right-1 w-2 h-2 bg-orange-500 rounded-full"></span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
+                  {selectedVariant && (
+                    <div className="text-xs md:text-sm">
+                      {selectedVariant.availabilityStatus === 'out_of_stock' && (
+                        <p className="text-red-600 lato-bold">Out of Stock</p>
+                      )}
+                      {selectedVariant.availabilityStatus === 'low_stock' && (
+                        <p className="text-orange-600 lato-bold">Only {selectedVariant.itemsRemaining} left in stock!</p>
+                      )}
+                      {selectedVariant.availabilityStatus === 'in_stock' && (
+                        <p className="text-green-600 lato-bold">In Stock</p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
               {/* Buttons - Desktop Only */}
               <div className="hidden md:block space-y-3">
                 <button
-                  disabled={!selectedVariant}
-                  className="w-full bg-gradient-to-r from-[#d4b500] to-[#af7834] text-white py-3 px-6 lato-bold uppercase tracking-wide disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  disabled={!selectedVariant || selectedVariant.availabilityStatus === 'out_of_stock'}
+                  className="w-full bg-gradient-to-r from-[#d4b500] to-[#af7834] text-white py-3 px-6 lato-bold uppercase tracking-wide disabled:bg-gray-300 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
                 >
-                  Buy Now
+                  {selectedVariant?.availabilityStatus === 'out_of_stock' ? 'Out of Stock' : 'Buy Now'}
                 </button>
 
                 <div className="grid grid-cols-2 gap-3">
                   <button
-                    disabled={!selectedVariant}
+                    disabled={!selectedVariant || selectedVariant.availabilityStatus === 'out_of_stock'}
                     onClick={handleAddToCart}
-                    className="bg-white border border-gray-900 text-gray-900 py-3 px-4 lato-bold uppercase tracking-wide hover:bg-gray-900 hover:text-white disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+                    className="bg-white border border-gray-900 text-gray-900 py-3 px-4 lato-bold uppercase tracking-wide hover:bg-gray-900 hover:text-white disabled:bg-gray-300 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-500 flex items-center justify-center gap-2 text-sm"
                   >
                     <ShoppingCart className="h-4 w-4" />
                     Add to Cart
@@ -350,12 +375,12 @@ export default function OneProductPage() {
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-50">
           <div className="flex gap-3">
             <button
-              disabled={!selectedVariant}
+              disabled={!selectedVariant || selectedVariant.availabilityStatus === 'out_of_stock'}
               onClick={handleAddToCart}
               className="flex-1 bg-gray-900 text-white py-3 px-4 lato-bold uppercase tracking-wide hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               <ShoppingCart className="h-4 w-4" />
-              Add to Cart
+              {selectedVariant?.availabilityStatus === 'out_of_stock' ? 'Out of Stock' : 'Add to Cart'}
             </button>
 
             <button

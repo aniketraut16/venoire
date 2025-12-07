@@ -56,6 +56,19 @@ export default function ProductCard(product: Product) {
           {product.catalog}
         </span>
 
+        {/* Availability Status Badge */}
+        {product.availabilityStatus && product.availabilityStatus !== 'in_stock' && (
+          <span
+            className={`absolute bottom-2 right-2 md:bottom-3 md:right-3 inline-flex items-center justify-center px-2 py-1 rounded text-[10px] md:text-xs font-bold whitespace-nowrap ${
+              product.availabilityStatus === 'out_of_stock'
+                ? 'bg-red-600 text-white'
+                : 'bg-orange-500 text-white'
+            }`}
+          >
+            {product.availabilityStatus === 'out_of_stock' ? 'Out of Stock' : 'Low Stock'}
+          </span>
+        )}
+
         <button 
         onClick={(e) => handleWishlistClick(e)}
         className="hidden md:block absolute top-3 right-3 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors duration-200">
