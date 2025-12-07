@@ -37,7 +37,8 @@ export const addToCart = async (
     return { success: true, message: "Item added to cart successfully" };
   } catch (error: any) {
     console.error("Error adding to cart:", error);
-    return { success: false, message: error.message as string | "Failed to add item to cart" };
+    const errorMessage = error?.response?.data?.message || error?.message || "Failed to add item to cart";
+    return { success: false, message: errorMessage };
   }
 };
 
@@ -89,7 +90,8 @@ export const removeFromCart = async (
     return { success: true, message: "Item removed from cart successfully" };
   } catch (error: any) {
     console.error("Error removing from cart:", error);
-    return { success: false, message: error.message as string | "Failed to remove item from cart" };
+    const errorMessage = error?.response?.data?.message || error?.message || "Failed to remove item from cart";
+    return { success: false, message: errorMessage };
   }
 };
 
@@ -118,7 +120,8 @@ export const updateCartItem = async (
     return { success: true, message: "Item updated in cart successfully" };
   } catch (error: any) {
     console.error("Error updating cart item:", error);
-    return { success: false, message: error.message as string | "Failed to update item in cart" };
+    const errorMessage = error?.response?.data?.message || error?.message || "Failed to update item in cart";
+    return { success: false, message: errorMessage };
   }
 };
 

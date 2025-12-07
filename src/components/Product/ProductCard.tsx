@@ -49,12 +49,12 @@ export default function ProductCard(product: Product) {
           draggable="false" // Prevent drag-and-drop of image
         />
 
-        <div
-          className={`absolute md:top-3 md:left-3 bottom-2 left-2 px-1.5 py-0.5 md:px-2 md:py-1 rounded-full text-[10px] md:text-xs font-semibold border border-black bg-white
+        <span
+          className={`absolute md:top-3 md:left-3 bottom-2 left-2 inline-flex items-center justify-center flex-shrink-0 h-auto max-h-7 px-1.5 py-0.5 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-semibold border border-black bg-white whitespace-nowrap leading-none
                     ${getTextColor("text-black", "text-black")}`}
         >
           {product.catalog}
-        </div>
+        </span>
 
         <button 
         onClick={(e) => handleWishlistClick(e)}
