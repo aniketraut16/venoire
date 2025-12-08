@@ -26,18 +26,22 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
     ((lowestOriginalPrice - lowestPrice) / lowestOriginalPrice) * 100
   );
 
-  // Mock rating data
+  // Fixed rating data - using perfume ID to generate consistent rating
   const rating = 4;
-  const reviewCount = Math.floor(Math.random() * 10) + 1;
+  const reviewCount = ((perfume.id.charCodeAt(0) + perfume.id.charCodeAt(1)) % 10) + 1;
 
-  // Image cycling effect on hover
+  // Image cycling effect on hover - starts immediately, changes every 2 seconds
   useEffect(() => {
     let interval: NodeJS.Timeout;
     
     if (isHovered && allImages.length > 1) {
+      // Immediately change to next image
+      setCurrentImageIndex(1);
+      
+      // Then set interval to continue cycling
       interval = setInterval(() => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
-      }, 1000); // Change image every 1 second
+      }, 2000); // Change image every 2 seconds
     } else {
       setCurrentImageIndex(0); // Reset to first image when not hovering
     }
@@ -90,7 +94,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
               router.push(`/perfume/${perfume.slug}`);
               // Add to cart logic here
             }}
-            className="bg-white border-2 border-[#1a2438] text-[#1a2438] font-semibold px-8 py-3 rounded-xl hover:bg-[#1a2438] hover:text-white transition-all duration-300 uppercase text-sm transform scale-90 group-hover:scale-100 w-full cursor-pointer"
+            className="bg-white border-2 border-red-500 text-red-500 font-semibold px-8 py-3 rounded-xl hover:bg-red-500 hover:text-white transition-all duration-300 uppercase text-sm transform scale-90 group-hover:scale-100 w-full cursor-pointer"
           >
             Buy Now
           </button>
@@ -101,7 +105,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
       <div className="p-5 space-y-3">
 
         {/* Product Name */}
-        <h3 className="font-bold text-lg text-gray-800 group-hover:text-[#1a2438] transition-colors line-clamp-1">
+        <h3 className="font-bold text-lg text-gray-800 group-hover:text-red-500 transition-colors line-clamp-1">
           {perfume.name}
         </h3>
 
@@ -139,8 +143,8 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
 
         {/* Fragrance Notes */}
         <div className="flex flex-wrap gap-1.5 pt-2">
-          <span className="text-sm text-red-500">
-            {perfume.price[0].quantity} ml
+          <span className="text-sm text-red-300">
+            {perfume.price[0].quantity} ML
           </span>
         </div>
       </div>

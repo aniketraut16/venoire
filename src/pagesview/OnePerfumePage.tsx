@@ -41,7 +41,7 @@ export default function OnePerfumePage() {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0f182c] mx-auto mb-4"></div>
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
                     <div className="text-xl text-gray-600">Loading perfume...</div>
                 </div>
             </div>
@@ -68,8 +68,8 @@ export default function OnePerfumePage() {
                         alt={perfume.name}
                         className="object-cover w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#0f182c]/70 via-[#0f182c]/60 to-[#0f182c]/50"></div>
-                    <div className="absolute inset-0 bg-black/10"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 via-orange-800/15 to-orange-600/20"></div>
+                    <div className="absolute inset-0 bg-black/30"></div>
                 </div>
             
                 <div className="max-w-7xl mx-auto px-4 pt-[25vh] pb-12 h-full relative z-10">
@@ -91,10 +91,10 @@ export default function OnePerfumePage() {
                                 {/* Price */}
                                 <div className="flex items-baseline gap-3 pt-2">
                                     <span className="text-3xl font-bold">Rs. {totalPrice.toFixed(2)}</span>
-                                    <span className="text-lg line-through text-purple-200/70">
+                                    <span className="text-lg line-through text-orange-200/70">
                                         Rs. {totalOriginalPrice.toFixed(2)}
                                     </span>
-                                    <span className="text-sm text-purple-200">Incl. all taxes</span>
+                                    <span className="text-sm text-orange-200">Incl. all taxes</span>
                                 </div>
 
                                 {/* Size & Quantity Row */}
@@ -114,7 +114,7 @@ export default function OnePerfumePage() {
                                                     }}
                                                     className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
                                                         selectedSize === index
-                                                            ? 'bg-white text-[#0f182c] shadow-lg'
+                                                            ? 'bg-white text-orange-600 shadow-lg'
                                                             : 'bg-white/20 backdrop-blur-sm text-white hover:bg-white/30'
                                                     }`}
                                                 >
@@ -149,7 +149,7 @@ export default function OnePerfumePage() {
 
                                 {/* Add to Cart Button */}
                                 <div className="pt-2">
-                                    <button onClick={handleAddToCart} className="bg-[#0f182c] hover:bg-[#1a2438] text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg uppercase text-sm tracking-wide">
+                                    <button onClick={handleAddToCart} className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg uppercase text-sm tracking-wide">
                                         Add to Cart
                                     </button>
                                 </div>
@@ -158,7 +158,7 @@ export default function OnePerfumePage() {
 
                         {/* Right Side - Fragrance Profile Card */}
                         <div className="hidden lg:block">
-                            <div className="bg-white/10 backdrop-blur-md rounded-2xl shadow-2xl p-8 text-white border border-white/20">
+                            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-8 text-white">
                                 <h2 className="text-lg font-bold mb-4 opacity-90">Fragrance Profile</h2>
                                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                                     <p className="text-2xl font-bold">{perfume.fragrance}</p>
@@ -180,11 +180,11 @@ export default function OnePerfumePage() {
             </div>
 
             {/* Features Section */}
-            <div className="bg-gradient-to-b from-white to-purple-50/30 py-6 border-b border-purple-100">
+            <div className="bg-gradient-to-b from-white to-orange-50/30 py-6 border-b border-orange-100">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-purple-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-[#0f182c] to-[#1a2438] p-2.5 rounded-lg">
+                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
+                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
                                 <FiPackage className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -192,8 +192,8 @@ export default function OnePerfumePage() {
                                 <p className="text-xs text-gray-600">Authentic fragrances</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-purple-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-[#0f182c] to-[#1a2438] p-2.5 rounded-lg">
+                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
+                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
                                 <FiTruck className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -201,8 +201,8 @@ export default function OnePerfumePage() {
                                 <p className="text-xs text-gray-600">On orders above Rs. 999</p>
                             </div>
                         </div>
-                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-purple-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-[#0f182c] to-[#1a2438] p-2.5 rounded-lg">
+                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
+                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
                                 <FiRefreshCw className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -215,23 +215,23 @@ export default function OnePerfumePage() {
             </div>
 
             {/* Product Details Section */}
-            <div className="bg-gradient-to-b from-purple-50/30 to-white py-16">
+            <div className="bg-gradient-to-b from-orange-50/30 to-white py-16">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         {/* Product Description Card - Order 2 on mobile, 1 on desktop */}
                         <div className="order-2 lg:order-1 lg:col-span-2 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-1 h-8 bg-gradient-to-b from-[#0f182c] to-[#1a2438] rounded-full"></div>
+                                <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
                                 <h2 className="text-xl font-bold text-gray-900">Product Description</h2>
                             </div>
                             <p className="text-gray-700 leading-relaxed text-sm">{perfume.productDescription}</p>
                             
                             <div className="mt-8 pt-6 border-t border-gray-100">
                                 <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-1 h-8 bg-gradient-to-b from-[#0f182c] to-[#1a2438] rounded-full"></div>
+                                    <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
                                     <h2 className="text-xl font-bold text-gray-900">Scent Story</h2>
                                 </div>
-                                <p className="text-gray-700 leading-relaxed italic text-sm bg-purple-50/50 p-4 rounded-lg border-l-4 border-[#0f182c]">
+                                <p className="text-gray-700 leading-relaxed italic text-sm bg-orange-50/50 p-4 rounded-lg border-l-4 border-orange-400">
                                     {perfume.scentStory}
                                 </p>
                             </div>
@@ -244,7 +244,7 @@ export default function OnePerfumePage() {
                                 {perfume.images.slice(0, 3).map((image, index) => (
                                     <div 
                                         key={index} 
-                                        className="group relative aspect-square bg-gradient-to-br from-purple-50 to-purple-100/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-purple-100"
+                                        className="group relative aspect-square bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-orange-100"
                                     >
                                         <img
                                             src={image}
@@ -267,21 +267,21 @@ export default function OnePerfumePage() {
                         {/* Fragrance Notes */}
                         <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-1 h-8 bg-gradient-to-b from-[#0f182c] to-[#1a2438] rounded-full"></div>
+                                <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
                                 <h2 className="text-xl font-bold text-gray-900">Fragrance Notes</h2>
                             </div>
                             <div className="space-y-3 text-sm">
                                 
-                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-purple-50 to-transparent rounded-lg">
-                                        <span className="inline-block w-1.5 h-1.5 bg-[#0f182c] rounded-full mt-1.5"></span>
+                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
                                         <p className="text-gray-700 flex-1">{perfume.top_notes}</p>
                                     </div>
-                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-purple-50 to-transparent rounded-lg">
-                                        <span className="inline-block w-1.5 h-1.5 bg-[#0f182c] rounded-full mt-1.5"></span>
+                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
                                         <p className="text-gray-700 flex-1">{perfume.middle_notes}</p>
                                     </div>
-                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-purple-50 to-transparent rounded-lg">
-                                        <span className="inline-block w-1.5 h-1.5 bg-[#0f182c] rounded-full mt-1.5"></span>
+                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
+                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
                                         <p className="text-gray-700 flex-1">{perfume.base_notes}</p>
                                     </div>
                                 
@@ -291,10 +291,10 @@ export default function OnePerfumePage() {
                         {/* Usage Tips */}
                         <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="w-1 h-8 bg-gradient-to-b from-[#0f182c] to-[#1a2438] rounded-full"></div>
+                                <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
                                 <h2 className="text-xl font-bold text-gray-900">Usage Tips</h2>
                             </div>
-                            <p className="text-gray-700 leading-relaxed text-sm bg-gradient-to-br from-purple-50 to-purple-100/50 p-5 rounded-xl border border-purple-200/50">
+                            <p className="text-gray-700 leading-relaxed text-sm bg-gradient-to-br from-orange-50 to-orange-100/50 p-5 rounded-xl border border-orange-200/50">
                                 {perfume.usageTips}
                             </p>
 

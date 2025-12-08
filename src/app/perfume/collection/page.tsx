@@ -117,7 +117,7 @@ const CollectionPageContent = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-[#0f182c] mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-red-500 mx-auto mb-4"></div>
           <div className="text-xl text-gray-600">Loading collection...</div>
         </div>
       </div>
@@ -128,7 +128,7 @@ const CollectionPageContent = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner with Cover Image */}
       {collection.slug !== "all" ? (
-        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-[#0f182c] to-[#1a2438] overflow-hidden">
+        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-red-500 to-orange-500 overflow-hidden">
           <img
             src={collection.banner_image_url}
             alt={collection.name}
@@ -143,7 +143,7 @@ const CollectionPageContent = () => {
           </div>
         </div>
       ) : (
-        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-[#0f182c] to-[#1a2438] overflow-hidden">
+        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-red-500 to-orange-500 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
             <h1 className="text-5xl md:text-7xl font-bold tracking-wider mb-4 drop-shadow-lg">
@@ -162,9 +162,9 @@ const CollectionPageContent = () => {
               <a
                 key={col.id}
                 href={`/perfume/collection?slug=${col.slug}`}
-                className={`flex-shrink-0 h-10 px-6 flex items-center justify-center bg-purple-50 font-medium transition-all border-2 rounded-md ${
+                className={`flex-shrink-0 h-10 px-6 flex items-center justify-center bg-red-50 font-medium transition-all border-2 rounded-md ${
                   col.slug === (collectionSlug || "all")
-                    ? "border-[#0f182c] text-[#0f182c] "
+                    ? "border-red-400 text-red-500 "
                     : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
               >
@@ -190,10 +190,10 @@ const CollectionPageContent = () => {
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white rounded-md pl-12 pr-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#0f182c]"
+                className="w-full bg-white rounded-md pl-12 pr-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
               />
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-[#0f182c] hover:bg-[#1a2438] text-white rounded-md p-2 transition-colors">
+              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 text-white rounded-md p-2 transition-colors">
                 <FiSearch className="text-lg" />
               </button>
             </div>
@@ -205,7 +205,7 @@ const CollectionPageContent = () => {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#0f182c] cursor-pointer"
+                className="bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
               >
                 <option value="new-arrivals">Latest</option>
                 <option value="price-low-high">Price: Low to High</option>
@@ -230,7 +230,7 @@ const CollectionPageContent = () => {
                 setSelectedGender("all");
                 setSortBy("new-arrivals");
               }}
-              className="mt-4 px-6 py-2 bg-[#0f182c] text-white rounded-md hover:bg-[#1a2438] transition-colors"
+              className="mt-4 px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
             >
               Clear Filters
             </button>
@@ -248,7 +248,7 @@ const CollectionPageContent = () => {
       <div className="fixed bottom-8 right-8 z-50">
         <button
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="bg-[#0f182c] hover:bg-[#1a2438] text-white p-4 rounded-full shadow-lg transition-all hover:scale-110"
+          className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full shadow-lg transition-all hover:scale-110"
           aria-label="Back to top"
         >
           <svg
