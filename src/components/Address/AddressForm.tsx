@@ -73,6 +73,28 @@ export default function AddressForm(props: {
             props.onCancel();
             return;
         }
+
+        if (formData.postal_code.length !== 6) {
+            toast.error('Postal code must be 6 digits');
+            return;
+        }
+        if(!formData.state) {
+            toast.error('State is required');
+            return;
+        }
+        if(!formData.city) {
+            toast.error('City is required');
+            return;
+        }
+        if(!formData.address_line1) {
+            toast.error('Address line 1 is required');
+            return;
+        }
+        if(!formData.country) {
+            toast.error('Country is required');
+            return;
+        }
+
         setIsLoading(true);
         
         if (props.method === 'create') {
@@ -235,11 +257,19 @@ export default function AddressForm(props: {
                                 </label>
                                 <input
                                     type="text"
+                                    maxLength={6}
                                     id="postal_code"
                                     name="postal_code"
                                     value={formData.postal_code}
                                     onChange={handleChange}
                                     required
+                                    pattern="[0-9]{6}"
+                                    inputMode="numeric"
+                                    onKeyPress={(e) => {
+                                        if (!/[0-9]/.test(e.key)) {
+                                            e.preventDefault();
+                                        }
+                                    }}
                                     className="w-full px-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors text-black placeholder-gray-400"
                                     placeholder="ZIP / Postal code"
                                 />

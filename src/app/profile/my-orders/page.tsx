@@ -77,6 +77,21 @@ function MyOrders() {
   }, [token, orderId, modalType]);
 
   useEffect(() => {
+    if (searchQuery) {
+      startLoading();
+      const debounceTimer = setTimeout(() => {
+        setCurrentPage(1);
+        fetchOrders(1);
+      }, 500);
+
+      return () => {
+        clearTimeout(debounceTimer);
+        stopLoading();
+      };
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape" && modalType) {
         closeModal();
@@ -104,6 +119,7 @@ function MyOrders() {
       limit: 5,
       sort: "created_at",
       order: "desc",
+      search: searchQuery,
     };
     if (statusFilter !== "all") {
       params.status = statusFilter;
@@ -191,7 +207,7 @@ function MyOrders() {
       delivered: "bg-green-100 text-green-800 border-green-200",
       cancelled: "bg-red-100 text-red-800 border-red-200",
       refunded: "bg-gray-100 text-gray-800 border-gray-200",
-    };
+    }
     return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
   };
 
@@ -587,30 +603,30 @@ function OrderDetailsModal({
           </div>
 
           <div>
-            <h4 className="text-sm font-medium uppercase tracking-wider mb-3 flex items-center space-x-2">
+            <h4 className="text-xs md:text-sm font-medium uppercase tracking-wider mb-3 flex items-center space-x-2">
               <CreditCard size={16} />
               <span>Payment Information</span>
             </h4>
-            <div className="bg-gray-50 p-4 border-l-2 border-black">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Method</p>
-                  <p className="text-sm text-gray-900 capitalize">
+                  <p className="text-xs md:text-sm text-gray-900 capitalize">
                     {order.payment.payment_method.replace("_", " ")}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Status</p>
-                  <p className="text-sm text-gray-900 capitalize">{order.payment.payment_status}</p>
+                  <p className="text-xs md:text-sm text-gray-900 capitalize">{order.payment.payment_status}</p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Transaction ID</p>
-                  <p className="text-sm text-gray-900 font-mono">{order.payment.transaction_id}</p>
+                  <p className="text-xs md:text-sm text-gray-900 font-mono break-all">{order.payment.transaction_id}</p>
                 </div>
                 {order.payment.paid_at && (
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Paid At</p>
-                    <p className="text-sm text-gray-900">
+                    <p className="text-xs md:text-sm text-gray-900">
                       {new Date(order.payment.paid_at).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
