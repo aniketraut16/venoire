@@ -156,6 +156,8 @@ export type Review = {
   product_name: string;
   product_slug: string;
   product_thumbnail: string | null;
+  order_id: string | null;
+  order_number: string | null;
   rating: number;
   comment: string | null;
   is_approved: boolean;
@@ -163,17 +165,22 @@ export type Review = {
   updated_at: string;
 };
 
-export type GetOrderReviewsResponse = {
+export type GetUserReviewsResponse = {
   success: boolean;
-  data: {
-    order_id: string;
-    reviews: Review[];
-    can_review: boolean;
+  data: Review[];
+  pagination: {
+    current_page: number;
+    total_pages: number;
+    total_reviews: number;
+    per_page: number;
+    has_next: boolean;
+    has_prev: boolean;
   };
 };
 
 export type CreateReviewArgs = {
   product_id: string;
+  order_id: string;
   rating: number;
   comment?: string;
 };

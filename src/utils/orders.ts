@@ -6,7 +6,7 @@ import {
   MOCK_ORDER_CALLBACK_Args,
   Order,
   TrackOrderResponse,
-  GetOrderReviewsResponse,
+  GetUserReviewsResponse,
   CreateReviewArgs,
   CreateReviewResponse,
 } from "@/types/orders";
@@ -143,36 +143,41 @@ export const trackOrder = async (orderId: string, token: string): Promise<{ succ
   }
 };
 
-export const getOrderReviews = async (
-  orderId: string,
-  token: string
-): Promise<GetOrderReviewsResponse> => {
+export const getUserReviews = async (
+  token: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<GetUserReviewsResponse> => {
   try {
-    const response = await axios.get(`${baseUrl}/user/orders/${orderId}/reviews`, {
+    const response = await axios.get(`${baseUrl}/user/reviews`, {
       headers: { Authorization: `Bearer ${token}` },
+      params: { page, limit },
     });
-    return response.data as GetOrderReviewsResponse;
+    return response.data as GetUserReviewsResponse;
   } catch (error) {
-    console.error("Error getting order reviews:", error);
+    console.error("Error getting user reviews:", error);
     return {
       success: false,
-      data: {
-        order_id: orderId,
-        reviews: [],
-        can_review: false,
+      data: [],
+      pagination: {
+        current_page: 1,
+        total_pages: 0,
+        total_reviews: 0,
+        per_page: limit,
+        has_next: false,
+        has_prev: false,
       },
     };
   }
 };
 
-export const createOrderReview = async (
-  orderId: string,
+export const createProductReview = async (
   token: string,
   reviewData: CreateReviewArgs
 ): Promise<CreateReviewResponse> => {
   try {
     const response = await axios.post(
-      `${baseUrl}/user/orders/${orderId}/reviews`,
+      `${baseUrl}/user/reviews`,
       reviewData,
       {
         headers: { Authorization: `Bearer ${token}` },
