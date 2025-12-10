@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'next/navigation'
-import { getDetailProduct } from '@/utils/products'
-import type { DetailProduct, ProductPricing } from '@/types/product'
+import { getDetailProduct, getSimilarProducts } from '@/utils/products'
+import type { DetailProduct, ProductPricing, Product } from '@/types/product'
 import { Heart, ShoppingCart, Truck, Tag, Star, Package, Calendar, Loader, ChevronDown, ChevronUp } from 'lucide-react'
 import { Lens } from '@/components/ui/lens'
 import OnproductImageView from '@/components/Product/OnproductImageView'
@@ -14,6 +14,7 @@ import { Pagination, Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/navigation'
+import ProductCard from '@/components/Product/ProductCard'
 
 export default function OneProductPage() {
   const params = useParams()
@@ -26,6 +27,7 @@ export default function OneProductPage() {
   const [showImageModal, setShowImageModal] = useState(false)
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
+  const [similarProducts, setSimilarProducts] = useState<Product[]>([])
   const { startLoading, stopLoading } = useLoading();
   const { addToCart, addToWishlist } = useCart();
 
@@ -38,6 +40,12 @@ export default function OneProductPage() {
       if (res.success && res.data) {
         setProduct(res.data)
         if (res.data.pricing.length > 0) setSelectedVariant(res.data.pricing[0])
+        
+        // Fetch similar products
+        const similarRes = await getSimilarProducts(res.data.id)
+        if (similarRes.success && similarRes.data) {
+          setSimilarProducts(similarRes.data)
+        }
       }
       stopLoading();
     }
@@ -369,6 +377,45 @@ export default function OneProductPage() {
               </div>
             </div>
           </div>
+
+          {/* Similar Products Section */}
+          {similarProducts.length > 0 && (
+            <div className="mt-12 md:mt-20">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-xl md:text-3xl pt-serif-bold text-gray-900 mb-2 relative inline-block">
+                  Similar Products
+                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-gradient-to-r from-gray-900 to-gray-600"></div>
+                </h3>
+                <p className="text-sm md:text-base text-gray-600 lato-regular mt-4">
+                  Discover more products you might love
+                </p>
+              </div>
+
+              {/* Desktop Grid */}
+              <div className="hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+                {similarProducts.map((similarProduct) => (
+                  <ProductCard key={similarProduct.id} {...similarProduct} />
+                ))}
+              </div>
+
+              {/* Mobile Carousel */}
+              <div className="block md:hidden">
+                <Swiper
+                  modules={[Pagination, Navigation]}
+                  spaceBetween={16}
+                  slidesPerView={1.5}
+                  pagination={{ clickable: true }}
+                  className="similar-products-swiper"
+                >
+                  {similarProducts.map((similarProduct) => (
+                    <SwiperSlide key={similarProduct.id}>
+                      <ProductCard {...similarProduct} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Floating Action Buttons - Mobile Only */}

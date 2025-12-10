@@ -1,4 +1,4 @@
-import { AttributesResponse,  DetailProductResponse, ProductFilters, ProductsResponse } from "@/types/product";
+import { AttributesResponse,  DetailProductResponse, ProductFilters, ProductsResponse , SimilarProductsResponse } from "@/types/product";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -30,5 +30,15 @@ export const getDetailProduct = async (slug: string): Promise<DetailProductRespo
   } catch (error) {
     console.error("Error fetching detail product:", error);
     return { success: false, data: null, message: "Error fetching detail product", error: "Error fetching detail product" };
+  }
+};
+
+export const getSimilarProducts = async (id: string): Promise<SimilarProductsResponse> => {
+  try {
+    const response = await axios.get(`${baseUrl}/product/similar-products/${id}`);
+    return response.data as SimilarProductsResponse;
+  } catch (error) {
+    console.error("Error fetching similar products:", error);
+    return { success: false, data: [] };
   }
 };

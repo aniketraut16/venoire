@@ -133,3 +133,10 @@ export interface AttributesResponse {
   message?: string;
   error?: string;
 }
+
+export interface SimilarProductsResponse {
+  success: boolean;
+  data: Product[];
+  message?: string;
+  error?: string;
+}
