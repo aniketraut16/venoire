@@ -108,12 +108,12 @@ export default function Navbar() {
                                     {item.slug?.includes('perfume') ? (
                                         <Link 
                                             href="/perfume"
-                                            className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
+                                            className={`text-sm font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
                                         >
                                             {item.name}
                                         </Link>
                                     ) : (
-                                        <button className={`text-xs font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}>
+                                        <button className={`text-sm font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}>
                                             {item.name}
                                         </button>
                                     )}
@@ -140,7 +140,7 @@ export default function Navbar() {
                             {/* Explore Links */}
                             <Link 
                                 href="/t/new-arrival" 
-                                className={`text-xs font-medium tracking-widest transition-colors uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
+                                className={`text-sm font-medium tracking-widest transition-colors uppercase ${textColor} ${isTransparent ? 'hover:text-gray-300' : 'hover:text-gray-600'}`}
                             >
                                 NEW ARRIVALS
                             </Link>

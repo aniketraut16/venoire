@@ -62,7 +62,7 @@ export default function LuxuryComingSoon() {
             that embody timeless beauty and exceptional craftsmanship.
           </motion.p>
 
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
@@ -77,7 +77,7 @@ export default function LuxuryComingSoon() {
             <button className="px-8 py-3 border border-gray-600 text-gray-300 rounded-full font-medium tracking-wide hover:border-gray-400 hover:text-gray-100 transition-colors">
               Learn More
             </button>
-          </motion.div>
+          </motion.div> */}
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -93,7 +93,7 @@ export default function LuxuryComingSoon() {
                 Exclusive Items
               </div>
             </div>
-            <div className="text-center">
+            <div className="text-center opacity-0">
               <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-rose-200 to-purple-200 mb-2">
                 25+
               </div>

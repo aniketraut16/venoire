@@ -94,7 +94,7 @@ export default function FewPerfumes() {
             onStackComplete={() => console.log('Stack complete')}
           >
             {perfumes.map((perfume, index) => (
-              <ScrollStackItem key={perfume.id} itemClassName={`bg-gradient-to-br ${gradientColors[index % gradientColors.length]}`}>
+              <ScrollStackItem key={perfume.id} itemClassName={`bg-white`}>
                 <div className="flex flex-col lg:flex-row items-start justify-between h-full gap-4 md:gap-6 lg:gap-8 p-4 sm:p-6 md:p-6 lg:p-6">
                   {/* Left Side - Image with Badge */}
                   <div className="relative flex-shrink-0 w-full lg:w-72 xl:w-80">
@@ -142,7 +142,7 @@ export default function FewPerfumes() {
 
                     {/* Description */}
                     <p className="text-sm sm:text-base text-gray-700 leading-relaxed max-w-2xl">
-                      Experience a captivating fragrance that speaks volumes with a heady blend of rich notes. A scent that doesn't just command attention—it stirs envy.
+                      {perfume.description.slice(0, 160)}...
                     </p>
 
                     {/* Fragrance Notes */}
