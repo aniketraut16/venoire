@@ -133,11 +133,14 @@ export default function FewPerfumes() {
                     {/* Rating */}
                     <div className="flex items-center gap-2">
                       <div className="flex gap-0.5">
-                        {[...Array(5)].map((_, i) => (
+                        {[...Array(Math.floor(parseFloat(perfume.rating)))].map((_, i) => (
                           <span key={i} className="text-black text-lg">★</span>
                         ))}
+                        {parseFloat(perfume.rating) % 1 >= 0.5 && (
+                          <span className="text-black text-lg">☆</span>
+                        )}
                       </div>
-                      <span className="text-sm text-gray-600">31 reviews</span>
+                      <span className="text-sm text-gray-600">{perfume.rating_count} reviews</span>
                     </div>
 
                     {/* Description */}
