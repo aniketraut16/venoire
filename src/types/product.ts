@@ -8,6 +8,7 @@ export type Product = {
 
   price: number;
   originalPrice: number;
+  badgeText: string;
   discount: number;
   size: string[];
   thumbnail: string;

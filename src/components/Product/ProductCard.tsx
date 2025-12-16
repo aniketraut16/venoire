@@ -137,13 +137,13 @@ export default function ProductCard(product: Product) {
               })}
             </span>
           )}
-          {product.discount > 0 && (
+          {product.badgeText && (
             <span
               className={`text-[10px] md:text-xs font-medium ${
                 mode === "light" ? "text-pink-300" : "text-red-600"
               }`}
             >
-              {product.discount}% OFF
+              {product.badgeText}
             </span>
           )}
         </div>
