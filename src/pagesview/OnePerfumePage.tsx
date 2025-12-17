@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation';
 import { getDetailedPerfume } from '@/utils/perfume';
 import { DetailedPerfume } from '@/types/perfume';
-import { FiMinus, FiPlus, FiPackage, FiTruck, FiRefreshCw } from 'react-icons/fi';
+import { FiMinus, FiPlus, FiPackage, FiTruck, FiRefreshCw, FiPercent } from 'react-icons/fi';
 import { useCart } from '@/contexts/cartContext';
 
 export default function OnePerfumePage() {
@@ -88,6 +88,8 @@ export default function OnePerfumePage() {
                                     </p> */}
                                 </div>
 
+                                
+
                                 {/* Price */}
                                 <div className="flex items-baseline gap-3 pt-2">
                                     <span className="text-3xl font-bold">Rs. {totalPrice.toFixed(2)}</span>
@@ -96,6 +98,16 @@ export default function OnePerfumePage() {
                                     </span>
                                     <span className="text-sm text-orange-200">Incl. all taxes</span>
                                 </div>
+
+                                {/* Badge Text for Applied Offer */}
+                                {perfume.badgeText && (
+                                    <div className="pt-2">
+                                        <span className="inline-flex items-center gap-2 bg-gradient-to-r from-green-400/30 to-emerald-400/30 backdrop-blur-sm text-green-100 px-3 py-1.5 text-sm font-semibold rounded-lg border border-green-300/40 shadow-lg shadow-green-500/20">
+                                            <FiPercent className="w-4 h-4 text-green-200" />
+                                            {perfume.badgeText}
+                                        </span>
+                                    </div>
+                                )}
 
                                 {/* Size & Quantity Row */}
                                 <div className="flex flex-wrap gap-4 pt-2">
@@ -304,6 +316,35 @@ export default function OnePerfumePage() {
                             </div>
                         </div>
                     </div>
+
+                    {/* Available Offers Section */}
+                    {perfume.offers && perfume.offers.length > 0 && (
+                        <div className="mt-6">
+                            <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+                                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                                        <FiPercent className="w-5 h-5 text-green-600" />
+                                        Available Offers
+                                    </h2>
+                                </div>
+                                <div className="space-y-3">
+                                    {perfume.offers.map((offer, index) => (
+                                        <div
+                                            key={index}
+                                            className="flex items-start gap-3 p-4 bg-gradient-to-r from-green-50 to-transparent rounded-lg border border-green-200 hover:border-green-300 transition-colors"
+                                        >
+                                            <div className="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-1.5"></div>
+                                            <div className="flex-1">
+                                                <h4 className="font-bold text-gray-900 text-sm mb-1">{offer.offer_name}</h4>
+                                                <p className="text-sm text-gray-700 leading-relaxed">{offer.text}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

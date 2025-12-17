@@ -47,6 +47,11 @@ export interface PerfumeDetails {
   concentration: string | null;
 }
 
+export interface OfferInfo {
+  offer_name: string;
+  text: string;
+}
+
 export interface DetailProduct {
   id: string;
   slug: string;
@@ -54,6 +59,8 @@ export interface DetailProduct {
   category: string | null;
   tags: string[];
   pricing: ProductPricing[];
+  badgeText: string | null;
+  offers: OfferInfo[];
   thumbnail: string | null;
   images: string[];
   description: string | null;

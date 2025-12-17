@@ -18,6 +18,11 @@ export type Perfume = {
     }[];
 }
 
+export interface PerfumeOfferInfo {
+    offer_name: string;
+    text: string;
+}
+
 export type DetailedPerfume = {
     id: string;
     name: string;
@@ -33,6 +38,8 @@ export type DetailedPerfume = {
         price: number;
         originalPrice: number;
     }[];
+    badgeText: string | null;
+    offers: PerfumeOfferInfo[];
     productDescription: string;
     scentStory: string;
     usageTips: string;
