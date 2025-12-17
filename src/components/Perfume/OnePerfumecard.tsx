@@ -22,9 +22,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
   const lowestOriginalPrice = Math.min(
     ...perfume.price.map((p) => p.originalPrice)
   );
-  const discount = Math.round(
-    ((lowestOriginalPrice - lowestPrice) / lowestOriginalPrice) * 100
-  );
+  const lowestBadgeText = perfume.price.filter((p) => p.price === lowestPrice)[0].badgeText;
 
   // Fixed rating data - using perfume ID to generate consistent rating
   const rating = 4;
@@ -139,6 +137,11 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
           <span className="text-sm text-gray-400 line-through">
             Rs. {lowestOriginalPrice}
           </span>
+          {lowestBadgeText && (
+            <span className="text-sm text-red-300">
+              {lowestBadgeText}
+            </span>
+          )}
         </div>
 
         {/* Fragrance Notes */}

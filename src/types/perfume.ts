@@ -14,6 +14,7 @@ export type Perfume = {
         quantity: number;
         price: number;
         originalPrice: number;
+        badgeText: string;
     }[];
 }
 
