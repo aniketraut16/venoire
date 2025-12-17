@@ -9,7 +9,8 @@ import toast from 'react-hot-toast';
 import { getCheckoutPricing } from '@/utils/cart';
 
 export default function ShoppingCartPage() {
-    const { items: cartItems, removeFromCart, updateCartItem, count, cartId } = useCart();
+    const { removeFromCart, updateCartItem, count, cartId } = useCart();
+    const cartItems: CartItem[] = [];
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
@@ -18,32 +19,6 @@ export default function ShoppingCartPage() {
     const router = useRouter();
     const [pricing, setPricing] = useState<CheckoutPricing | null>(null);
     const [isLoadingPricing, setIsLoadingPricing] = useState(false);
-
-    // Keep local selections in sync when cart items update from server
-    useEffect(() => {
-        const nextSizes: { [key: string]: string } = {};
-        const nextVolumes: { [key: string]: string } = {};
-        const nextQuantities: { [key: string]: number } = {};
-
-        cartItems.forEach((item: CartItem) => {
-            if (item.productType === "clothing") {
-                const current = selectedSizes[item.id];
-                const isCurrentValid = current && (item.possibleSizes ?? []).some(s => s.size === current);
-                nextSizes[item.id] = isCurrentValid ? current : (item.size?.size ?? "");
-            }
-            if (item.productType === "perfume") {
-                const current = selectedVolumes[item.id];
-                const isCurrentValid = current && (item.possibleVolumes ?? []).some(v => v.ml_volume === current);
-                nextVolumes[item.id] = isCurrentValid ? current : (item.ml_volume?.ml_volume ?? "");
-            }
-            const qtyNum = Number(item.quantity);
-            nextQuantities[item.id] = Number.isFinite(qtyNum) && qtyNum > 0 ? qtyNum : 1;
-        });
-
-        setSelectedSizes(prev => ({ ...prev, ...nextSizes }));
-        setSelectedVolumes(prev => ({ ...prev, ...nextVolumes }));
-        setSelectedQuantities(prev => ({ ...prev, ...nextQuantities }));
-    }, [cartItems]);
 
     const getCurrentQuantity = (item: CartItem): number => {
         const q = selectedQuantities[item.id] ?? item.quantity ?? 1;
@@ -106,7 +81,6 @@ export default function ShoppingCartPage() {
         }
     };
 
-    // Fetch pricing from backend
     useEffect(() => {
         const fetchPricing = async () => {
             if (!cartId) {
@@ -124,7 +98,7 @@ export default function ShoppingCartPage() {
             }
         };
         fetchPricing();
-    }, [cartId, cartItems]);
+    }, [cartId]);
 
     const bagTotal = pricing?.subtotal || 0;
     const shipping = pricing?.shippingAmount.shippingAmount || 0;

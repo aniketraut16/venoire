@@ -42,6 +42,30 @@ export const addToCart = async (
   }
 };
 
+export const getCartCount = async (
+  token: string | null = null
+): Promise<{ success: boolean, message: string, count: number, cartId: string }> => {
+  try {
+    let sessionId = null;
+    if (!token) {
+      sessionId = getCookie("sessionId");
+      if (!sessionId) {
+        return { success: false, message: "Session ID is required", count: 0, cartId: "" };
+      }
+    }
+    const headers = token
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : sessionId
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
+    const response = await axios.get(`${baseUrl}/cart/count`, headers);
+    return { success: true, message: "Cart count fetched successfully", count: response.data.count as number, cartId: response.data.cartId as string };
+  } catch (error) {
+    console.error("Error getting cart count:", error);
+    return { success: false, message: "Failed to fetch cart count", count: 0, cartId: "" };
+  }
+};
+
 export const getCart = async (
   token: string | null = null
 ): Promise<{ success: boolean, message: string, items: CartItem[], cartId: string }> => {

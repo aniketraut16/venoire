@@ -12,10 +12,12 @@ import MockPaymentGateway from '@/components/PaymentGateway/MockPaymentGateway';
 import OrderSuccess from '@/components/Order/OrderSuccess';
 import { CheckoutPricing } from '@/types/cart';
 import { getCheckoutPricing } from '@/utils/cart';
+import { CartItem } from '@/types/cart';
 
 export default function CheckoutPage() {
     const { user, dbUser, token } = useAuth();
-    const { items: cartItems, cartId } = useCart();
+    const { cartId } = useCart();
+    const cartItems: CartItem[] = [];
 
     const [addresses, setAddresses] = useState<AddressType[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -59,7 +61,6 @@ export default function CheckoutPage() {
         }
     }, [addresses]);
 
-    // Fetch pricing from backend
     useEffect(() => {
         const fetchPricing = async () => {
             if (!cartId) {
@@ -77,7 +78,7 @@ export default function CheckoutPage() {
             }
         };
         fetchPricing();
-    }, [cartId, cartItems, appliedCoupon]);
+    }, [cartId, appliedCoupon]);
 
     const bagTotal = pricing?.subtotal || 0;
     const discount = pricing?.discountAmount.afterDiscount ? (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) : 0;
