@@ -2,9 +2,7 @@
 import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { getPerfumes } from "@/utils/perfume";
-import { Perfume } from "@/types/perfume";
+import { useHomepage } from "@/contexts/HomepageContext";
 
 const gradientColors = [
   "from-amber-50 to-orange-50",
@@ -14,23 +12,8 @@ const gradientColors = [
 ];
 
 export default function FewPerfumes() {
-  const [perfumes, setPerfumes] = useState<Perfume[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPerfumes = async () => {
-      try {
-        const data = await getPerfumes();
-        // Get only first 4 perfumes
-        setPerfumes(data.slice(0, 4));
-      } catch (error) {
-        console.error("Error fetching perfumes:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPerfumes();
-  }, []);
+  const { perfumes, isLoading: loading } = useHomepage();
+  const displayPerfumes = perfumes.slice(0, 4);
   return (
     <section className="w-full py-8 sm:py-12 md:py-16 bg-gradient-to-b from-white to-gray-50">
       {/* Header Section */}
@@ -78,7 +61,7 @@ export default function FewPerfumes() {
           <div className="text-center py-20">
             <p className="text-gray-500 text-lg">Loading perfumes...</p>
           </div>
-        ) : perfumes.length === 0 ? (
+        ) : displayPerfumes.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-gray-500 text-lg">No perfumes available at the moment.</p>
           </div>
@@ -93,7 +76,7 @@ export default function FewPerfumes() {
             baseScale={0.92}
             onStackComplete={() => console.log('Stack complete')}
           >
-            {perfumes.map((perfume, index) => (
+            {displayPerfumes.map((perfume, index) => (
               <ScrollStackItem key={perfume.id} itemClassName={`bg-white`}>
                 <div className="flex flex-col lg:flex-row items-start justify-between h-full gap-4 md:gap-6 lg:gap-8 p-4 sm:p-6 md:p-6 lg:p-6">
                   {/* Left Side - Image with Badge */}

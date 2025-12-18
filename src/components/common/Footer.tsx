@@ -1,20 +1,20 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Shield, Truck, RefreshCw, Instagram, X } from 'lucide-react'
 import { FaFacebook, FaXTwitter, FaYoutube } from 'react-icons/fa6'
 import Link from 'next/link';
 import { subscribeNewsletter } from '@/utils/contact';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHomepage } from '@/contexts/HomepageContext';
 import toast from 'react-hot-toast';
-import { getNavbarContent } from '@/utils/homepage';
-import { MenuItem } from '@/types/homepage';
-
 
 export default function Footer() {
     const [email, setEmail] = useState('');
     const [isSubscribing, setIsSubscribing] = useState(false);
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
     const { token } = useAuth();
+    const { navbarContent } = useHomepage();
+    
+    const menuItems = navbarContent?.menuItems || [];
 
     const hrefGenerator = (type: string, slug: string) => {
         switch (type) {
@@ -30,16 +30,6 @@ export default function Footer() {
                 return '#'
         }
     }
-
-    useEffect(() => {
-        const fetchNavbarContent = async () => {
-            const response = await getNavbarContent()
-            if (response.success) {
-                setMenuItems(response.data?.menuItems || [])
-            }
-        }
-        fetchNavbarContent()
-    }, [])
 
     const handleNewsletterSubscribe = async () => {
         if (!email.trim()) {

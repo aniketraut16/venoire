@@ -1,5 +1,4 @@
 "use client";
-import { useEffect, useState } from "react";
 import Hero from "@/components/HomePage/Hero";
 import Categories from "@/components/HomePage/Categories";
 import  BrowseCollections  from "@/components/HomePage/BrowseCollections";
@@ -10,23 +9,14 @@ import SignInRequest from "@/components/HomePage/SignInRequest";
 import LittleAboutUs from "@/components/HomePage/LittleAboutUs";
 import FewPerfumes from "@/components/HomePage/FewPerfumes";
 import InstaReels from "@/components/HomePage/InstaReels";
-import { getCategories } from "@/utils/homepage";
-import { CategoryorCollection } from "@/types/homepage";
-
+import { useHomepage } from "@/contexts/HomepageContext";
 
 export default function HomePage() {
+  const { collectionsAndCategories, isLoading } = useHomepage();
 
-  const [categories, setCategories] = useState<CategoryorCollection[]>([]);
-  const [collections, setCollections] = useState<CategoryorCollection[]>([]);
+  const categories = collectionsAndCategories?.categories || [];
+  const collections = collectionsAndCategories?.collections || [];
 
-  useEffect(() => {
-    const fetchCollectionsAndCategories = async () => {
-      const { collections, categories } = await getCategories();
-      setCollections(collections);
-      setCategories(categories);
-    };
-    fetchCollectionsAndCategories();
-  }, []);
   return (
     <div>
       <Hero />

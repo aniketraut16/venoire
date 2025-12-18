@@ -1,18 +1,22 @@
 import axios from "axios";
-import { CategoryorCollection, NavbarContentResponse, TopProductswithCategory } from "@/types/homepage";
+import { 
+  CategoryorCollection, 
+  HomepageContentResponse 
+} from "@/types/homepage";
+
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export const getNavbarContent = async (): Promise<NavbarContentResponse> => {
+export const getHomepageContent = async (): Promise<HomepageContentResponse> => {
   try {
-    const response = await axios.get(`${baseUrl}/home/navbar`);
-    return response.data as NavbarContentResponse;
+    const response = await axios.get(`${baseUrl}/home/content`);
+    return response.data as HomepageContentResponse;
   } catch (error) {
-    console.error("Error fetching navbar content:", error);
+    console.error("Error fetching homepage content:", error);
     return {
       success: false,
-      message: "Failed to fetch navbar content",
-      error: error as string,
-    };  
+      message: "Failed to fetch homepage content",
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 };
 
@@ -35,12 +39,3 @@ export const getCategories = async (): Promise<{
   }
 };
 
-export const getTopProducts = async (): Promise<TopProductswithCategory[]> => {
-  try {
-    const response = await axios.get(`${baseUrl}/home/top-products`);
-    return response.data.data as TopProductswithCategory[];
-  } catch (error) {
-    console.error("Error fetching top products:", error);
-    return [];
-  }
-};

@@ -1,20 +1,22 @@
 "use client"
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import ProductCard from '../Product/ProductCard'
 import { motion } from 'framer-motion'
-import { TopProductswithCategory } from '@/types/homepage'
-import { getTopProducts } from '@/utils/homepage'
+import { useHomepage } from '@/contexts/HomepageContext'
+import { Product } from '@/types/product'
 
 export default function FewProducts() {
-  const [activeCategory, setActiveCategory] = useState<string | null>(null)
-  const [topProducts, setTopProducts] = useState<TopProductswithCategory[]>([])
   const [scrollProgress, setScrollProgress] = useState(0)
   const [showArrows, setShowArrows] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const { topProducts } = useHomepage()
 
-  // Detect mobile on mount
+  const allProducts = useMemo(() => {
+    return topProducts.flatMap(category => category.products)
+  }, [topProducts])
+
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640)
@@ -25,32 +27,20 @@ export default function FewProducts() {
   }, [])
 
   useEffect(() => {
-    const fetchTopProducts = async () => {
-      const topProducts = await getTopProducts()
-      setTopProducts(topProducts)
-      setActiveCategory(topProducts[0].category_slug)
-    }
-    fetchTopProducts()
-  }, [])
-  // Calculate scroll progress and check if arrows should be shown
-  useEffect(() => {
     const handleScroll = () => {
       if (scrollContainerRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current
         const maxScroll = scrollWidth - clientWidth
         const progress = maxScroll > 0 ? (scrollLeft / maxScroll) * 100 : 0
         setScrollProgress(progress)
-        setShowArrows(maxScroll > 10) // Show arrows only if there's content to scroll
+        setShowArrows(maxScroll > 10)
       }
     }
 
     const container = scrollContainerRef.current
     if (container) {
       container.addEventListener('scroll', handleScroll)
-      // Initial calculation
       handleScroll()
-      
-      // Recalculate on window resize
       window.addEventListener('resize', handleScroll)
     }
 
@@ -60,7 +50,7 @@ export default function FewProducts() {
       }
       window.removeEventListener('resize', handleScroll)
     }
-  }, [topProducts])
+  }, [allProducts])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -81,35 +71,19 @@ export default function FewProducts() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Title */}
         <motion.div 
-          className="text-center mb-6 sm:mb-8"
+          className="text-center mb-6 sm:mb-8 md:mb-12"
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-yellow-400 mb-4 sm:mb-6 md:mb-8 tracking-wide px-2">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-yellow-400 mb-2 sm:mb-3 tracking-wide px-2">
             Trending Styles
           </h2>
+          <p className="text-sm sm:text-base text-gray-300 px-4">
+            Discover our curated collection of top-rated products
+          </p>
         </motion.div>
-
-        {/* Category Tabs */}
-        <div className="flex justify-center mb-6 sm:mb-8 md:mb-12 overflow-x-auto scrollbar-hide">
-          <div className="flex space-x-3 sm:space-x-4 md:space-x-6 lg:space-x-8 px-2 min-w-max">
-            {topProducts.map((category) => (
-              <button
-                key={category.category_slug}
-                onClick={() => setActiveCategory(category.category_slug)}
-                className={`px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium tracking-wider transition-colors duration-200 whitespace-nowrap ${
-                  activeCategory === category.category_slug
-                    ? 'text-white border-b-2 border-yellow-400'
-                    : 'text-gray-300 hover:text-white'
-                }`}
-              >
-                {category.category_name}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Products Carousel */}
         <div className="relative">
@@ -144,10 +118,9 @@ export default function FewProducts() {
               msOverflowStyle: 'none', 
               WebkitOverflowScrolling: 'touch',
               overscrollBehaviorX: 'contain',
-              // overscrollBehaviorY: 'none'
             }}
           >
-            {topProducts.find((category) => category.category_slug === activeCategory)?.products.map((product, index) => (
+            {allProducts.map((product, index) => (
               <motion.div 
                 key={product.id} 
                 className="flex-none w-[75vw] sm:w-[45vw] md:w-[350px] lg:w-80 relative snap-start"
@@ -156,11 +129,11 @@ export default function FewProducts() {
                 viewport={{ once: true, amount: 0.2 }}
                 transition={{ 
                   duration: 0.5, 
-                  delay: isMobile && index < 2 ? 0 : index * 0.1,
+                  delay: isMobile && index < 2 ? 0 : Math.min(index * 0.05, 0.5),
                   ease: "easeOut" 
                 }}
               >
-                  <ProductCard {...product} mode="light" />
+                <ProductCard {...product} mode="light" />
               </motion.div>
             ))}
           </div>

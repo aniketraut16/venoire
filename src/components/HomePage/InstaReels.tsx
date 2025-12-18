@@ -1,76 +1,12 @@
 'use client'
-import React, { useEffect, useRef, useState } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import Script from 'next/script'
 import { Instagram } from 'lucide-react'
 import { config } from '@/variables/config'
 
-const reels = [
-//   {
-//     id: 1,
-//     url: 'https://www.instagram.com/reel/DPygBPjkdUr/',
-//     embedUrl: 'https://www.instagram.com/reel/DPygBPjkdUr/embed/captioned'
-//   },
-  {
-    id: 2,
-    url: 'https://www.instagram.com/reel/DR1FyJSkgoK/',
-    embedUrl: 'https://www.instagram.com/reel/DR1FyJSkgoK/embed/captioned'
-  },
-  {
-    id: 3,
-    url: 'https://www.instagram.com/reel/DRep44wknRi/',
-    embedUrl: 'https://www.instagram.com/reel/DRep44wknRi/embed/captioned'
-  },
-  {
-    id: 4,
-    url: 'https://www.instagram.com/reel/DRU_cOEDTVm/',
-    embedUrl: 'https://www.instagram.com/reel/DRU_cOEDTVm/embed/captioned'
-  }
-]
 
 export default function InstaReels() {
-  const [activeReel, setActiveReel] = useState<number | null>(null)
-  const [isMuted, setIsMuted] = useState(true)
-  const iframeRefs = useRef<{ [key: number]: HTMLIFrameElement | null }>({})
-  const observerRef = useRef<IntersectionObserver | null>(null)
-
-  useEffect(() => {
-    // Load Instagram embed script and process embeds
-    const loadInstagramEmbeds = () => {
-      if (typeof window !== 'undefined' && (window as any).instgrm) {
-        (window as any).instgrm.Embeds.process()
-      }
-    }
-
-    // Try to load embeds after a short delay
-    const timer = setTimeout(loadInstagramEmbeds, 1000)
-
-    // Create intersection observer to detect when reels are in viewport
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const reelId = parseInt(entry.target.getAttribute('data-reel-id') || '0')
-          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-            setActiveReel(reelId)
-          }
-        })
-      },
-      { threshold: 0.5 }
-    )
-
-    // Observe all reel containers
-    const reelElements = document.querySelectorAll('[data-reel-id]')
-    reelElements.forEach((el) => observerRef.current?.observe(el))
-
-    return () => {
-      clearTimeout(timer)
-      observerRef.current?.disconnect()
-    }
-  }, [])
-
-  const handleReelClick = (reelId: number) => {
-    setActiveReel(reelId)
-  }
 
   return (
     <section className="w-full py-12 sm:py-16 md:py-20 lg:py-32 bg-white overflow-hidden">

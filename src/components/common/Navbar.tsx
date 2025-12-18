@@ -4,10 +4,10 @@ import Link from 'next/link'
 import { Search, User, ShoppingBag, Menu, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import SearchPopup from './SearchPopup'
-import { getNavbarContent } from '@/utils/homepage'
 import { MenuItem } from '@/types/homepage'
 import { useAuth } from '@/contexts/AuthContext'
 import { useCart } from '@/contexts/cartContext'
+import { useHomepage } from '@/contexts/HomepageContext'
 
 export default function Navbar() {
     const [activeMenu, setActiveMenu] = useState<string | null>(null)
@@ -15,10 +15,13 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [expandedMobileMenu, setExpandedMobileMenu] = useState<string | null>(null)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
-    const [menuItems, setMenuItems] = useState<MenuItem[]>([])
     const pathname = usePathname()
     const { user , needsCompleteSetup } = useAuth()
     const { count } = useCart()
+    const { navbarContent } = useHomepage()
+    
+    const menuItems = navbarContent?.menuItems || []
+
     useEffect(() => {
         const handleScroll = () => {
             setScrollPosition(window.scrollY)
@@ -28,7 +31,6 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll)
     }, [])
 
-    // Check if we're on home page or perfume pages
     const isHomePage = pathname === '/'
     const isPerfumePage = pathname?.startsWith('/perfume')
     const shouldUseScrollEffect = isHomePage || isPerfumePage 
@@ -43,7 +45,7 @@ export default function Navbar() {
             : scrollPosition >= endFade 
             ? 1 
             : (scrollPosition - startFade) / (endFade - startFade))
-        : 1 // Always white on other pages
+        : 1
     
     const isTransparent = shouldUseScrollEffect && bgOpacity < 0.5
     const textColor = isTransparent ? 'text-white' : 'text-black'
@@ -63,16 +65,6 @@ export default function Navbar() {
                 return '#'
         }
     }
-
-    useEffect(() => {
-        const fetchNavbarContent = async () => {
-            const response = await getNavbarContent()
-            if (response.success) {
-                setMenuItems(response.data?.menuItems || [])
-            }
-        }
-        fetchNavbarContent()
-    }, [])
 
     return (
         <>

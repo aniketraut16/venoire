@@ -8,6 +8,7 @@ import { LoadingWrapper } from "@/components/common/LoadingWrapper";
 import LoginPopupWrapper from "@/components/common/LoginPopupWrapper";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/cartContext";
+import { HomepageProvider } from "@/contexts/HomepageContext";
 import Script from "next/script";
 import { Toaster } from "react-hot-toast";
 
@@ -34,12 +35,14 @@ export default function RootLayout({
       />
         <AuthProvider>
           <LoadingWrapper>
-            <CartProvider>
+            <HomepageProvider>
+              <CartProvider>
                 <Navbar />
                 <SmoothScrolling>{children}</SmoothScrolling>
                 <Footer />
                 <LoginPopupWrapper />
-            </CartProvider>
+              </CartProvider>
+            </HomepageProvider>
           </LoadingWrapper>
         </AuthProvider>
       </body>
