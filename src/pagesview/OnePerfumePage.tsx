@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'next/navigation';
 import { getDetailedPerfume } from '@/utils/perfume';
 import { DetailedPerfume } from '@/types/perfume';
@@ -14,7 +14,9 @@ export default function OnePerfumePage() {
     const [selectedSizeId, setSelectedSizeId] = useState<string | null>(null);
     const [quantity, setQuantity] = useState<number>(1);
     const [isLoading, setIsLoading] = useState(true);
+    const [showStickyBar, setShowStickyBar] = useState(false);
     const { addToCart } = useCart();
+    const ctaButtonsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchPerfume = async () => {
@@ -28,6 +30,32 @@ export default function OnePerfumePage() {
         };
         fetchPerfume();
     }, [slug]);
+
+    // Scroll handler for sticky bar
+    useEffect(() => {
+        const handleScroll = () => {
+            if (ctaButtonsRef.current) {
+                const ctaRect = ctaButtonsRef.current.getBoundingClientRect();
+                
+                // Check if footer exists and get its position
+                const footer = document.querySelector('footer');
+                let shouldShow = ctaRect.bottom < 0;
+                
+                if (footer) {
+                    const footerRect = footer.getBoundingClientRect();
+                    // Hide sticky bar if footer is visible in viewport
+                    if (footerRect.top < window.innerHeight) {
+                        shouldShow = false;
+                    }
+                }
+                
+                setShowStickyBar(shouldShow);
+            }
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     const handleQuantityDecrease = () => {
         if (quantity > 1) setQuantity(quantity - 1);
@@ -160,7 +188,7 @@ export default function OnePerfumePage() {
                                 </div>
 
                                 {/* Add to Cart Button */}
-                                <div className="pt-2">
+                                <div ref={ctaButtonsRef} className="pt-2">
                                     <button onClick={handleAddToCart} className="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-10 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg uppercase text-sm tracking-wide">
                                         Add to Cart
                                     </button>
@@ -347,6 +375,98 @@ export default function OnePerfumePage() {
                     )}
                 </div>
             </div>
+
+            {/* Sticky Bottom Bar - Desktop Only */}
+            {perfume && (
+                <div
+                    className={`hidden lg:block fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50 transition-transform duration-300 ${
+                        showStickyBar ? 'translate-y-0' : 'translate-y-full'
+                    }`}
+                >
+                    <div className="max-w-7xl mx-auto px-6 py-3">
+                        <div className="flex items-center justify-between gap-6">
+                            {/* Product Info */}
+                            <div className="flex items-center gap-4 flex-1">
+                                <div className="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 rounded overflow-hidden flex-shrink-0">
+                                    <img
+                                        src={perfume.coverImage}
+                                        alt={perfume.name}
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="text-sm font-bold text-gray-900 line-clamp-1">
+                                        {perfume.name}
+                                    </h3>
+                                    <div className="flex items-baseline gap-2 mt-1">
+                                        <span className="text-lg font-bold text-gray-900">
+                                            Rs. {(selectedPrice.price * quantity).toFixed(2)}
+                                        </span>
+                                        <span className="text-sm text-gray-400 line-through">
+                                            Rs. {(selectedPrice.originalPrice * quantity).toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Size Selector - Compact */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-gray-600 uppercase">
+                                    Size:
+                                </span>
+                                <div className="flex gap-2">
+                                    {perfume.price.map((priceOption, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => {
+                                                setSelectedSize(index);
+                                                setSelectedSizeId(perfume.price[index].id);
+                                            }}
+                                            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                                                selectedSize === index
+                                                    ? 'bg-orange-600 text-white shadow-md'
+                                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                        >
+                                            {priceOption.quantity} ml
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Quantity Selector */}
+                            <div className="flex items-center gap-2">
+                                <span className="text-xs font-medium text-gray-600 uppercase">
+                                    Qty:
+                                </span>
+                                <div className="flex items-center bg-gray-100 rounded-lg border border-gray-200">
+                                    <button
+                                        onClick={handleQuantityDecrease}
+                                        className="p-2 hover:bg-gray-200 transition-colors rounded-l-lg"
+                                    >
+                                        <FiMinus className="w-3 h-3" />
+                                    </button>
+                                    <span className="px-4 text-sm font-semibold">{quantity}</span>
+                                    <button
+                                        onClick={handleQuantityIncrease}
+                                        className="p-2 hover:bg-gray-200 transition-colors rounded-r-lg"
+                                    >
+                                        <FiPlus className="w-3 h-3" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Add to Cart Button */}
+                            <button 
+                                onClick={handleAddToCart}
+                                className="bg-red-500 hover:bg-red-600 text-white font-bold py-2.5 px-8 rounded-lg transition-all duration-300 uppercase text-sm tracking-wide shadow-md"
+                            >
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div>
     );

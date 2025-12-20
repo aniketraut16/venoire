@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
 import { getDetailProduct, getSimilarProducts } from "@/utils/products";
 import type { DetailProduct, ProductPricing, Product } from "@/types/product";
@@ -42,8 +42,11 @@ export default function OneProductPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
+  const [showStickyBar, setShowStickyBar] = useState(false);
   const { startLoading, stopLoading } = useLoading();
   const { addToCart, addToWishlist } = useCart();
+  const ctaButtonsRef = useRef<HTMLDivElement>(null);
+  const footerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     if (!slug) return;
@@ -65,6 +68,32 @@ export default function OneProductPage() {
     };
     fetchProduct();
   }, [slug]);
+
+  // Scroll handler for sticky bar
+  useEffect(() => {
+    const handleScroll = () => {
+      if (ctaButtonsRef.current) {
+        const ctaRect = ctaButtonsRef.current.getBoundingClientRect();
+        
+        // Check if footer exists and get its position
+        const footer = document.querySelector('footer');
+        let shouldShow = ctaRect.bottom < 0;
+        
+        if (footer) {
+          const footerRect = footer.getBoundingClientRect();
+          // Hide sticky bar if footer is visible in viewport
+          if (footerRect.top < window.innerHeight) {
+            shouldShow = false;
+          }
+        }
+        
+        setShowStickyBar(shouldShow);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleSizeSelect = (size: string) => {
     if (!product) return;
@@ -303,7 +332,7 @@ export default function OneProductPage() {
               )}
 
               {/* Buttons - Desktop Only */}
-              <div className="hidden md:block space-y-3">
+              <div ref={ctaButtonsRef} className="hidden md:block space-y-3">
                 <button
                   disabled={
                     !selectedVariant ||
@@ -574,6 +603,103 @@ export default function OneProductPage() {
                 fill={isWishlisted ? "currentColor" : "none"}
               />
             </button>
+          </div>
+        </div>
+
+        {/* Sticky Bottom Bar - Desktop Only */}
+        <div
+          className={`hidden md:block fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50 transition-transform duration-300 ${
+            showStickyBar ? 'translate-y-0' : 'translate-y-full'
+          }`}
+        >
+          <div className="max-w-7xl mx-auto px-6 py-3">
+            <div className="flex items-center justify-between gap-6">
+              {/* Product Info */}
+              <div className="flex items-center gap-4 flex-1">
+                <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                  <img
+                    src={product.thumbnail}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-bold text-gray-900 line-clamp-1 lato-bold">
+                    {product.name}
+                  </h3>
+                  <div className="flex items-baseline gap-2 mt-1">
+                    <span className="text-lg font-bold text-gray-900 lato-black">
+                      Rs {displayedPrice.toLocaleString("en-IN")}
+                    </span>
+                    {displayedDiscount > 0 && (
+                      <span className="text-sm text-gray-400 line-through lato-regular">
+                        Rs {displayedOriginalPrice.toLocaleString("en-IN")}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Size Selector - Compact */}
+              {product.pricing.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-medium text-gray-600 lato-bold uppercase">
+                    Size:
+                  </span>
+                  <div className="flex gap-2">
+                    {product.pricing.slice(0, 4).map((variant) => {
+                      const isOutOfStock = variant.availabilityStatus === "out_of_stock";
+                      const isSelected = selectedVariant?.size === variant.size;
+                      return (
+                        <button
+                          key={variant.size}
+                          onClick={() => !isOutOfStock && handleSizeSelect(variant.size ?? "")}
+                          disabled={isOutOfStock}
+                          className={`px-3 py-1.5 border transition-colors lato-regular text-xs ${
+                            isOutOfStock
+                              ? "border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed line-through"
+                              : isSelected
+                              ? "border-gray-900 bg-gray-900 text-white"
+                              : "border-gray-300 bg-white text-gray-700 hover:border-gray-900"
+                          }`}
+                        >
+                          {variant.size}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  disabled={
+                    !selectedVariant ||
+                    selectedVariant.availabilityStatus === "out_of_stock"
+                  }
+                  onClick={handleAddToCart}
+                  className="bg-gray-900 text-white py-2.5 px-6 lato-bold uppercase tracking-wide hover:bg-gray-800 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  Add to Cart
+                </button>
+
+                <button
+                  onClick={() => addToWishlist(product.id)}
+                  className={`p-2.5 lato-bold uppercase tracking-wide transition-colors border flex items-center justify-center ${
+                    isWishlisted
+                      ? "border-red-500 bg-red-50 text-red-600"
+                      : "border-gray-300 bg-white text-gray-700 hover:border-gray-400"
+                  }`}
+                >
+                  <Heart
+                    className="h-5 w-5"
+                    fill={isWishlisted ? "currentColor" : "none"}
+                  />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
