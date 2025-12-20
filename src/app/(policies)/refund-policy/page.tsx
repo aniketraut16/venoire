@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { config } from '@/variables/config';
+import { siteConfig } from '@/variables/config';
 
 export default function RefundPolicyPage() {
     return (
@@ -30,8 +30,8 @@ export default function RefundPolicyPage() {
                                 </ul>
                                 <p className="text-gray-700 leading-relaxed">
                                     Send these details to{' '}
-                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
-                                        {config.EMAIL}
+                                    <a href={`mailto:${siteConfig.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {siteConfig.EMAIL}
                                     </a>
                                     , and our support team will assist you promptly.
                                 </p>

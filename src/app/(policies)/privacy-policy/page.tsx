@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { config } from '@/variables/config';
+import { siteConfig } from '@/variables/config';
 
 export default function PrivacyPolicyPage() {
     return (
@@ -18,8 +18,8 @@ export default function PrivacyPolicyPage() {
                                 </p>
                                 <p className="text-gray-700 leading-relaxed">
                                     If you have any questions or need further clarification regarding this Privacy Policy, you can contact us at{' '}
-                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
-                                        {config.EMAIL}
+                                    <a href={`mailto:${siteConfig.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {siteConfig.EMAIL}
                                     </a>
                                 </p>
                             </div>
@@ -111,8 +111,8 @@ export default function PrivacyPolicyPage() {
                                 </p>
                                 <p className="text-gray-700 leading-relaxed mb-4">
                                     itsvenoire.com does not knowingly collect any personally identifiable information from children under the age of 13. If you believe your child has provided such information on our website, please contact us immediately at{' '}
-                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
-                                        {config.EMAIL}
+                                    <a href={`mailto:${siteConfig.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {siteConfig.EMAIL}
                                     </a>
                                     . We will take prompt action to delete the data from our records.
                                 </p>

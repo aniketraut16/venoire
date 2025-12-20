@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { Shield, Truck, RefreshCw, Heart, Award, Users } from "lucide-react";
-import { config } from "@/variables/config";
+import { siteConfig } from "@/variables/config";
 
 export default function AboutUsPage() {
   return (
@@ -236,10 +236,10 @@ export default function AboutUsPage() {
             <h3 className="text-sm font-medium tracking-wider uppercase mb-4">Get In Touch</h3>
             <div className="space-y-2 text-gray-300">
               <p>
-                <span className="font-medium">Email:</span> {config.EMAIL}
+                <span className="font-medium">Email:</span> {siteConfig.EMAIL}
               </p>
               <p>
-                <span className="font-medium">Phone:</span> {config.PHONE}
+                <span className="font-medium">Phone:</span> {siteConfig.PHONE}
               </p>
               <p>
                 <span className="font-medium">Location:</span> Shipping across India

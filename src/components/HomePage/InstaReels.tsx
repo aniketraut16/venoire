@@ -3,7 +3,7 @@ import React from 'react'
 import Link from 'next/link'
 import Script from 'next/script'
 import { Instagram } from 'lucide-react'
-import { config } from '@/variables/config'
+import { siteConfig } from '@/variables/config'
 
 
 export default function InstaReels() {
@@ -35,7 +35,7 @@ export default function InstaReels() {
         {/* CTA Button */}
         <div className="text-center px-4">
           <Link
-            href={config.INSTAGRAM_URL}
+            href={siteConfig.INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 sm:gap-3 px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 text-white text-xs sm:text-sm tracking-widest uppercase rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300"

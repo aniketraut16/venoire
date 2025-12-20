@@ -3,7 +3,7 @@ import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { User, ShoppingBag, MapPin, Heart, Star, LogOut } from "lucide-react";
-import { config } from "@/variables/config";
+import { siteConfig } from "@/variables/config";
 
 export default function ProfileLayout({
   children,
@@ -81,7 +81,7 @@ export default function ProfileLayout({
               <div className="bg-gray-900 text-white p-6 text-center">
                 <h3 className="text-sm font-medium tracking-wider uppercase mb-2">Need Help?</h3>
                 <p className="text-xs text-gray-300 mb-4">Contact our support team</p>
-                <p className="text-lg font-light">{config.EMAIL}</p>
+                <p className="text-lg font-light">{siteConfig.EMAIL}</p>
               </div>
             </div>
           </div>

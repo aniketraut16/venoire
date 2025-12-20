@@ -1,6 +1,6 @@
 'use client'
 import React from 'react';
-import { config } from '@/variables/config';
+import { siteConfig } from '@/variables/config';
 
 export default function CookiePolicyPage() {
     return (
@@ -165,8 +165,8 @@ export default function CookiePolicyPage() {
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">7. Contact Us</h2>
                                 <p className="text-gray-700 leading-relaxed">
                                     If you have any questions regarding this Cookie Policy, you can contact us at:{' '}
-                                    <a href={`mailto:${config.EMAIL}`} className="text-black underline hover:text-gray-700">
-                                        {config.EMAIL}
+                                    <a href={`mailto:${siteConfig.EMAIL}`} className="text-black underline hover:text-gray-700">
+                                        {siteConfig.EMAIL}
                                     </a>
                                 </p>
                             </section>
