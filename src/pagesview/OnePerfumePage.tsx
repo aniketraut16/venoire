@@ -92,11 +92,11 @@ export default function OnePerfumePage() {
                 {/* Background Image with Overlay */}
                 <div className="absolute inset-0">
                     <img
-                        src={perfume.coverImage}
+                        src={perfume.bannerImage || perfume.coverImage}
                         alt={perfume.name}
                         className="object-cover w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-br from-orange-900/20 via-orange-800/15 to-orange-600/20"></div>
+                    <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-black/5"></div>
                     <div className="absolute inset-0 bg-black/30"></div>
                 </div>
             
@@ -197,7 +197,7 @@ export default function OnePerfumePage() {
                         </div>
 
                         {/* Right Side - Fragrance Profile Card */}
-                        <div className="hidden lg:block">
+                        {/* <div className="hidden lg:block">
                             <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-8 text-white">
                                 <h2 className="text-lg font-bold mb-4 opacity-90">Fragrance Profile</h2>
                                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
@@ -214,7 +214,7 @@ export default function OnePerfumePage() {
                                     </p>
                                 </div>
                             </div>
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

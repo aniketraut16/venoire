@@ -49,6 +49,7 @@ export type DetailedPerfume = {
     ingredients: string;
     brandAndManufacturerInfo: string;
     concentration: string;
+    bannerImage: string | null;
 }
 
 export type PerfumeCollection = {
