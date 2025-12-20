@@ -15,8 +15,25 @@ export default function OnePerfumePage() {
     const [quantity, setQuantity] = useState<number>(1);
     const [isLoading, setIsLoading] = useState(true);
     const [showStickyBar, setShowStickyBar] = useState(false);
+    const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+    const [accordionOpen, setAccordionOpen] = useState<{
+        fragranceNotes: boolean;
+        usageTips: boolean;
+        brandInfo: boolean;
+    }>({
+        fragranceNotes: true,
+        usageTips: false,
+        brandInfo: false,
+    });
     const { addToCart } = useCart();
     const ctaButtonsRef = useRef<HTMLDivElement>(null);
+
+    const toggleAccordion = (section: 'fragranceNotes' | 'usageTips' | 'brandInfo') => {
+        setAccordionOpen(prev => ({
+            ...prev,
+            [section]: !prev[section]
+        }));
+    };
 
     useEffect(() => {
         const fetchPerfume = async () => {
@@ -111,9 +128,9 @@ export default function OnePerfumePage() {
                                     <h1 className="text-3xl md:text-4xl font-bold leading-tight">
                                         {perfume.name}
                                     </h1>
-                                    {/* <p className="text-base text-purple-100/90 italic">
-                                        {perfume.description}
-                                    </p> */}
+                                    <p className="text-base text-purple-100/90 italic">
+                                        {perfume.fragrance}
+                                    </p>
                                 </div>
 
                                 
@@ -197,150 +214,168 @@ export default function OnePerfumePage() {
                         </div>
 
                         {/* Right Side - Fragrance Profile Card */}
-                        {/* <div className="hidden lg:block">
-                            <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl shadow-lg p-8 text-white">
-                                <h2 className="text-lg font-bold mb-4 opacity-90">Fragrance Profile</h2>
-                                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
-                                    <p className="text-2xl font-bold">{perfume.fragrance}</p>
-                                </div>
-                                <div className="mt-6 space-y-2 text-sm opacity-90">
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-white rounded-full"></span>
-                                        Gender: <strong>{perfume.gender}</strong>
-                                    </p>
-                                    <p className="flex items-center gap-2">
-                                        <span className="w-2 h-2 bg-white rounded-full"></span>
-                                        Available: {perfume.price.map(p => `${p.quantity}ml`).join(', ')}
-                                    </p>
-                                </div>
-                            </div>
-                        </div> */}
                     </div>
                 </div>
             </div>
 
-            {/* Features Section */}
-            <div className="bg-gradient-to-b from-white to-orange-50/30 py-6 border-b border-orange-100">
-                <div className="max-w-7xl mx-auto px-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
-                                <FiPackage className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-gray-900 text-sm">Premium Quality</h4>
-                                <p className="text-xs text-gray-600">Authentic fragrances</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
-                                <FiTruck className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-gray-900 text-sm">Free Shipping</h4>
-                                <p className="text-xs text-gray-600">On orders above Rs. 999</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
-                                <FiRefreshCw className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <h4 className="font-semibold text-gray-900 text-sm">Easy Returns</h4>
-                                <p className="text-xs text-gray-600">Replacement delivery for any exchanged product will be delivered within 7-10 days</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            
 
-            {/* Product Details Section */}
+            {/* Product Gallery and Description Section */}
             <div className="bg-gradient-to-b from-orange-50/30 to-white py-16">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        {/* Product Description Card - Order 2 on mobile, 1 on desktop */}
-                        <div className="order-2 lg:order-1 lg:col-span-2 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
-                                <h2 className="text-xl font-bold text-gray-900">Product Description</h2>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Left Side - Sticky Gallery */}
+                        <div className="order-1">
+                            <div className="lg:sticky lg:top-24">
+                                {/* Main Image Display */}
+                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100 mb-3">
+                                    <div className="aspect-square bg-gradient-to-br from-orange-50 to-orange-100/30 relative max-h-[500px]">
+                                        <img
+                                            src={perfume.images[selectedImageIndex] || perfume.coverImage}
+                                            alt={perfume.name}
+                                            className="w-full h-full object-cover transition-all duration-500"
+                                        />
+                                    </div>
+                                </div>
+                                
+                                {/* Thumbnail Strip */}
+                                <div className="grid grid-cols-4 gap-2">
+                                    {perfume.images.slice(0, 4).map((image, index) => (
+                                        <button 
+                                            key={index}
+                                            onClick={() => setSelectedImageIndex(index)}
+                                            className={`group relative aspect-square bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border-2 cursor-pointer ${
+                                                selectedImageIndex === index 
+                                                    ? 'border-orange-500 ring-2 ring-orange-300' 
+                                                    : 'border-orange-200 hover:border-orange-400'
+                                            }`}
+                                        >
+                                            <img
+                                                src={image}
+                                                alt={`${perfume.name} - Thumbnail ${index + 1}`}
+                                                className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
+                                            />
+                                            {selectedImageIndex === index && (
+                                                <div className="absolute inset-0 bg-orange-500/10"></div>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                            <p className="text-gray-700 leading-relaxed text-sm">{perfume.productDescription}</p>
-                            
-                            <div className="mt-8 pt-6 border-t border-gray-100">
+                        </div>
+
+                        {/* Right Side - Scrollable Content */}
+                        <div className="order-2 space-y-6">
+                            {/* Product Description Card */}
+                            <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
+                                    <h2 className="text-xl font-bold text-gray-900">Product Description</h2>
+                                </div>
+                                <p className="text-gray-700 leading-relaxed text-sm whitespace-pre-line">
+                                    {perfume.productDescription}
+                                </p>
+                            </div>
+
+                            {/* Scent Story Card */}
+                            <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
                                 <div className="flex items-center gap-3 mb-4">
                                     <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
                                     <h2 className="text-xl font-bold text-gray-900">Scent Story</h2>
                                 </div>
-                                <p className="text-gray-700 leading-relaxed italic text-sm bg-orange-50/50 p-4 rounded-lg border-l-4 border-orange-400">
+                                <p className="text-gray-700 leading-relaxed italic text-sm bg-orange-50/50 p-6 rounded-lg border-l-4 border-orange-400 whitespace-pre-line">
                                     {perfume.scentStory}
                                 </p>
-                            </div>
-                        </div>
-
-                        {/* Product Gallery - Order 1 on mobile, 2 on desktop */}
-                        <div className="order-1 lg:order-2 bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-6 border border-gray-100">
-                            <h3 className="text-lg font-bold text-gray-900 mb-4">Product Gallery</h3>
-                            <div className="grid grid-cols-1 gap-3">
-                                {perfume.images.slice(0, 3).map((image, index) => (
-                                    <div 
-                                        key={index} 
-                                        className="group relative aspect-square bg-gradient-to-br from-orange-50 to-orange-100/50 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-orange-100"
-                                    >
-                                        <img
-                                            src={image}
-                                            alt={`${perfume.name} - Image ${index + 1}`}
-                                            className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                            <div className="absolute bottom-2 left-2 text-white">
-                                                <p className="text-xs font-semibold">View {index + 1}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
                             </div>
                         </div>
                     </div>
 
                     {/* Fragrance Notes & Info */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                        {/* Fragrance Notes */}
-                        <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
-                                <h2 className="text-xl font-bold text-gray-900">Fragrance Notes</h2>
+                    <div className="mt-8">
+                        <div className="bg-white">
+                            {/* Fragrance Notes Accordion */}
+                            <div className="border-b border-gray-200">
+                                <button
+                                    onClick={() => toggleAccordion('fragranceNotes')}
+                                    className="w-full flex items-center justify-between p-6 hover:bg-orange-50/30 transition-colors text-left"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600"></div>
+                                        <h2 className="text-xl font-bold text-gray-900">Fragrance Notes</h2>
+                                    </div>
+                                    <div className="text-orange-600 text-3xl font-light leading-none">
+                                        {accordionOpen.fragranceNotes ? '−' : '+'}
+                                    </div>
+                                </button>
+                                {accordionOpen.fragranceNotes && (
+                                    <div className="px-6 pb-6 space-y-3 text-sm">
+                                        <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent">
+                                            <span className="inline-block w-1.5 h-1.5 bg-orange-500 mt-1.5 flex-shrink-0"></span>
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-gray-900 mb-1">Top Notes</p>
+                                                <p className="text-gray-700">{perfume.top_notes}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent">
+                                            <span className="inline-block w-1.5 h-1.5 bg-orange-500 mt-1.5 flex-shrink-0"></span>
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-gray-900 mb-1">Middle Notes</p>
+                                                <p className="text-gray-700">{perfume.middle_notes}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent">
+                                            <span className="inline-block w-1.5 h-1.5 bg-orange-500 mt-1.5 flex-shrink-0"></span>
+                                            <div className="flex-1">
+                                                <p className="font-semibold text-gray-900 mb-1">Base Notes</p>
+                                                <p className="text-gray-700">{perfume.base_notes}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="space-y-3 text-sm">
-                                
-                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
-                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
-                                        <p className="text-gray-700 flex-1">{perfume.top_notes}</p>
-                                    </div>
-                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
-                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
-                                        <p className="text-gray-700 flex-1">{perfume.middle_notes}</p>
-                                    </div>
-                                    <div className="flex items-start gap-3 p-3 bg-gradient-to-r from-orange-50 to-transparent rounded-lg">
-                                        <span className="inline-block w-1.5 h-1.5 bg-orange-500 rounded-full mt-1.5"></span>
-                                        <p className="text-gray-700 flex-1">{perfume.base_notes}</p>
-                                    </div>
-                                
-                            </div>
-                        </div>
 
-                        {/* Usage Tips */}
-                        <div className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-shadow p-8 border border-gray-100">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600 rounded-full"></div>
-                                <h2 className="text-xl font-bold text-gray-900">Usage Tips</h2>
+                            {/* Usage Tips Accordion */}
+                            <div className="border-b border-gray-200">
+                                <button
+                                    onClick={() => toggleAccordion('usageTips')}
+                                    className="w-full flex items-center justify-between p-6 hover:bg-orange-50/30 transition-colors text-left"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600"></div>
+                                        <h2 className="text-xl font-bold text-gray-900">Usage Tips</h2>
+                                    </div>
+                                    <div className="text-orange-600 text-3xl font-light leading-none">
+                                        {accordionOpen.usageTips ? '−' : '+'}
+                                    </div>
+                                </button>
+                                {accordionOpen.usageTips && (
+                                    <div className="px-6 pb-6">
+                                        <p className="text-gray-700 leading-relaxed text-sm bg-gradient-to-br from-orange-50 to-orange-100/50 p-5">
+                                            {perfume.usageTips}
+                                        </p>
+                                    </div>
+                                )}
                             </div>
-                            <p className="text-gray-700 leading-relaxed text-sm bg-gradient-to-br from-orange-50 to-orange-100/50 p-5 rounded-xl border border-orange-200/50">
-                                {perfume.usageTips}
-                            </p>
 
-                            <div className="mt-6 pt-6 border-t border-gray-100">
-                                <h3 className="text-sm font-semibold text-gray-900 mb-3">Brand Information</h3>
-                                <p className="text-gray-600 text-xs leading-relaxed">{perfume.brandAndManufacturerInfo}</p>
+                            {/* Brand Information Accordion */}
+                            <div className="border-b border-gray-200">
+                                <button
+                                    onClick={() => toggleAccordion('brandInfo')}
+                                    className="w-full flex items-center justify-between p-6 hover:bg-orange-50/30 transition-colors text-left"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-1 h-8 bg-gradient-to-b from-orange-500 to-orange-600"></div>
+                                        <h2 className="text-xl font-bold text-gray-900">Brand Information</h2>
+                                    </div>
+                                    <div className="text-orange-600 text-3xl font-light leading-none">
+                                        {accordionOpen.brandInfo ? '−' : '+'}
+                                    </div>
+                                </button>
+                                {accordionOpen.brandInfo && (
+                                    <div className="px-6 pb-6">
+                                        <p className="text-gray-600 text-xs leading-relaxed">{perfume.brandAndManufacturerInfo}</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -373,6 +408,40 @@ export default function OnePerfumePage() {
                             </div>
                         </div>
                     )}
+                </div>
+            </div>
+
+            <div className="bg-gradient-to-b from-white to-orange-50/30 py-6 border-b border-orange-100">
+                <div className="max-w-7xl mx-auto px-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
+                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
+                                <FiPackage className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-gray-900 text-sm">Premium Quality</h4>
+                                <p className="text-xs text-gray-600">Authentic fragrances</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
+                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
+                                <FiTruck className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-gray-900 text-sm">Free Shipping</h4>
+                                <p className="text-xs text-gray-600">On orders above Rs. 999</p>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
+                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
+                                <FiRefreshCw className="w-5 h-5 text-white" />
+                            </div>
+                            <div>
+                                <h4 className="font-semibold text-gray-900 text-sm">Easy Returns</h4>
+                                <p className="text-xs text-gray-600">Replacement delivery for any exchanged product will be delivered within 7-10 days</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

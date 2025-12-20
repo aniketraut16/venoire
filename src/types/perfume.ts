@@ -30,6 +30,8 @@ export type DetailedPerfume = {
     description: string;
     fragrance: string;
     coverImage: string;
+    rating: number;
+    rating_count: number;
     images: string[];
     gender: "Men" | "Women" | "Unisex";
     price: {
