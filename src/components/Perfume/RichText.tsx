@@ -23,7 +23,7 @@ export default function RichText({
   descriptionParts,
   titleColor = '#0f182c',
   textColor = '#0f182c',
-  bgColor = '#fcf9ee',
+  bgColor = '#ffffff',
 }: RichTextProps) {
   return (
     <section

@@ -39,7 +39,7 @@ const featureItems = [
 
 export default function MediaGallery() {
   return (
-    <section className="py-15 md:py-7 bg-[#fcf9ee]">
+    <section className="py-15 md:py-7 bg-white">
       <div className="max-w-[1410px] mx-auto px-6 md:px-20">
         <div className="text-center mt-6 mb-12">
           <h2 className="text-2xl md:text-4xl font-heading text-[#0f182c] mb-2 leading-tight">

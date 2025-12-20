@@ -29,7 +29,7 @@ export default function FeaturedCollection() {
 
   if (isLoading) {
     return (
-      <section className="py-12 bg-[#fcf9ee]">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
@@ -46,7 +46,7 @@ export default function FeaturedCollection() {
   }
 
   return (
-    <section className="py-12 bg-[#fcf9ee]">
+    <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <h2 className="text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
@@ -62,7 +62,7 @@ export default function FeaturedCollection() {
         <div className="text-center mt-12">
           <Link 
             href={`/perfume/collection${firstCollectionSlug ? `?slug=${firstCollectionSlug}` : ''}`}
-            className="inline-block bg-black hover:bg-[#1a2438] text-white font-bold py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
+            className="inline-block bg-white hover:bg-black text-black hover:text-white  border border-black py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
             View All Collections
           </Link>

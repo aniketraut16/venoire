@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function FeaturedProduct() {
   return (
-    <section className="py-7 md:py-9 bg-gradient-to-b from-[#fcf9ee] to-[#fcf9ee]">
+    <section className="py-7 md:py-9 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
           {/* Image */}

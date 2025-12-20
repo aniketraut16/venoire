@@ -4,13 +4,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useHomepage } from "@/contexts/HomepageContext";
 
-const gradientColors = [
-  "from-amber-50 to-orange-50",
-  "from-rose-50 to-pink-50",
-  "from-emerald-50 to-teal-50",
-  "from-violet-50 to-purple-50"
-];
-
 export default function FewPerfumes() {
   const { perfumes, isLoading: loading } = useHomepage();
   const displayPerfumes = perfumes.slice(0, 4);
