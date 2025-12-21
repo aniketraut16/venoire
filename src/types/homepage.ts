@@ -55,10 +55,13 @@ export interface CollectionsAndCategories {
   categories: CategoryorCollection[];
 }
 
+export  type BestSellers = Perfume | Product;
+
 export interface HomepageData {
   hero_carousel: HeroCarouselItem[];
   featured_perfumes: Perfume[];
   featured_clothing: Product[];
+  best_sellers: BestSellers[];
   instagram_reels: InstagramReel[];
   navbar_content: NavbarContentData;
   collections_and_categories: CollectionsAndCategories;

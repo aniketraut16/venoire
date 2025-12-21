@@ -9,6 +9,7 @@ import SignInRequest from "@/components/HomePage/SignInRequest";
 import LittleAboutUs from "@/components/HomePage/LittleAboutUs";
 import FewPerfumes from "@/components/HomePage/FewPerfumes";
 import InstaReels from "@/components/HomePage/InstaReels";
+import BestSellers from "@/components/HomePage/BestSellers";
 import { useHomepage } from "@/contexts/HomepageContext";
 
 export default function HomePage() {
@@ -20,6 +21,8 @@ export default function HomePage() {
   return (
     <div>
       <Hero />
+      <BestSellers />
+      <Divider />
       <LittleAboutUs />
       <Divider />
       <Categories categories={categories} />

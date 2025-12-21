@@ -5,7 +5,8 @@ import {
   HeroCarouselItem,
   InstagramReel,
   NavbarContentData,
-  CollectionsAndCategories
+  CollectionsAndCategories,
+  BestSellers
 } from "@/types/homepage";
 import { Product } from "@/types/product";
 import { getHomepageContent } from "@/utils/homepage";
@@ -15,6 +16,7 @@ interface HomepageContextType {
   heroCarousel: HeroCarouselItem[];
   featuredPerfumes: Perfume[];
   featuredClothing: Product[];
+  bestSellers: BestSellers[];
   instagramReels: InstagramReel[];
   navbarContent: NavbarContentData | null;
   collectionsAndCategories: CollectionsAndCategories | null;
@@ -33,6 +35,7 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
   const [heroCarousel, setHeroCarousel] = useState<HeroCarouselItem[]>([]);
   const [featuredPerfumes, setFeaturedPerfumes] = useState<Perfume[]>([]);
   const [featuredClothing, setFeaturedClothing] = useState<Product[]>([]);
+  const [bestSellers, setBestSellers] = useState<BestSellers[]>([]);
   const [instagramReels, setInstagramReels] = useState<InstagramReel[]>([]);
   const [navbarContent, setNavbarContent] = useState<NavbarContentData | null>(null);
   const [collectionsAndCategories, setCollectionsAndCategories] = useState<CollectionsAndCategories | null>(null);
@@ -50,6 +53,7 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
         setHeroCarousel(response.data.hero_carousel || []);
         setFeaturedPerfumes(response.data.featured_perfumes || []);
         setFeaturedClothing(response.data.featured_clothing || []);
+        setBestSellers(response.data.best_sellers || []);
         setInstagramReels(response.data.instagram_reels || []);
         setNavbarContent(response.data.navbar_content || null);
         setCollectionsAndCategories(response.data.collections_and_categories || null);
@@ -76,6 +80,7 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
     heroCarousel,
     featuredPerfumes,
     featuredClothing,
+    bestSellers,
     instagramReels,
     navbarContent,
     collectionsAndCategories,
