@@ -48,7 +48,6 @@ export type DetailedPerfume = {
     top_notes: string;
     middle_notes: string;
     base_notes: string;
-    ingredients: string;
     brandAndManufacturerInfo: string;
     concentration: string;
     bannerImage: string | null;
