@@ -11,11 +11,7 @@ export default function FewProducts() {
   const [showArrows, setShowArrows] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const { topProducts } = useHomepage()
-
-  const allProducts = useMemo(() => {
-    return topProducts.flatMap(category => category.products)
-  }, [topProducts])
+  const { featuredClothing: clothing } = useHomepage()
 
   useEffect(() => {
     const checkMobile = () => {
@@ -50,7 +46,7 @@ export default function FewProducts() {
       }
       window.removeEventListener('resize', handleScroll)
     }
-  }, [allProducts])
+  }, [clothing])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -120,7 +116,7 @@ export default function FewProducts() {
               overscrollBehaviorX: 'contain',
             }}
           >
-            {allProducts.map((product, index) => (
+            {clothing.map((product, index) => (
               <motion.div 
                 key={product.id} 
                 className="flex-none w-[75vw] sm:w-[45vw] md:w-[350px] lg:w-80 relative snap-start"

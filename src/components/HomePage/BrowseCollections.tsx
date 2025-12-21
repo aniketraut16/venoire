@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation";
 
 export default function BrowseCollections({ collections }: { collections: CategoryorCollection[] }) {
   const collectionsSwiperRef = useRef<SwiperType | null>(null);
-  const productsSwiperRef = useRef<SwiperType | null>(null);
   const router = useRouter();
     return (
     <div className="w-full bg-white">
@@ -169,26 +168,3 @@ export default function BrowseCollections({ collections }: { collections: Catego
     );
 }
 
-// Collections Data
-const collectionsData = [
-  {
-    title: "WINGS OF GLORY",
-    image: "/category/mens.jpg",
-  },
-  {
-    title: "LEOPARDS & LILIES",
-    image: "/category/womens.png",
-  },
-  {
-    title: "LEGS NOW TURN HEADS",
-    image: "/category/kids.jpeg",
-  },
-  {
-    title: "SUMMER COLLECTION",
-    image: "/category/perfumes.jpg",
-  },
-  {
-    title: "GIFT ITEMS",
-    image: "/category/gifts.jpg",
-  },
-];

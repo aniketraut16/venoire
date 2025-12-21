@@ -2,30 +2,22 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { 
-  HomepageData, 
-  HomepageMeta,
   HeroCarouselItem,
-  FeaturedCollection,
-  FeaturedProduct,
   InstagramReel,
   NavbarContentData,
-  CollectionsAndCategories,
-  TopProductswithCategory
+  CollectionsAndCategories
 } from "@/types/homepage";
-import { Perfume } from "@/types/perfume";
+import { Product } from "@/types/product";
 import { getHomepageContent } from "@/utils/homepage";
+import { Perfume } from "@/types/perfume";
 
 interface HomepageContextType {
   heroCarousel: HeroCarouselItem[];
-  featuredCollections: FeaturedCollection[];
-  featuredPerfumes: FeaturedProduct[];
-  featuredClothing: FeaturedProduct[];
+  featuredPerfumes: Perfume[];
+  featuredClothing: Product[];
   instagramReels: InstagramReel[];
   navbarContent: NavbarContentData | null;
   collectionsAndCategories: CollectionsAndCategories | null;
-  topProducts: TopProductswithCategory[];
-  perfumes: Perfume[];
-  meta: HomepageMeta | null;
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -39,15 +31,11 @@ interface HomepageProviderProps {
 
 export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) => {
   const [heroCarousel, setHeroCarousel] = useState<HeroCarouselItem[]>([]);
-  const [featuredCollections, setFeaturedCollections] = useState<FeaturedCollection[]>([]);
-  const [featuredPerfumes, setFeaturedPerfumes] = useState<FeaturedProduct[]>([]);
-  const [featuredClothing, setFeaturedClothing] = useState<FeaturedProduct[]>([]);
+  const [featuredPerfumes, setFeaturedPerfumes] = useState<Perfume[]>([]);
+  const [featuredClothing, setFeaturedClothing] = useState<Product[]>([]);
   const [instagramReels, setInstagramReels] = useState<InstagramReel[]>([]);
   const [navbarContent, setNavbarContent] = useState<NavbarContentData | null>(null);
   const [collectionsAndCategories, setCollectionsAndCategories] = useState<CollectionsAndCategories | null>(null);
-  const [topProducts, setTopProducts] = useState<TopProductswithCategory[]>([]);
-  const [perfumes, setPerfumes] = useState<Perfume[]>([]);
-  const [meta, setMeta] = useState<HomepageMeta | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,15 +48,11 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
 
       if (response.success && response.data) {
         setHeroCarousel(response.data.hero_carousel || []);
-        setFeaturedCollections(response.data.featured_collections || []);
         setFeaturedPerfumes(response.data.featured_perfumes || []);
         setFeaturedClothing(response.data.featured_clothing || []);
         setInstagramReels(response.data.instagram_reels || []);
         setNavbarContent(response.data.navbar_content || null);
         setCollectionsAndCategories(response.data.collections_and_categories || null);
-        setTopProducts(response.data.top_products || []);
-        setPerfumes(response.data.perfumes || []);
-        setMeta(response.meta || null);
       } else {
         setError(response.message || "Failed to fetch homepage content");
       }
@@ -90,15 +74,11 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
 
   const value: HomepageContextType = {
     heroCarousel,
-    featuredCollections,
     featuredPerfumes,
     featuredClothing,
     instagramReels,
     navbarContent,
     collectionsAndCategories,
-    topProducts,
-    perfumes,
-    meta,
     isLoading,
     error,
     refetch,

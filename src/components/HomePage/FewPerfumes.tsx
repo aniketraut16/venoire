@@ -3,10 +3,11 @@ import ScrollStack, { ScrollStackItem } from "@/components/ScrollStack";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useHomepage } from "@/contexts/HomepageContext";
+import { Perfume } from "@/types/perfume";
 
 export default function FewPerfumes() {
-  const { perfumes, isLoading: loading } = useHomepage();
-  const displayPerfumes = perfumes.slice(0, 4);
+  const { featuredPerfumes: perfumes, isLoading: loading } = useHomepage();
+  const displayPerfumes = perfumes.slice(0, 4) as unknown as Perfume[];
   return (
     <section className="w-full py-8 sm:py-12 md:py-16 bg-gradient-to-b from-white to-gray-50">
       {/* Header Section */}
