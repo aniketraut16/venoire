@@ -3,12 +3,11 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CategoryorCollection } from "@/types/homepage";
-import { getCategories } from "@/utils/homepage";
 import { useRouter } from "next/navigation";
-
+import { getCollections } from "@/utils/homepage";
 export default function CollectionsPage() {
-  const [collections, setCollections] = useState<CategoryorCollection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [collections, setCollections] = useState<CategoryorCollection[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -16,7 +15,7 @@ export default function CollectionsPage() {
     
     const fetchCollections = async () => {
       setIsLoading(true);
-      const { collections } = await getCategories();
+      const collections = await getCollections();
       setCollections(collections);
       setIsLoading(false);
     };

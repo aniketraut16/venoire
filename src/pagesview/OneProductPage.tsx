@@ -46,7 +46,7 @@ export default function OneProductPage() {
   const { startLoading, stopLoading } = useLoading();
   const { addToCart, addToWishlist } = useCart();
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
-  const footerRef = useRef<HTMLElement>(null);
+
 
   useEffect(() => {
     if (!slug) return;
@@ -618,7 +618,7 @@ export default function OneProductPage() {
               <div className="flex items-center gap-4 flex-1">
                 <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                   <img
-                    src={product.thumbnail}
+                    src={product.thumbnail || ''}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
