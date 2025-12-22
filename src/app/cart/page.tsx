@@ -114,7 +114,6 @@ export default function ShoppingCartPage() {
             toast.error('Please complete your profile to checkout');
             router.push('/complete-profile?redirect=/checkout');
         } else {
-            toast.success('Redirecting to checkout...');
             router.push('/checkout');
         }
     }

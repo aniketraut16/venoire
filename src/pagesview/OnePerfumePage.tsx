@@ -6,15 +6,13 @@ import { DetailedPerfume } from "@/types/perfume";
 import {
   FiMinus,
   FiPlus,
-  FiPackage,
-  FiTruck,
-  FiRefreshCw,
-  FiPercent,
 } from "react-icons/fi";
 import { useCart } from "@/contexts/cartContext";
 
 export default function OnePerfumePage() {
   const params = useParams();
+  const { openAddToCartModal } = useCart();
+
   const slug = params?.slug as string;
   const [perfume, setPerfume] = useState<DetailedPerfume | null>(null);
   const [selectedSize, setSelectedSize] = useState<number>(0);
@@ -108,7 +106,21 @@ export default function OnePerfumePage() {
 
   const handleAddToCart = async () => {
     if (!selectedSizeId) return;
-    await addToCart({ productVariantId: selectedSizeId, quantity: quantity });
+    const ok = await addToCart({ productVariantId: selectedSizeId, quantity: quantity });
+    if (ok) {
+    openAddToCartModal({
+      productId: perfume.id,
+      productName: perfume.name,
+      productImage: perfume.coverImage,
+      productType: "perfume",
+      productVariants: perfume.price.map((p) => ({
+        id: p.id,
+        price: p.price,
+        originalPrice: p.originalPrice,
+        badgeText: "",
+        ml_volume: p.quantity.toString(),
+      })),
+    }, "added", selectedSizeId);}
   };
 
   return (

@@ -21,6 +21,16 @@ export const getPerfumes = async (
     }
 }
 
+export const getSimilarPerfumes = async (id: string): Promise<Perfume[]> => {
+    try {
+        const response = await axios.get(`${baseUrl}/product/similar-perfumes/${id}`);
+        return response.data.data as Perfume[];
+    } catch (error) {
+        console.error("Error fetching similar perfumes:", error);
+        return [];
+    }
+}
+
 export const getDetailedPerfume = async (slug: string): Promise<DetailedPerfume | null> => {
     try {
         const response = await axios.get(`${baseUrl}/product/all-perfumes/${slug}`);

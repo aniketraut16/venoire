@@ -27,10 +27,12 @@ import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import ProductCard from "@/components/Product/ProductCard";
+import { FaStar } from "react-icons/fa6";
 
 export default function OneProductPage() {
   const params = useParams();
   const slug = params?.slug as string;
+  const { openAddToCartModal } = useCart();
 
   const [product, setProduct] = useState<DetailProduct | null>(null);
   const [selectedVariant, setSelectedVariant] = useState<ProductPricing | null>(
@@ -43,10 +45,10 @@ export default function OneProductPage() {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [similarProducts, setSimilarProducts] = useState<Product[]>([]);
   const [showStickyBar, setShowStickyBar] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const { startLoading, stopLoading } = useLoading();
   const { addToCart, addToWishlist } = useCart();
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
-
 
   useEffect(() => {
     if (!slug) return;
@@ -74,11 +76,11 @@ export default function OneProductPage() {
     const handleScroll = () => {
       if (ctaButtonsRef.current) {
         const ctaRect = ctaButtonsRef.current.getBoundingClientRect();
-        
+
         // Check if footer exists and get its position
-        const footer = document.querySelector('footer');
+        const footer = document.querySelector("footer");
         let shouldShow = ctaRect.bottom < 0;
-        
+
         if (footer) {
           const footerRect = footer.getBoundingClientRect();
           // Hide sticky bar if footer is visible in viewport
@@ -86,13 +88,13 @@ export default function OneProductPage() {
             shouldShow = false;
           }
         }
-        
+
         setShowStickyBar(shouldShow);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const handleSizeSelect = (size: string) => {
@@ -123,10 +125,42 @@ export default function OneProductPage() {
       : null;
   };
 
+  const handleQuantityChange = (type: "increment" | "decrement") => {
+    if (type === "increment") {
+      const maxQuantity = selectedVariant?.itemsRemaining || 10;
+      setQuantity((prev) => Math.min(prev + 1, maxQuantity));
+    } else {
+      setQuantity((prev) => Math.max(1, prev - 1));
+    }
+  };
+
   const handleAddToCart = async () => {
     const variantId = getSelectedVariantId();
     if (!variantId) return;
-    await addToCart({ productVariantId: variantId, quantity: 1 });
+    const ok = await addToCart({
+      productVariantId: variantId,
+      quantity: quantity,
+    });
+    if (ok) {
+      openAddToCartModal(
+        {
+          productId: product?.id ?? "",
+          productName: product?.name ?? "",
+          productImage: product?.thumbnail ?? "",
+          productType: "clothing",
+          productVariants:
+            product?.pricing.map((p) => ({
+              id: p.id,
+              price: p.price,
+              originalPrice: p.originalPrice,
+              badgeText: "",
+              size: p.size as string,
+            })) ?? [],
+        },
+        "added",
+        variantId
+      );
+    }
   };
 
   if (!product) {
@@ -222,15 +256,42 @@ export default function OneProductPage() {
                   {product.name}
                 </h1>
 
-                <div className="flex items-center gap-2 mb-2 md:mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className="h-3 w-3 fill-yellow-500 text-yellow-500"
-                    />
-                  ))}
-                  <span className="text-xs text-gray-600 lato-regular">
-                    (4.8) • 127 reviews
+                <div className="flex items-center gap-1 mb-2">
+                  <FaStar className="w-3.5 h-3.5 text-yellow-400" />
+                  <span className="text-sm font-semibold text-gray-900">
+                    {parseFloat(product.rating.toString()).toFixed(1)}
+                  </span>
+                  <span className="text-xs text-gray-400">|</span>
+                  {/* <FaCheckCircle className="w-3 h-3 text-blue-500" /> */}
+                  <svg
+                    viewBox="0 0 18 18"
+                    className="w-3 h-3 text-blue-500"
+                    height="14"
+                    width="14"
+                    preserveAspectRatio="xMidYMid meet"
+                    version="1.1"
+                    x="0px"
+                    y="0px"
+                    enableBackground="new 0 0 18 18"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <polygon
+                      id="Star-2"
+                      fill="#005eff"
+                      points="9,16 7.1,16.9 5.8,15.2 3.7,15.1 3.4,13 1.5,12 2.2,9.9 1.1,8.2 2.6,6.7 2.4,4.6 4.5,4 5.3,2 7.4,2.4 9,1.1 10.7,2.4 12.7,2 13.6,4 15.6,4.6 15.5,6.7 17,8.2 15.9,9.9 16.5,12 14.7,13 14.3,15.1 12.2,15.2 10.9,16.9 "
+                    ></polygon>
+                    <polygon
+                      id="Check-Icon"
+                      fill="#FFFFFF"
+                      points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
+                    ></polygon>
+                  </svg>
+                  <span className="text-xs text-gray-600">
+                    (
+                    {product.rating_count >= 1000
+                      ? `${(product.rating_count / 1000).toFixed(1)}K`
+                      : product.rating_count}{" "}
+                    Reviews)
                   </span>
                 </div>
 
@@ -330,6 +391,38 @@ export default function OneProductPage() {
                   )}
                 </div>
               )}
+
+              {/* Quantity Selector - Desktop Only */}
+              <div className="hidden md:block space-y-2">
+                <h3 className="text-sm lato-bold text-gray-900 uppercase tracking-wide">
+                  Quantity
+                </h3>
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center border border-gray-300">
+                    <button
+                      onClick={() => handleQuantityChange("decrement")}
+                      disabled={quantity <= 1}
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors lato-bold text-lg"
+                    >
+                      -
+                    </button>
+                    <span className="px-6 py-2 border-l border-r border-gray-300 lato-bold text-gray-900 min-w-[60px] text-center">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => handleQuantityChange("increment")}
+                      disabled={
+                        !selectedVariant ||
+                        quantity >= (selectedVariant?.itemsRemaining || 10)
+                      }
+                      className="px-4 py-2 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors lato-bold text-lg"
+                    >
+                      +
+                    </button>
+                  </div>
+                  
+                </div>
+              </div>
 
               {/* Buttons - Desktop Only */}
               <div ref={ctaButtonsRef} className="hidden md:block space-y-3">
@@ -575,6 +668,33 @@ export default function OneProductPage() {
 
         {/* Floating Action Buttons - Mobile Only */}
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-50">
+          {/* <div className="flex items-center gap-3 mb-3">
+            <span className="text-xs lato-bold text-gray-900 uppercase">
+              Qty:
+            </span>
+            <div className="flex items-center border border-gray-300">
+              <button
+                onClick={() => handleQuantityChange("decrement")}
+                disabled={quantity <= 1}
+                className="px-3 py-1.5 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors lato-bold"
+              >
+                -
+              </button>
+              <span className="px-4 py-1.5 border-l border-r border-gray-300 lato-bold text-gray-900 min-w-[50px] text-center text-sm">
+                {quantity}
+              </span>
+              <button
+                onClick={() => handleQuantityChange("increment")}
+                disabled={
+                  !selectedVariant ||
+                  quantity >= (selectedVariant?.itemsRemaining || 10)
+                }
+                className="px-3 py-1.5 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors lato-bold"
+              >
+                +
+              </button>
+            </div>
+          </div> */}
           <div className="flex gap-3">
             <button
               disabled={
@@ -609,7 +729,7 @@ export default function OneProductPage() {
         {/* Sticky Bottom Bar - Desktop Only */}
         <div
           className={`hidden md:block fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-2xl z-50 transition-transform duration-300 ${
-            showStickyBar ? 'translate-y-0' : 'translate-y-full'
+            showStickyBar ? "translate-y-0" : "translate-y-full"
           }`}
         >
           <div className="max-w-7xl mx-auto px-6 py-3">
@@ -618,7 +738,7 @@ export default function OneProductPage() {
               <div className="flex items-center gap-4 flex-1">
                 <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
                   <img
-                    src={product.thumbnail || ''}
+                    src={product.thumbnail || ""}
                     alt={product.name}
                     className="w-full h-full object-cover"
                   />
@@ -648,12 +768,16 @@ export default function OneProductPage() {
                   </span>
                   <div className="flex gap-2">
                     {product.pricing.slice(0, 4).map((variant) => {
-                      const isOutOfStock = variant.availabilityStatus === "out_of_stock";
+                      const isOutOfStock =
+                        variant.availabilityStatus === "out_of_stock";
                       const isSelected = selectedVariant?.size === variant.size;
                       return (
                         <button
                           key={variant.size}
-                          onClick={() => !isOutOfStock && handleSizeSelect(variant.size ?? "")}
+                          onClick={() =>
+                            !isOutOfStock &&
+                            handleSizeSelect(variant.size ?? "")
+                          }
                           disabled={isOutOfStock}
                           className={`px-3 py-1.5 border transition-colors lato-regular text-xs ${
                             isOutOfStock
@@ -670,6 +794,35 @@ export default function OneProductPage() {
                   </div>
                 </div>
               )}
+
+              {/* Quantity Selector - Compact */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-medium text-gray-600 lato-bold uppercase">
+                  Qty:
+                </span>
+                <div className="flex items-center border border-gray-300">
+                  <button
+                    onClick={() => handleQuantityChange("decrement")}
+                    disabled={quantity <= 1}
+                    className="px-2.5 py-1 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors lato-bold text-sm"
+                  >
+                    -
+                  </button>
+                  <span className="px-4 py-1 border-l border-r border-gray-300 lato-bold text-gray-900 min-w-[45px] text-center text-sm">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={() => handleQuantityChange("increment")}
+                    disabled={
+                      !selectedVariant ||
+                      quantity >= (selectedVariant?.itemsRemaining || 10)
+                    }
+                    className="px-2.5 py-1 text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors lato-bold text-sm"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
 
               {/* Action Buttons */}
               <div className="flex items-center gap-3">

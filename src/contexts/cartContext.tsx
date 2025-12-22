@@ -17,7 +17,7 @@ type CartContextType = {
   moveToWishlist: (item: CartItem) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   addToWishlist: (productId: string) => Promise<void>;
-  openAddToCartModal: (params: AddTOCartModalParams) => void;
+  openAddToCartModal: (params: AddTOCartModalParams, mode?: "add" | "added", preSelectedVariantId?: string) => void;
   closeAddToCartModal: () => void;
 };
 
@@ -28,11 +28,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [count, setCount] = useState<number>(0);
   const [modalParams, setModalParams] = useState<AddTOCartModalParams | null>(null);
   const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState<boolean>(false);
+  const [modalMode, setModalMode] = useState<"add" | "added">("add");
+  const [preSelectedVariantId, setPreSelectedVariantId] = useState<string | undefined>(undefined);
   const [cartId, setCartId] = useState<string>("");
   const {  startLoading, stopLoading } = useLoading();
 
 
-  const openAddToCartModal = useCallback((params: AddTOCartModalParams) => {
+  const openAddToCartModal = useCallback((params: AddTOCartModalParams, mode?: "add" | "added", preSelectedVariantId?: string) => {
+    setModalMode(mode || "add");
+    setPreSelectedVariantId(preSelectedVariantId);
     setModalParams(params);
     setIsAddToCartModalOpen(true);
   }, []);
@@ -40,6 +44,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const closeAddToCartModal = useCallback(() => {
     setModalParams(null);
     setIsAddToCartModalOpen(false);
+    setModalMode("add");
+    setPreSelectedVariantId(undefined);
   }, []);
 
   const refresh = useCallback(async () => {
@@ -61,7 +67,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const ok = await addToCartApi(args, token ?? null);
       if (ok.success) {
         await refresh();
-        toast.success(ok.message);
       } else {
         toast.error(ok.message);
       }
@@ -77,7 +82,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const ok = await removeFromCartApi(itemId, token ?? null);
       if (ok.success) {
         await refresh();
-        toast.success(ok.message);
       } else {
         toast.error(ok.message);
       }
@@ -98,7 +102,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (ok.success) {
         await removeFromCart(item.id);
         await refresh();
-        toast.success(ok.message);
       } else {
         toast.error(ok.message);
       }
@@ -117,7 +120,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       startLoading();
       const ok = await addOrRemoveFromWishlist(token, productId, "remove");
       if (ok.success) {
-        toast.success(ok.message);
       } else {
         toast.error(ok.message);
       }
@@ -135,7 +137,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       startLoading();
       const ok = await addOrRemoveFromWishlist(token, productId, "add");
       if (ok.success) {
-        toast.success(ok.message);
       } else {
         toast.error(ok.message);
       }
@@ -150,7 +151,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const ok = await updateCartItemApi(itemId, args, token ?? null);
       if (ok.success) {
         await refresh();
-        toast.success(ok.message);
       } else {
         toast.error(ok.message);
       }
@@ -190,7 +190,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   return (
     <CartContext.Provider value={value}>
-      <AddtoCartModal modalParams={modalParams} addToCart={addToCart} isOpen={isAddToCartModalOpen} onClose={closeAddToCartModal} />
+      <AddtoCartModal modalParams={modalParams} addToCart={addToCart} isOpen={isAddToCartModalOpen} onClose={closeAddToCartModal} mode={modalMode} preSelectedVariantId={preSelectedVariantId} />
       {children}
     </CartContext.Provider>
   );

@@ -64,6 +64,8 @@ export interface DetailProduct {
   name: string;
   category: string | null;
   tags: string[];
+  rating: number;
+  rating_count: number;
   pricing: ProductPricing[];
   badgeText: string | null;
   offers: OfferInfo[];
