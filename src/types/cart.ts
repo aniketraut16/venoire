@@ -31,23 +31,37 @@ export type AddToCartArgs = {
   quantity: number;
 };
 
-
 export type CheckoutPricing = {
-  subtotal: number,
+  subtotal: number;
   discountAmount: {
-    beforeDiscount: number,
-    afterDiscount: number,
-    iscountPercentage: number
-  },
+    beforeDiscount: number;
+    afterDiscount: number;
+    iscountPercentage: number;
+  };
   taxAmount: {
-    beforeTaxAddition: number,
-    afterTaxAddition: number,
-    taxPercentage: number
-  },
+    beforeTaxAddition: number;
+    afterTaxAddition: number;
+    taxPercentage: number;
+  };
   shippingAmount: {
-    beforeShippingAddition: number,
-    afterShippingAddition: number,
-    shippingAmount: number
-  },
-  totalAmount: number
-}
+    beforeShippingAddition: number;
+    afterShippingAddition: number;
+    shippingAmount: number;
+  };
+  totalAmount: number;
+};
+
+export type AddTOCartModalParams = {
+  productId: string;
+  productName: string;
+  productImage: string;
+  productType: "clothing" | "perfume";
+  productVariants: {
+    id: string;
+    size?: string;
+    ml_volume?: string;
+    price: number;
+    originalPrice: number;
+    badgeText?: string;
+  }[];
+};

@@ -10,7 +10,13 @@ export type Product = {
   originalPrice: number;
   badgeText: string;
   discount: number;
-  size: string[];
+  size: {
+    id: string;
+    size: string;
+    price: number;
+    originalPrice: number;
+    badgeText: string;
+  }[];
   thumbnail: string;
   mode?: "light" | "dark";
   availabilityStatus?: "in_stock" | "low_stock" | "out_of_stock";

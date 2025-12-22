@@ -7,6 +7,7 @@ import { FaStar } from "react-icons/fa";
 import { useHomepage } from "@/contexts/HomepageContext";
 import { Perfume } from "@/types/perfume";
 import { Product } from "@/types/product";
+import { useCart } from "@/contexts/cartContext";
 
 // Unified Card Component that handles both Perfume and Product
 interface BestSellerCardProps {
@@ -17,6 +18,7 @@ function BestSellerCard({ item }: BestSellerCardProps) {
   const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { openAddToCartModal } = useCart();
 
   // Type guard to check if item is a Perfume
   const isPerfume = (item: Perfume | Product): item is Perfume => {
@@ -72,7 +74,9 @@ function BestSellerCard({ item }: BestSellerCardProps) {
   };
 
   // Get category label
-  const categoryLabel = isPerfume(item) ? "PERFUME" : item.category || "PRODUCT";
+  const categoryLabel = isPerfume(item)
+    ? "PERFUME"
+    : item.category || "PRODUCT";
 
   // Get link URL
   const linkUrl = isPerfume(item)
@@ -203,7 +207,27 @@ function BestSellerCard({ item }: BestSellerCardProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
-            router.push(linkUrl);
+            openAddToCartModal({
+              productId: item.id,
+              productName: item.name,
+              productImage: isPerfume(item) ? item.coverImage : item.thumbnail,
+              productType: isPerfume(item) ? "perfume" : "clothing",
+              productVariants: isPerfume(item)
+                ? item.price.map((p) => ({
+                    id: p.id,
+                    price: p.price,
+                    originalPrice: p.originalPrice ?? 0,
+                    badgeText: p.badgeText ?? "",
+                    ml_volume: p.quantity.toString(),
+                  }))
+                : item.size.map((s) => ({
+                    id: s.id,
+                    price: s.price,
+                    originalPrice: s.originalPrice ?? 0,
+                    badgeText: s.badgeText ?? "",
+                    size: s.size,
+                  })),
+            });
           }}
           className="w-full bg-black text-white font-semibold py-3 rounded hover:bg-gray-800 transition-colors duration-300 uppercase text-sm mt-2"
         >

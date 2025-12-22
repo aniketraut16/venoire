@@ -1,12 +1,13 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { AddToCartArgs, CartItem } from "@/types/cart";
+import { AddToCartArgs, AddTOCartModalParams, CartItem } from "@/types/cart";
 import { addToCart as addToCartApi, getCartCount as getCartCountApi, removeFromCart as removeFromCartApi, updateCartItem as updateCartItemApi, mergeCartAfterLogin as mergeCartAfterLoginApi } from "@/utils/cart";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "./LoadingContext";
 import toast from "react-hot-toast";
 import { addOrRemoveFromWishlist } from "@/utils/wishlist";
+import AddtoCartModal from "@/components/common/AddtoCartModal";
 type CartContextType = {
   cartId: string;
   count: number;
@@ -16,6 +17,8 @@ type CartContextType = {
   moveToWishlist: (item: CartItem) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   addToWishlist: (productId: string) => Promise<void>;
+  openAddToCartModal: (params: AddTOCartModalParams) => void;
+  closeAddToCartModal: () => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -23,8 +26,21 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const { token } = useAuth();
   const [count, setCount] = useState<number>(0);
+  const [modalParams, setModalParams] = useState<AddTOCartModalParams | null>(null);
+  const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState<boolean>(false);
   const [cartId, setCartId] = useState<string>("");
   const {  startLoading, stopLoading } = useLoading();
+
+
+  const openAddToCartModal = useCallback((params: AddTOCartModalParams) => {
+    setModalParams(params);
+    setIsAddToCartModalOpen(true);
+  }, []);
+
+  const closeAddToCartModal = useCallback(() => {
+    setModalParams(null);
+    setIsAddToCartModalOpen(false);
+  }, []);
 
   const refresh = useCallback(async () => {
     try {
@@ -168,10 +184,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     moveToWishlist,
     removeFromWishlist,
     addToWishlist,
+    openAddToCartModal,
+    closeAddToCartModal
   }), [count, cartId, addToCart, removeFromCart, updateCartItem, moveToWishlist, removeFromWishlist, addToWishlist]);
 
   return (
     <CartContext.Provider value={value}>
+      <AddtoCartModal modalParams={modalParams} addToCart={addToCart} isOpen={isAddToCartModalOpen} onClose={closeAddToCartModal} />
       {children}
     </CartContext.Provider>
   );

@@ -79,15 +79,15 @@ export default function ProductCard(product: Product) {
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
             <div className="flex gap-2">
               {[...sizes].sort((a, b) => {
-                const sizeA = parseInt(a);
-                const sizeB = parseInt(b);
+                const sizeA = parseInt(a.size ?? "0");
+                const sizeB = parseInt(b.size ?? "0");
                 return sizeA - sizeB;
               }).map((size) => (
                 <button
-                  key={size}
+                  key={size.id}
                   className="w-8 h-8 rounded-md text-sm font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                 >
-                  {size}
+                  {size.size}
                 </button>
               ))}
             </div>

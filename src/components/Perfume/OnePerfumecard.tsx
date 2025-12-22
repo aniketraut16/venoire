@@ -2,18 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaStar, FaCheckCircle } from "react-icons/fa";
-import { Perfume } from "@/types/perfume";
-import { useRouter } from "next/navigation";
+import { FaStar } from "react-icons/fa";
+import { Perfume } from "@/types/perfume";  
+import { useCart } from "@/contexts/cartContext";
 
 interface OnePerfumecardProps {
   perfume: Perfume;
 }
 
 export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
-  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { openAddToCartModal } = useCart();
 
   // Create array of all images [coverImage, ...images]
   const allImages = [perfume.coverImage, ...(perfume.images || [])];
@@ -68,7 +68,6 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-
       {/* Image */}
       <div className="relative w-full aspect-square overflow-hidden flex items-center justify-center rounded-sm">
         <img
@@ -77,28 +76,30 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
           className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
-        
-      {/* Top Badge - Gender */}
-      <div className="absolute top-1 left-2 z-10">
-        <span className={`text-white text-[10px] font-semibold px-3 py-1 rounded uppercase tracking-wide ${
-          perfume.gender === "Unisex" 
-            ? "bg-purple-500" 
-            : perfume.gender === "Mens" 
-            ? "bg-blue-500" 
-            : "bg-pink-500"
-        }`}>
-          {getGenderBadge()}
-        </span>
-      </div>
 
-      {/* Discount Badge - Bottom Left */}
-      {lowestBadgeText && (
-        <div className="absolute bottom-3 left-2 z-10">
-          <span className="bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wide shadow-md">
-            {lowestBadgeText}
+        {/* Top Badge - Gender */}
+        <div className="absolute top-1 left-2 z-10">
+          <span
+            className={`text-white text-[10px] font-semibold px-3 py-1 rounded uppercase tracking-wide ${
+              perfume.gender === "Unisex"
+                ? "bg-purple-500"
+                : perfume.gender === "Mens"
+                ? "bg-blue-500"
+                : "bg-pink-500"
+            }`}
+          >
+            {getGenderBadge()}
           </span>
         </div>
-      )}
+
+        {/* Discount Badge - Bottom Left */}
+        {lowestBadgeText && (
+          <div className="absolute bottom-3 left-2 z-10">
+            <span className="bg-green-500 text-white text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wide shadow-md">
+              {lowestBadgeText}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Content */}
@@ -114,7 +115,9 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
         {/* Rating */}
         <div className="flex items-center gap-1">
           <FaStar className="w-3.5 h-3.5 text-yellow-400" />
-          <span className="text-sm font-semibold text-gray-900">{parseFloat(perfume.rating.toString()).toFixed(1)}</span>
+          <span className="text-sm font-semibold text-gray-900">
+            {parseFloat(perfume.rating.toString()).toFixed(1)}
+          </span>
           <span className="text-xs text-gray-400">|</span>
           {/* <FaCheckCircle className="w-3 h-3 text-blue-500" /> */}
           <svg
@@ -141,9 +144,11 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
             ></polygon>
           </svg>
           <span className="text-xs text-gray-600">
-            ({perfume.rating_count >= 1000 
-              ? `${(perfume.rating_count / 1000).toFixed(1)}K` 
-              : perfume.rating_count} Reviews)
+            (
+            {perfume.rating_count >= 1000
+              ? `${(perfume.rating_count / 1000).toFixed(1)}K`
+              : perfume.rating_count}{" "}
+            Reviews)
           </span>
         </div>
 
@@ -161,7 +166,19 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
         <button
           onClick={(e) => {
             e.preventDefault();
-            router.push(`/perfume/${perfume.slug}`);
+            openAddToCartModal({
+              productId: perfume.id,
+              productName: perfume.name,
+              productImage: perfume.coverImage,
+              productType: "perfume",
+              productVariants: perfume.price.map((p) => ({
+                id: p.id,
+                price: p.price,
+                originalPrice: p.originalPrice,
+                badgeText: p.badgeText,
+                ml_volume: p.quantity.toString(),
+              })),
+            });
           }}
           className="w-full bg-black text-white font-semibold py-3 rounded hover:bg-gray-800 transition-colors duration-300 uppercase text-sm mt-2"
         >
