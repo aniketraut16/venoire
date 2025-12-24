@@ -1,8 +1,28 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, ReactNode } from "react";
-import { AddToCartArgs, AddTOCartModalParams, CartItem } from "@/types/cart";
-import { addToCart as addToCartApi, getCartCount as getCartCountApi, removeFromCart as removeFromCartApi, updateCartItem as updateCartItemApi, mergeCartAfterLogin as mergeCartAfterLoginApi } from "@/utils/cart";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  ReactNode,
+} from "react";
+import {
+  AddToCartArgs,
+  AddTOCartModalParams,
+  CartApiResponse,
+  CartItem,
+  Pricing,
+} from "@/types/cart";
+import {
+  addToCart as addToCartApi,
+  removeFromCart as removeFromCartApi,
+  updateCartItem as updateCartItemApi,
+  mergeCartAfterLogin as mergeCartAfterLoginApi,
+  getCart,
+} from "@/utils/cart";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "./LoadingContext";
 import toast from "react-hot-toast";
@@ -11,13 +31,21 @@ import AddtoCartModal from "@/components/common/AddtoCartModal";
 type CartContextType = {
   cartId: string;
   count: number;
+  cartItems: CartItem[];
+  pricing: Pricing | null;
+  isCartLoading: boolean;
+  fetchCart: () => Promise<void>;
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
   removeFromCart: (itemId: string) => Promise<boolean>;
   updateCartItem: (itemId: string, args: AddToCartArgs) => Promise<boolean>;
   moveToWishlist: (item: CartItem) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   addToWishlist: (productId: string) => Promise<void>;
-  openAddToCartModal: (params: AddTOCartModalParams, mode?: "add" | "added", preSelectedVariantId?: string) => void;
+  openAddToCartModal: (
+    params: AddTOCartModalParams,
+    mode?: "add" | "added",
+    preSelectedVariantId?: string
+  ) => void;
   closeAddToCartModal: () => void;
 };
 
@@ -26,20 +54,34 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const { token } = useAuth();
   const [count, setCount] = useState<number>(0);
-  const [modalParams, setModalParams] = useState<AddTOCartModalParams | null>(null);
-  const [isAddToCartModalOpen, setIsAddToCartModalOpen] = useState<boolean>(false);
-  const [modalMode, setModalMode] = useState<"add" | "added">("add");
-  const [preSelectedVariantId, setPreSelectedVariantId] = useState<string | undefined>(undefined);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string>("");
-  const {  startLoading, stopLoading } = useLoading();
+  const [pricing, setPricing] = useState<Pricing | null>(null);
+  const [modalParams, setModalParams] = useState<AddTOCartModalParams | null>(
+    null
+  );
+  const [isAddToCartModalOpen, setIsAddToCartModalOpen] =
+    useState<boolean>(false);
+  const [modalMode, setModalMode] = useState<"add" | "added">("add");
+  const [preSelectedVariantId, setPreSelectedVariantId] = useState<
+    string | undefined
+  >(undefined);
+  const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
+  const { startLoading, stopLoading } = useLoading();
 
-
-  const openAddToCartModal = useCallback((params: AddTOCartModalParams, mode?: "add" | "added", preSelectedVariantId?: string) => {
-    setModalMode(mode || "add");
-    setPreSelectedVariantId(preSelectedVariantId);
-    setModalParams(params);
-    setIsAddToCartModalOpen(true);
-  }, []);
+  const openAddToCartModal = useCallback(
+    (
+      params: AddTOCartModalParams,
+      mode?: "add" | "added",
+      preSelectedVariantId?: string
+    ) => {
+      setModalMode(mode || "add");
+      setPreSelectedVariantId(preSelectedVariantId);
+      setModalParams(params);
+      setIsAddToCartModalOpen(true);
+    },
+    []
+  );
 
   const closeAddToCartModal = useCallback(() => {
     setModalParams(null);
@@ -48,16 +90,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setPreSelectedVariantId(undefined);
   }, []);
 
-  const refresh = useCallback(async () => {
+  const fetchCart = useCallback(async () => {
+    setIsCartLoading(true);
     try {
-      startLoading();
-      const fetched = await getCartCountApi(token ?? null);
+      const fetched: CartApiResponse = await getCart(token ?? null);
       if (fetched.success) {
-        setCount(fetched.count);
-        setCartId(fetched.cartId);
+        setCartItems(fetched.cartItems);
+        setPricing(fetched.pricing);
+        setCartId(fetched.cartId ?? "");
+        const newCount = fetched.cartItems.reduce(
+          (sum, item) => sum + (item.quantity ?? 0),
+          0
+        );
+        setCount(newCount);
+      } else {
+        setCartItems([]);
+        setPricing(null);
+        setCartId("");
+        setCount(0);
       }
     } finally {
-      stopLoading();
+      setIsCartLoading(false);
     }
   }, [token]);
 
@@ -66,14 +119,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       startLoading();
       const ok = await addToCartApi(args, token ?? null);
       if (ok.success) {
-        await refresh();
+        await fetchCart();
       } else {
         toast.error(ok.message);
       }
       stopLoading();
       return ok.success;
     },
-    [token, refresh]
+    [token, fetchCart]
   );
 
   const removeFromCart = useCallback(
@@ -81,14 +134,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       startLoading();
       const ok = await removeFromCartApi(itemId, token ?? null);
       if (ok.success) {
-        await refresh();
+        await fetchCart();
       } else {
         toast.error(ok.message);
       }
       stopLoading();
       return ok.success;
     },
-    [token, refresh]
+    [token, fetchCart]
   );
 
   const moveToWishlist = useCallback(
@@ -101,14 +154,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
       const ok = await addOrRemoveFromWishlist(token, item.productId, "add");
       if (ok.success) {
         await removeFromCart(item.id);
-        await refresh();
+        await fetchCart();
       } else {
         toast.error(ok.message);
       }
       stopLoading();
       return;
     },
-    [token, removeFromCart]
+    [token, removeFromCart, fetchCart]
   );
 
   const removeFromWishlist = useCallback(
@@ -150,22 +203,22 @@ export function CartProvider({ children }: { children: ReactNode }) {
       startLoading();
       const ok = await updateCartItemApi(itemId, args, token ?? null);
       if (ok.success) {
-        await refresh();
+        await fetchCart();
       } else {
         toast.error(ok.message);
       }
       stopLoading();
       return ok.success;
     },
-    [token, refresh]
+    [token, fetchCart]
   );
 
   useEffect(() => {
     startLoading();
-    refresh().finally(() => {
+    fetchCart().finally(() => {
       stopLoading();
     });
-  }, [refresh]);
+  }, [fetchCart]);
 
   useEffect(() => {
     if (!token) return;
@@ -175,22 +228,49 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, [token]);
 
-  const value = useMemo<CartContextType>(() => ({
-    count,
-    cartId,
-    addToCart,
-    removeFromCart,
-    updateCartItem,
-    moveToWishlist,
-    removeFromWishlist,
-    addToWishlist,
-    openAddToCartModal,
-    closeAddToCartModal
-  }), [count, cartId, addToCart, removeFromCart, updateCartItem, moveToWishlist, removeFromWishlist, addToWishlist]);
+  const value = useMemo<CartContextType>(
+    () => ({
+      count,
+      cartId,
+      cartItems,
+      pricing,
+      isCartLoading,
+      fetchCart,
+      addToCart,
+      removeFromCart,
+      updateCartItem,
+      moveToWishlist,
+      removeFromWishlist,
+      addToWishlist,
+      openAddToCartModal,
+      closeAddToCartModal,
+    }),
+    [
+      count,
+      cartId,
+      cartItems,
+      pricing,
+      isCartLoading,
+      fetchCart,
+      addToCart,
+      removeFromCart,
+      updateCartItem,
+      moveToWishlist,
+      removeFromWishlist,
+      addToWishlist,
+    ]
+  );
 
   return (
     <CartContext.Provider value={value}>
-      <AddtoCartModal modalParams={modalParams} addToCart={addToCart} isOpen={isAddToCartModalOpen} onClose={closeAddToCartModal} mode={modalMode} preSelectedVariantId={preSelectedVariantId} />
+      <AddtoCartModal
+        modalParams={modalParams}
+        addToCart={addToCart}
+        isOpen={isAddToCartModalOpen}
+        onClose={closeAddToCartModal}
+        mode={modalMode}
+        preSelectedVariantId={preSelectedVariantId}
+      />
       {children}
     </CartContext.Provider>
   );
@@ -203,5 +283,3 @@ export function useCart() {
   }
   return context;
 }
-
-

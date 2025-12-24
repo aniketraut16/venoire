@@ -10,14 +10,12 @@ import { Package, Shield, Truck, Trash2, Pencil, Plus } from 'lucide-react';
 import { intiateOrder, MOCK_ORDER_CALLBACK } from '@/utils/orders';
 import MockPaymentGateway from '@/components/PaymentGateway/MockPaymentGateway';
 import OrderSuccess from '@/components/Order/OrderSuccess';
-import { CheckoutPricing } from '@/types/cart';
+import { Pricing, CartItem } from '@/types/cart';
 import { getCheckoutPricing } from '@/utils/cart';
-import { CartItem } from '@/types/cart';
 
 export default function CheckoutPage() {
     const { user, dbUser, token } = useAuth();
-    const { cartId } = useCart();
-    const cartItems: CartItem[] = [];
+    const { cartId, cartItems, pricing: cartPricing, isCartLoading } = useCart();
 
     const [addresses, setAddresses] = useState<AddressType[]>([]);
     const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
@@ -36,7 +34,7 @@ export default function CheckoutPage() {
         transactionId: string;
         amount: number;
     } | null>(null);
-    const [pricing, setPricing] = useState<CheckoutPricing | null>(null);
+    const [pricing, setPricing] = useState<Pricing | null>(cartPricing);
     const [isLoadingPricing, setIsLoadingPricing] = useState(false);
 
     useEffect(() => {
@@ -62,11 +60,16 @@ export default function CheckoutPage() {
     }, [addresses]);
 
     useEffect(() => {
+        if (!cartId) {
+            setPricing(null);
+            return;
+        }
+        // If no coupon applied, use shared cart pricing to avoid extra call
+        if (!appliedCoupon) {
+            setPricing(cartPricing ?? null);
+            return;
+        }
         const fetchPricing = async () => {
-            if (!cartId) {
-                setPricing(null);
-                return;
-            }
             setIsLoadingPricing(true);
             try {
                 const pricingData = await getCheckoutPricing(cartId, appliedCoupon);
@@ -78,11 +81,11 @@ export default function CheckoutPage() {
             }
         };
         fetchPricing();
-    }, [cartId, appliedCoupon]);
+    }, [cartId, appliedCoupon, cartPricing]);
 
-    const bagTotal = pricing?.subtotal || 0;
-    const discount = pricing?.discountAmount.afterDiscount ? (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) : 0;
-    const shipping = pricing?.shippingAmount.shippingAmount || 0;
+    const bagTotal = pricing?.originalSubtotal || 0;
+    const discount = pricing?.totalDiscount || 0;
+    const shipping = pricing?.shippingAmount || 0;
     const payableAmount = pricing?.totalAmount || 0;
 
     const applyCoupon = () => {
@@ -368,9 +371,21 @@ export default function CheckoutPage() {
                                                             <div className="px-3 py-2 col-span-5 break-words whitespace-normal" title={item.name}>
                                                                 <div className="flex flex-col gap-1">
                                                                     <span>{item.name}</span>
-                                                                    <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 w-fit">
-                                                                        {item.productType === 'clothing' ? item.size?.size : item.ml_volume?.ml_volume}
-                                                                    </span>
+                                                                    <div className="flex flex-wrap gap-1">
+                                                                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-700 border border-gray-300 w-fit">
+                                                                            {item.productType === 'clothing' ? item.size?.size : item.ml_volume?.ml_volume}
+                                                                        </span>
+                                                                        {item.offerBadge && (
+                                                                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded">
+                                                                                {item.offerBadge}
+                                                                            </span>
+                                                                        )}
+                                                                        {item.buyXGetYBadge?.message && (
+                                                                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
+                                                                                {item.buyXGetYBadge.message}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                             <div className="px-3 py-2 text-right col-span-1">{qty}</div>
@@ -380,6 +395,21 @@ export default function CheckoutPage() {
                                                         {/* Card (mobile) */}
                                                         <div key={`m-${item.id}`} className="md:hidden border-t border-gray-200 px-3 py-3 text-sm">
                                                             <div className="font-semibold text-gray-900 mb-2 break-words whitespace-normal" title={item.name}>{item.name}</div>
+                                                            {/* Offer Badges */}
+                                                            {(item.offerBadge || item.buyXGetYBadge?.message) && (
+                                                                <div className="flex flex-wrap gap-2 mb-2">
+                                                                    {item.offerBadge && (
+                                                                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded">
+                                                                            {item.offerBadge}
+                                                                        </span>
+                                                                    )}
+                                                                    {item.buyXGetYBadge?.message && (
+                                                                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
+                                                                            {item.buyXGetYBadge.message}
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            )}
                                                             <div className="grid grid-cols-2 gap-y-2 text-gray-800">
                                                                 <div className="text-gray-600">Variant</div>
                                                                 <div className="text-right">{item.productType === 'clothing' ? item.size?.size : item.ml_volume?.ml_volume}</div>
@@ -443,25 +473,25 @@ export default function CheckoutPage() {
                                         </span>
                                     </div>
 
-                                    {pricing?.discountAmount && (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) > 0 && (
+                                    {pricing && pricing.totalDiscount > 0 && (
                                         <div className="flex justify-between items-center text-sm gap-4">
                                             <span className="text-gray-700">
-                                                Discount ({pricing.discountAmount.iscountPercentage}%)
+                                                Discount
                                             </span>
                                             <span className="font-medium text-green-600 whitespace-nowrap">
-                                                - ₹ {(pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount).toLocaleString()}
+                                                - ₹ {pricing.totalDiscount.toLocaleString()}
                                             </span>
                                         </div>
                                     )}
 
                                     <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">
-                                            Tax {pricing?.taxAmount?.taxPercentage ? `(${pricing.taxAmount.taxPercentage}%)` : ''}
+                                            Tax {pricing?.taxPercentage ? `(${pricing.taxPercentage}%)` : ''}
                                         </span>
                                         <span className="font-medium whitespace-nowrap">
                                             {isLoadingPricing ? 'Loading...' : (
                                                 pricing?.taxAmount ? 
-                                                `₹ ${(pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition).toLocaleString()}` : 
+                                                `₹ ${pricing.taxAmount.toLocaleString()}` : 
                                                 '₹ 0'
                                             )}
                                         </span>

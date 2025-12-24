@@ -326,6 +326,7 @@ export default function OneProductPage() {
                     </>
                   )}
                 </div>
+                <p className="text-xs md:text-sm text-gray-600 lato-regular">Incl. all taxes</p>
               </div>
 
               {/* Sizes */}

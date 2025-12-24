@@ -1,24 +1,20 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Heart, Trash2, ChevronDown, Shield, Package, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/cartContext';
-import { CartItem, CheckoutPricing } from '@/types/cart';
+import { CartItem } from '@/types/cart';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-import { getCheckoutPricing } from '@/utils/cart';
 
 export default function ShoppingCartPage() {
-    const { removeFromCart, updateCartItem, count, cartId } = useCart();
-    const cartItems: CartItem[] = [];
+    const { removeFromCart, updateCartItem, count, cartItems, pricing, isCartLoading } = useCart();
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
     const { user, needsCompleteSetup } = useAuth()
     const { moveToWishlist } = useCart();
     const router = useRouter();
-    const [pricing, setPricing] = useState<CheckoutPricing | null>(null);
-    const [isLoadingPricing, setIsLoadingPricing] = useState(false);
 
     const getCurrentQuantity = (item: CartItem): number => {
         const q = selectedQuantities[item.id] ?? item.quantity ?? 1;
@@ -81,30 +77,11 @@ export default function ShoppingCartPage() {
         }
     };
 
-    useEffect(() => {
-        const fetchPricing = async () => {
-            if (!cartId) {
-                setPricing(null);
-                return;
-            }
-            setIsLoadingPricing(true);
-            try {
-                const pricingData = await getCheckoutPricing(cartId);
-                setPricing(pricingData);
-            } catch (error) {
-                console.error('Error fetching pricing:', error);
-            } finally {
-                setIsLoadingPricing(false);
-            }
-        };
-        fetchPricing();
-    }, [cartId]);
-
     const bagTotal = pricing?.subtotal || 0;
-    const shipping = pricing?.shippingAmount.shippingAmount || 0;
-    const payableAmount = pricing?.totalAmount || 0;
-    const discount = pricing?.discountAmount ? (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) : 0;
-    const tax = pricing?.taxAmount ? (pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition) : 0;
+    const shipping = pricing?.shipping || 0;
+    const payableAmount = pricing?.total || 0;
+    const discount = pricing?.discount || 0;
+    const tax = pricing?.gst || 0;
 
     const handleCheckout = () => {
         if (!user) {
@@ -164,23 +141,39 @@ export default function ShoppingCartPage() {
                                     </div>
 
                                     {/* Pricing */}
-                                    <div className="flex items-baseline gap-2 mb-3">
+                                    <div className="mb-2">
+                                        {/* Total Price - Most Prominent */}
+                                        <p className="text-xl font-bold text-gray-900 mb-1">₹ {Number(item.price * item.quantity).toLocaleString()}</p>
+                                        
+                                        {/* Unit Price - Secondary */}
+                                        {item.quantity > 1 && <p className="text-sm text-gray-600 mb-1">₹ {Number(item.price).toLocaleString()} each</p>}
+                                        
+                                        {/* Original Price - Tertiary */}
                                         {item.originalPrice && Number(item.originalPrice) > Number(item.price) && (
-                                            <span className="text-xs text-gray-400 line-through">
-                                                ₹ {Number(item.originalPrice).toLocaleString()}
+                                            <p className="text-xs text-gray-400 line-through mb-1">₹ {Number(item.originalPrice).toLocaleString()}</p>
+                                        )}
+                                        
+                                        {/* Savings - Accent */}
+                                        {item.price > 0 && item.originalPrice > item.price && (
+                                            <p className="text-xs text-green-600 font-medium">Saved ₹{Math.round(item.originalPrice - item.price).toLocaleString()} {item.badgeText && `(Incl. Offer)`}</p>
+                                        )}
+                                    </div>
+
+                                    {/* Offer Badges */}
+                                    <div className="flex flex-wrap gap-2 mb-2">
+                                        {item.badgeText && (
+                                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded">
+                                                {item.badgeText}
                                             </span>
                                         )}
-                                        <span className="text-lg font-bold text-gray-900">
-                                            ₹ {Number(item.price).toLocaleString()}
-                                        </span>
-                                        {item.originalPrice && Number(item.originalPrice) > Number(item.price) && (
-                                            <span className="text-xs font-semibold text-red-600">
-                                                {Math.round((1 - Number(item.price) / Number(item.originalPrice)) * 100)}% Off
+                                        {item.buyXGetYOffer.applicable && item.buyXGetYOffer.x > item.quantity && (
+                                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
+                                                {`Add ${item.buyXGetYOffer.x - item.quantity} more to get ${item.buyXGetYOffer.y} free`}
                                             </span>
                                         )}
                                     </div>
 
-                                    <p className="text-xs text-gray-500 mb-3">Inclusive of GST benefit</p>
+                                    {/* <p className="text-xs text-gray-500 mb-3">Inclusive of GST benefit</p> */}
 
                                     {/* Size and Quantity Selectors */}
                                     <div className="flex gap-3 mt-auto">
@@ -233,6 +226,12 @@ export default function ShoppingCartPage() {
                                                     ))}
                                                 </select>
                                                 <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                                                {item.buyXGetYOffer.applicable && item.buyXGetYOffer.x < item.quantity && (
+                                                        <div className="mt-1 text-xs font-medium text-green-600 flex items-center gap-1">
+                                                            <span className="inline-block">🎁</span>
+                                                            <span>+{item.buyXGetYOffer.y} FREE</span>
+                                                        </div>
+                                                    )}
                                             </div>
                                         </div>
                                     </div>
@@ -252,7 +251,7 @@ export default function ShoppingCartPage() {
                             <div className="flex justify-between items-center text-sm">
                                 <span className="text-gray-700">Bag Total ({count})</span>
                                 <span className="font-medium text-gray-900">
-                                    {isLoadingPricing ? '...' : `₹ ${bagTotal.toLocaleString()}`}
+                                    {isCartLoading ? '...' : `₹ ${bagTotal.toLocaleString()}`}
                                 </span>
                             </div>
 
@@ -260,16 +259,16 @@ export default function ShoppingCartPage() {
                                 <div className="flex justify-between items-center text-sm">
                                     <span className="text-gray-700">Product Savings:</span>
                                     <span className="font-medium text-green-600">
-                                        - ₹ {discount.toLocaleString()}
+                                        - ₹ {discount.toLocaleString()} {pricing?.appliedOffer && `(${pricing.appliedOffer})`}
                                     </span>
                                 </div>
                             )}
 
                             {tax > 0 && (
                                 <div className="flex justify-between items-center text-sm">
-                                    <span className="text-gray-700">GST Rate Reduction:</span>
+                                    <span className="text-gray-700">GST:</span>
                                     <span className="font-medium text-green-600">
-                                        - ₹ {tax.toLocaleString()}
+                                        Included in Subtotal
                                     </span>
                                 </div>
                             )}
@@ -280,7 +279,7 @@ export default function ShoppingCartPage() {
                                     <span className="text-xs text-gray-500">(i)</span>
                                 </span>
                                 <span className="font-medium text-green-600">
-                                    {isLoadingPricing ? '...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
+                                    {isCartLoading ? '...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
                                 </span>
                             </div>
                         </div>
@@ -292,17 +291,17 @@ export default function ShoppingCartPage() {
                                     <p className="text-xs text-gray-500">(Includes Tax)</p>
                                 </div>
                                 <p className="text-lg font-bold text-gray-900">
-                                    {isLoadingPricing ? '...' : `₹ ${payableAmount.toLocaleString()}`}
+                                    {isCartLoading ? '...' : `₹ ${payableAmount.toLocaleString()}`}
                                 </p>
                             </div>
                         </div>
 
-                        <button 
+                        {/* <button 
                             onClick={handleCheckout}
                             className="w-full bg-red-600 text-white py-3 rounded font-medium text-sm hover:bg-red-700 transition-colors mb-3"
                         >
                             VIEW COUPONS
-                        </button>
+                        </button> */}
                     </div>
 
                     {/* Mobile: Trust Badges */}
@@ -349,12 +348,40 @@ export default function ShoppingCartPage() {
                                         {/* Product Details */}
                                         <div className="flex-1">
                                             <div className="flex justify-between items-start mb-2">
-                                                <div>
+                                                <div className="flex-1">
                                                     <p className="text-sm text-gray-900 font-semibold leading-tight">{item.name}</p>
-                                                    <p className="text-xs text-gray-600 leading-tight">{item.description}</p>
+                                                    <p className="text-xs text-gray-600 leading-tight mb-2">{item.description}</p>
+                                                    
+                                                    {/* Offer Badges */}
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {item.badgeText && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded">
+                                                                {item.badgeText}
+                                                            </span>
+                                                        )}
+                                                        {item.buyXGetYOffer.applicable && item.buyXGetYOffer.x > item.quantity && (
+                                                            <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
+                                                                {`Add ${item.buyXGetYOffer.x - item.quantity} more to get ${item.buyXGetYOffer.y} free`}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-lg font-semibold">₹ {Number(item.price).toLocaleString()}</p>
+                                                <div className="text-right ml-4">
+                                                    {/* Total Price - Most Prominent */}
+                                                    <p className="text-xl font-bold text-gray-900 mb-1">₹ {Number(item.price * item.quantity).toLocaleString()}</p>
+                                                    
+                                                    {/* Unit Price - Secondary */}
+                                                    {item.quantity > 1 && <p className="text-sm text-gray-600 mb-1">₹ {Number(item.price).toLocaleString()} each</p>}
+                                                    
+                                                    {/* Original Price - Tertiary */}
+                                                    {item.originalPrice && Number(item.originalPrice) > Number(item.price) && (
+                                                        <p className="text-xs text-gray-400 line-through mb-1">₹ {Number(item.originalPrice).toLocaleString()}</p>
+                                                    )}
+                                                    
+                                                    {/* Savings - Accent */}
+                                                    {item.price > 0 && item.originalPrice > item.price && (
+                                                        <p className="text-xs text-green-600 font-medium">Saved ₹{Math.round(item.originalPrice - item.price).toLocaleString()} {item.badgeText && `(Incl. Offer)`}</p>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -410,6 +437,12 @@ export default function ShoppingCartPage() {
                                                         </select>
                                                         <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                                                     </div>
+                                                    {item.buyXGetYOffer.applicable && item.buyXGetYOffer.x < item.quantity && (
+                                                        <div className="mt-1 text-xs font-medium text-green-600 flex items-center gap-1">
+                                                            <span className="inline-block">🎁</span>
+                                                            <span>+{item.buyXGetYOffer.y} FREE</span>
+                                                        </div>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -439,7 +472,11 @@ export default function ShoppingCartPage() {
 
                     {/* Right Side - Order Summary */}
                     <div className="w-full lg:w-96">
-                        <div className="bg-white shadow-sm">
+
+                        <div className="sticky top-25">
+
+                        
+                        <div className="bg-white shadow-sm ">
                             {/* Header */}
                             <div className="flex items-center gap-3 p-6 border-b">
                                 <Package className="w-5 h-5" />
@@ -452,30 +489,28 @@ export default function ShoppingCartPage() {
                                     <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">Bag Total ({count})</span>
                                         <span className="font-medium whitespace-nowrap">
-                                            {isLoadingPricing ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}
+                                            {isCartLoading ? 'Loading...' : `₹ ${bagTotal.toLocaleString()}`}
                                         </span>
                                     </div>
                                     
-                                    {pricing?.discountAmount && (pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount) > 0 && (
+                                    {pricing && pricing.discount > 0 && (
                                         <div className="flex justify-between items-center text-sm gap-4">
                                             <span className="text-gray-700">
-                                                Product Savings:
+                                                Discount:
                                             </span>
                                             <span className="font-medium text-green-600 whitespace-nowrap">
-                                                - ₹ {(pricing.discountAmount.beforeDiscount - pricing.discountAmount.afterDiscount).toLocaleString()}
+                                                - ₹ {pricing.discount.toLocaleString()} {pricing?.appliedOffer && `(${pricing.appliedOffer})`}
                                             </span>
                                         </div>
                                     )}
 
                                     <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">
-                                            GST Rate Reduction:
+                                            GST:
                                         </span>
                                         <span className="font-medium text-green-600 whitespace-nowrap">
-                                            {isLoadingPricing ? 'Loading...' : (
-                                                pricing?.taxAmount ? 
-                                                `- ₹ ${(pricing.taxAmount.afterTaxAddition - pricing.taxAmount.beforeTaxAddition).toLocaleString()}` : 
-                                                '- ₹ 237'
+                                            {isCartLoading ? 'Loading...' : (
+                                                'Included in Subtotal'
                                             )}
                                         </span>
                                     </div>
@@ -483,7 +518,7 @@ export default function ShoppingCartPage() {
                                     <div className="flex justify-between items-center text-sm gap-4">
                                         <span className="text-gray-700">Shipping Charges</span>
                                         <span className="font-medium text-green-600 whitespace-nowrap">
-                                            {isLoadingPricing ? 'Loading...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
+                                            {isCartLoading ? 'Loading...' : (shipping === 0 ? 'Free' : `₹ ${shipping.toLocaleString()}`)}
                                         </span>
                                     </div>
                                 </div>
@@ -495,22 +530,22 @@ export default function ShoppingCartPage() {
                                             <p className="text-xs text-gray-500">(Includes Tax)</p>
                                         </div>
                                         <p className="text-lg font-semibold whitespace-nowrap">
-                                            {isLoadingPricing ? 'Loading...' : `₹ ${payableAmount.toLocaleString()}`}
+                                            {isCartLoading ? 'Loading...' : `₹ ${payableAmount.toLocaleString()}`}
                                         </p>
                                     </div>
                                 </div>
 
                                 {/* Checkout Button */}
                                 <button onClick={handleCheckout} className="w-full bg-black text-white py-3 font-medium text-sm hover:bg-gray-800 transition-colors mb-4">
-                                    CHECK OUT ({count})
+                                    CHECK OUT (₹ {pricing?.total.toLocaleString()})
                                 </button>
 
                                 {/* Coupon Link */}
-                                <div className="text-center">
+                                {/* <div className="text-center">
                                     <button className="text-red-600 text-sm font-medium hover:text-red-700 transition-colors">
                                         VIEW COUPONS
                                     </button>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
 
@@ -534,6 +569,7 @@ export default function ShoppingCartPage() {
                                 </div>
                             </div>
                         </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -548,7 +584,7 @@ export default function ShoppingCartPage() {
                         onClick={handleCheckout}
                         className="bg-black text-white px-8 py-3 rounded font-semibold text-sm hover:bg-gray-800 transition-colors"
                     >
-                        CHECK OUT ({count})
+                        CHECK OUT (₹ {pricing?.total.toLocaleString()})
                     </button>
                 </div>
             </div>

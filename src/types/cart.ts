@@ -1,6 +1,8 @@
 export type CartItem = {
   id: string;
   productId: string;
+  categoryId: string | null;
+  categoryPath: string | null;
   quantity: number;
   size?: {
     size: string;
@@ -13,42 +15,45 @@ export type CartItem = {
   possibleSizes?: {
     size: string;
     variantId: string;
+    price: number;
+    originalPrice: number;
   }[];
   possibleVolumes?: {
     ml_volume: string;
     variantId: string;
+    price: number;
+    originalPrice: number;
   }[];
-  price: number;
-  originalPrice?: number;
+  price: number; // discounted price per unit
+  originalPrice: number; // original price per unit
   name: string;
-  image: string;
+  badgeText: string | null; // e.g., "Extra 10% OFF on orders above ₹500"
+  buyXGetYOffer: {
+    applicable: boolean;
+    x: number;
+    y: number;
+    message: string | null; // e.g., "Buy 2 Get 1 Free"
+  };
   description: string;
   productType: "clothing" | "perfume";
+  image: string;
 };
 
-export type AddToCartArgs = {
-  productVariantId: string;
-  quantity: number;
+export type Pricing = {
+  subtotal: number; // total after item-level discounts
+  gst: number; // tax amount
+  shipping: number; // shipping cost
+  discount: number; // cart-level discount
+  total: number; // final amount to pay
+  appliedOffer: string | null;
 };
 
-export type CheckoutPricing = {
-  subtotal: number;
-  discountAmount: {
-    beforeDiscount: number;
-    afterDiscount: number;
-    iscountPercentage: number;
-  };
-  taxAmount: {
-    beforeTaxAddition: number;
-    afterTaxAddition: number;
-    taxPercentage: number;
-  };
-  shippingAmount: {
-    beforeShippingAddition: number;
-    afterShippingAddition: number;
-    shippingAmount: number;
-  };
-  totalAmount: number;
+export type CartApiResponse = {
+  success: boolean;
+  message: string;
+  cartId: string;
+  cartItems: CartItem[];
+  pricing: Pricing;
 };
 
 export type AddTOCartModalParams = {
@@ -64,4 +69,10 @@ export type AddTOCartModalParams = {
     originalPrice: number;
     badgeText?: string;
   }[];
+};
+
+
+export type AddToCartArgs = {
+  productVariantId: string;
+  quantity: number;
 };
