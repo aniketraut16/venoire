@@ -6,12 +6,14 @@ import { CartItem } from '@/types/cart';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import CheckoutPageModal from '@/components/common/CheckOutModal';
 
 export default function ShoppingCartPage() {
-    const { removeFromCart, updateCartItem, count, cartItems, pricing, isCartLoading } = useCart();
+    const { removeFromCart, updateCartItem, count, cartItems, pricing, isCartLoading ,cartId } = useCart();
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
+    const [showCheckoutModal, setShowCheckoutModal] = useState(false);  
     const { user, needsCompleteSetup } = useAuth()
     const { moveToWishlist } = useCart();
     const router = useRouter();
@@ -86,16 +88,24 @@ export default function ShoppingCartPage() {
     const handleCheckout = () => {
         if (!user) {
             toast.error('Please login to checkout');
-            router.push('/auth?redirect=/checkout');
+            router.push('/auth?redirect=/cart?showCheckoutModal=true');
         } else if (needsCompleteSetup) {
             toast.error('Please complete your profile to checkout');
-            router.push('/complete-profile?redirect=/checkout');
-        } else {
-            router.push('/checkout');
+            router.push('/complete-profile?redirect=/cart?showCheckoutModal=true');
+        } else if (isCartLoading) {
+            toast.error('Please wait while we load your cart...');
+        } else if (!pricing) {
+            toast.error('Cart pricing information is not available. Please try again.');
+        } 
+        else if (!cartId || cartId.trim() === '') {
+            toast.error('Cart information is not available. Please try again.');
+        } 
+        else {
+            setShowCheckoutModal(true);
         }
     }
 
-    return (
+    return (<>
         <div className="min-h-screen bg-gray-50 pt-20 pb-32 md:pb-8">
             <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
                 {/* Mobile: Cart Items */}
@@ -589,5 +599,7 @@ export default function ShoppingCartPage() {
                 </div>
             </div>
         </div>
+            <CheckoutPageModal open={showCheckoutModal} onClose={() => setShowCheckoutModal(false)} pricing={pricing} cartId={cartId} appliedCoupon={null} />
+            </>
     );
 }

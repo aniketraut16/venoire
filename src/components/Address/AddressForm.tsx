@@ -125,20 +125,20 @@ export default function AddressForm(props: {
     return (
         <div 
             data-lenis-prevent="true"
-            className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 z-50 flex md:justify-center md:items-center md:p-4 items-end"
             onClick={props.onCancel}
         >
             <div 
-                className="bg-white w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200"
+                className="bg-white w-full md:max-w-2xl max-h-[90vh] overflow-y-auto md:border border-gray-200 md:rounded-none rounded-t-2xl animate-slide-up md:animate-none"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-8 py-6 flex justify-between items-center">
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-8 py-4 md:py-6 flex justify-between items-center">
                     <div>
-                        <h2 className="text-2xl font-light tracking-wide uppercase text-black">
+                        <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase text-black">
                             {props.method === 'create' ? 'Add New Address' : 'Update Address'}
                         </h2>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-xs md:text-sm text-gray-600 mt-1">
                             {props.method === 'create' 
                                 ? 'Fill in the details below to add a new delivery address' 
                                 : 'Update your delivery address information'}
@@ -156,7 +156,7 @@ export default function AddressForm(props: {
                 </div>
 
                 {/* Form */}
-                <div className="px-8 py-6">
+                <div className="px-4 md:px-8 py-4 md:py-6">
                     <div className="space-y-6">
                         {/* Address Line 1 */}
                         <div>
