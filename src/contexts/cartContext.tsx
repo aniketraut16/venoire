@@ -52,7 +52,7 @@ type CartContextType = {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const { token } = useAuth();
+  const { token, dbUser } = useAuth();
   const [count, setCount] = useState<number>(0);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [cartId, setCartId] = useState<string>("");
@@ -221,12 +221,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [fetchCart]);
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !dbUser) return;
     startLoading();
-    mergeCartAfterLoginApi(token).finally(() => {
-      stopLoading();
-    });
-  }, [token]);
+    mergeCartAfterLoginApi(token)
+      .then(() => {
+        return fetchCart();
+      })
+      .finally(() => {
+        stopLoading();
+      });
+  }, [token, dbUser, fetchCart]);
 
   const value = useMemo<CartContextType>(
     () => ({

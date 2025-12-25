@@ -7,7 +7,7 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 // Helper functions to manage cookies in the browser
 const getCookie = (name: string): string | undefined => {
   return Cookies.get(name) ?? undefined;
-};  
+};
 
 const setCookie = (name: string, value: string, days: number = 30): void => {
   Cookies.set(name, value, { expires: days });
@@ -166,12 +166,9 @@ export const updateCartItem = async (
 
 export const mergeCartAfterLogin = async (token: string): Promise<void> => {
   try {
-    let sessionId = null;
-    if (!token) {
-      sessionId = getCookie("sessionId");
-      if (!sessionId) {
-        return;
-      }
+    const sessionId = getCookie("sessionId");
+    if (!sessionId) {
+      return;
     }
     await axios.patch(`${baseUrl}/cart`, undefined, {
       headers: {
