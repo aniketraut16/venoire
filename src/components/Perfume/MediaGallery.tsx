@@ -71,7 +71,7 @@ function FeatureCard({ item }: { item: typeof featureItems[0] }) {
         <img
           src={item.src}
           alt={item.title}
-          className={`w-full h-full object-cover ${item.position}`}
+          className={`${item.position}`}
         />
       </div>
 
