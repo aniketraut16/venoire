@@ -11,9 +11,11 @@ import FewPerfumes from "@/components/HomePage/FewPerfumes";
 import InstaReels from "@/components/HomePage/InstaReels";
 import BestSellers from "@/components/HomePage/BestSellers";
 import { useHomepage } from "@/contexts/HomepageContext";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function HomePage() {
   const { collectionsAndCategories, isLoading } = useHomepage();
+  const { user } = useAuth();
 
   const categories = collectionsAndCategories?.categories || [];
   const collections = collectionsAndCategories?.collections || [];
@@ -30,7 +32,7 @@ export default function HomePage() {
       <FewPerfumes />
       <FewProducts />
       <Explore />
-      <SignInRequest />
+      {!user && <SignInRequest />}
       <InstaReels />
     </div>
   );

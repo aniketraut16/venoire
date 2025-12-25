@@ -8,9 +8,9 @@ export default function SignInRequest() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img
-          src="https://t4.ftcdn.net/jpg/03/67/56/73/360_F_367567354_JnT96QOWu8rugfLdYaESxWkqaIOUja8t.jpg"
+          src="/signinbanner.jpg"
           alt="Person reading"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-left sm:object-center"
         />
         {/* Dark overlay for better contrast */}
         <div className="absolute inset-0 bg-black opacity-40"></div>
@@ -29,11 +29,11 @@ export default function SignInRequest() {
           </div>
           
           {/* Main Heading */}
-          <h2 className='text-blue-950 text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight mb-0.5 sm:mb-1'>EARN POINTS</h2>
-          <h3 className='text-blue-950 text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 md:mb-4'>ON EVERY PURCHASE</h3>
+          <h2 className='text-blue-950 text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold leading-tight mb-0.5 sm:mb-1'>SIGN IN FOR A</h2>
+          <h3 className='text-blue-950 text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold mb-2 sm:mb-3 md:mb-4'> BETTER EXPERIENCE</h3>
           
           {/* Description */}
-          <p className='text-blue-950 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-4 md:mb-5 lg:mb-6'>Register with us to get updates and spend your point to buy.</p>
+          <p className='text-blue-950 text-xs sm:text-sm md:text-base leading-relaxed mb-3 sm:mb-4 md:mb-5 lg:mb-6'>Save your preferences, track orders, and get a smoother checkout every time.</p>
           
           {/* Sign Up Button */}
           <button className='bg-blue-950 text-yellow-400 px-5 sm:px-6 md:px-7 lg:px-8 py-2 sm:py-2.5 md:py-3 rounded-lg font-bold text-xs sm:text-sm md:text-base uppercase hover:bg-blue-900 transition-colors duration-300 shadow-lg w-full sm:w-4/5 md:w-3/4 lg:w-2/3 mx-auto'>

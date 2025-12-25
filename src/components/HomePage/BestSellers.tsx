@@ -247,7 +247,7 @@ export default function BestSellers() {
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
+            <h2 className="text-2xl md:text-3xl  font-bold text-[#0f182c]">BEST SELLERS</h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
@@ -270,7 +270,7 @@ export default function BestSellers() {
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0f182c]">BEST SELLERS</h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {bestSellers.slice(0, 8).map((item) => (

@@ -10,6 +10,7 @@ export default function FewProducts() {
   const [scrollProgress, setScrollProgress] = useState(0)
   const [showArrows, setShowArrows] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [shouldAnimate, setShouldAnimate] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const { featuredClothing: clothing } = useHomepage()
 
@@ -63,7 +64,7 @@ export default function FewProducts() {
   }
 
   return (
-    <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-slate-900 to-slate-800 overflow-x-hidden">
+    <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-slate-900 to-slate-800 overflow-x-hidden mt-10 md:mt-0">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Title */}
         <motion.div 
@@ -121,12 +122,18 @@ export default function FewProducts() {
                 key={product.id} 
                 className="flex-none w-[75vw] sm:w-[45vw] md:w-[350px] lg:w-80 relative snap-start"
                 initial={{ opacity: 0, x: 50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true, amount: 0.2 }}
+                animate={isMobile && shouldAnimate ? { opacity: 1, x: 0 } : undefined}
+                whileInView={!isMobile ? { opacity: 1, x: 0 } : undefined}
+                viewport={!isMobile ? { once: true, amount: 0.2 } : undefined}
                 transition={{ 
                   duration: 0.5, 
-                  delay: isMobile && index < 2 ? 0 : Math.min(index * 0.05, 0.5),
+                  delay: isMobile ? index * 0.1 : Math.min(index * 0.05, 0.5),
                   ease: "easeOut" 
+                }}
+                onViewportEnter={() => {
+                  if (isMobile && index === 0 && !shouldAnimate) {
+                    setShouldAnimate(true)
+                  }
                 }}
               >
                 <ProductCard {...product} mode="light" />

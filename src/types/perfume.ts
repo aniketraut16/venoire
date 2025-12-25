@@ -5,6 +5,8 @@ export type Perfume = {
     description: string;
     images: string[];
     fragrance: string;
+    concentration: string;
+    base_notes: string;
     rating: string;
     rating_count: number;
     coverImage: string;
