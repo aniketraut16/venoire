@@ -3,39 +3,43 @@ import Image from 'next/image';
 
 const featureItems = [
   {
-    id: 2,
-    type: 'image',
-    src: '/perfume/personalization.png',
-    title: 'Full Personalization',
-    description: 'Create your own signature scent with custom names, bottle engravings, and tailored fragrance notes.',
-    span: 'col-span-1 md:col-span-2 row-span-1',
-  },
-  {
     id: 1,
     type: 'image',
-    src: '/perfume/artisan-blend.png',
-    title: 'Artisan Crafted Scents',
-    description: 'Each fragrance is meticulously handcrafted in small batches, ensuring uniqueness and exceptional quality.',
+    src: '/perfume/curated-scents.png',
+    title: 'Carefully Curated Scents',
+    description: 'Each fragrance is designed with a distinct character — refined, balanced, and made to be effortlessly wearable.',
     span: 'col-span-1 md:col-span-3 row-span-2',
+    position: 'object-center',
+  },
+  {
+    id: 2,
+    type: 'image',
+    src: '/perfume/small-batch.png',
+    title: 'Small-Batch Production',
+    description: 'Produced in limited quantities to maintain consistency, control, and attention to detail.',
+    span: 'col-span-1 md:col-span-2 row-span-1',
+    position: 'object-bottom',
   },
   {
     id: 3,
     type: 'image',
-    src: '/perfume/niche-ingredients.png',
-    title: 'Rare & Premium Ingredients',
-    description: 'We only use high-quality, ethically sourced ingredients, making our perfumes long-lasting and luxurious.',
+    src: '/perfume/quality-ingredients.png',
+    title: 'High-Quality Ingredients',
+    description: 'We focus on well-balanced compositions using quality ingredients for a lasting impression.',
     span: 'col-span-1 md:col-span-2 row-span-1',
+    position: 'object-center',
   },
-  
   {
     id: 4,
     type: 'image',
-    src: '/perfume/cruelty-free.png',
-    title: 'Vegan & Cruelty Free',
-    description: 'Our entire collection is vegan and never tested on animals, for an ethical perfume experience.',
+    src: '/perfume/vegan-cruelty-free.png',
+    title: 'Vegan & Cruelty-Free',
+    description: 'Our fragrances are vegan and never tested on animals.',
     span: 'col-span-1 md:col-span-5 row-span-1',
+    position: 'object-center',
   }
 ];
+
 
 export default function MediaGallery() {
   return (
@@ -67,7 +71,7 @@ function FeatureCard({ item }: { item: typeof featureItems[0] }) {
         <img
           src={item.src}
           alt={item.title}
-          className="object-cover"
+          className={`w-full h-full object-cover ${item.position}`}
         />
       </div>
 

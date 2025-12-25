@@ -16,18 +16,13 @@ import {
   Autoplay,
 } from "swiper/modules";
 import type { Swiper as SwiperType } from "swiper";
+import { useHomepage } from "@/contexts/HomepageContext";
 
 export default function Hero() {
   const swiperRef = useRef<SwiperType | null>(null);
   const heroRef = useRef<HTMLDivElement | null>(null);
   const [scrollScale, setScrollScale] = useState(1);
-
-  const heroImages = [
-    "/banner1.jpg",
-    "/banner2.jpg",
-    "/banner3.jpg",
-    "/banner4.jpg",
-  ];
+  const { heroCarousel } = useHomepage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -71,11 +66,11 @@ export default function Hero() {
         className="w-full h-full"
         onSwiper={(swiper) => (swiperRef.current = swiper)}
       >
-        {heroImages.map((image, index) => (
+        {heroCarousel.map((item, index) => (
           <SwiperSlide key={index}>
             <div className="relative w-full h-full overflow-hidden cursor-pointer">
               <img
-                src={image}
+                src={item.image_url}
                 alt={`Hero slide ${index + 1}`}
                 className="w-full h-full object-cover md:object-contain transition-transform duration-100 ease-out"
                 style={{ 
