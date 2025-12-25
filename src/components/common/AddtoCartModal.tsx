@@ -94,7 +94,7 @@ export default function AddtoCartModal({
   };
 
   const handleCheckout = () => {
-    router.push("/checkout");
+    router.push(`/cart?from=add-to-cart&checkoutmodal=true`);
     onClose();
   };
 

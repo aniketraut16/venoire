@@ -79,7 +79,7 @@ export default function OrderFailedPage() {
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row gap-3">
                             <button
-                                onClick={() => router.push('/checkout')}
+                                onClick={() => router.push('/cart?from=order-failed&checkoutmodal=true')}
                                 className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white font-medium rounded-lg hover:bg-gray-800 transition-colors"
                             >
                                 <RefreshCw className="w-5 h-5" />

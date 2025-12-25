@@ -1,20 +1,23 @@
 "use client";
-import React, { useState } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Heart, Trash2, ChevronDown, Shield, Package, Truck } from 'lucide-react';
 import { useCart } from '@/contexts/cartContext';
 import { CartItem } from '@/types/cart';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import toast from 'react-hot-toast';
 import CheckoutPageModal from '@/components/common/CheckOutModal';
 
-export default function ShoppingCartPage() {
+function ShoppingCartPage() {
     const { removeFromCart, updateCartItem, count, cartItems, pricing, isCartLoading ,cartId } = useCart();
     const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>({});
     const [selectedVolumes, setSelectedVolumes] = useState<{ [key: string]: string }>({});
     const [selectedQuantities, setSelectedQuantities] = useState<{ [key: string]: number }>({});
     const [showCheckoutModal, setShowCheckoutModal] = useState(false);  
     const { user, needsCompleteSetup } = useAuth()
+    const searchParams = useSearchParams();
+    const from = searchParams.get('from') || null;
+    const checkoutmodal = searchParams.get('checkoutmodal') || 'false';
     const { moveToWishlist } = useCart();
     const router = useRouter();
 
@@ -23,6 +26,21 @@ export default function ShoppingCartPage() {
         const asNum = Number(q);
         return Number.isFinite(asNum) && asNum > 0 ? asNum : 1;
     };
+
+    useEffect(() => {
+        if (checkoutmodal === 'true' && !showCheckoutModal) {
+            if(user && needsCompleteSetup){
+                router.push("/complete-profile?redirect=/cart?checkoutmodal=true");
+                return;
+            }
+            if(!user){
+                router.push("/auth?redirect=/cart?checkoutmodal=true");
+                return;
+            }
+
+            setShowCheckoutModal(true);
+        }
+    }, [checkoutmodal, showCheckoutModal]);
 
     const getCurrentVariantId = (item: CartItem): string | null => {
         if (item.productType === "clothing") {
@@ -88,10 +106,10 @@ export default function ShoppingCartPage() {
     const handleCheckout = () => {
         if (!user) {
             toast.error('Please login to checkout');
-            router.push('/auth?redirect=/cart?showCheckoutModal=true');
+            router.push('/auth?redirect=/cart?checkoutmodal=true');
         } else if (needsCompleteSetup) {
             toast.error('Please complete your profile to checkout');
-            router.push('/complete-profile?redirect=/cart?showCheckoutModal=true');
+            router.push('/complete-profile?redirect=/cart?checkoutmodal=true');
         } else if (isCartLoading) {
             toast.error('Please wait while we load your cart...');
         } else if (!pricing) {
@@ -603,3 +621,12 @@ export default function ShoppingCartPage() {
             </>
     );
 }
+
+
+export default function ShoppingCartPageSuspense(){
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <ShoppingCartPage />
+        </Suspense>
+    );
+};

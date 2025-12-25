@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "@/utils/user";
 import { UserSignInArgs } from "@/types/user";
 import { useLoading } from "@/contexts/LoadingContext";
 
-export default function CompleteProfile() {
+function CompleteProfile() {
     const { user, token, needsCompleteSetup } = useAuth();
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect') || null;
     
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -36,12 +38,20 @@ export default function CompleteProfile() {
 
     useEffect(() => {
         if (user && !needsCompleteSetup) {
-            router.push("/");
+            if(redirect){
+                router.push(redirect);
+            } else {
+                router.push("/");
+            }
         }
         if (!user) {
-            router.push("/auth");
+            if(redirect){
+                router.push("/auth?redirect=" + redirect);
+            } else {
+                router.push("/auth");
+            }
         }
-    }, [user, needsCompleteSetup, router]);
+    }, [user, needsCompleteSetup, redirect, router]);
 
     const validateForm = (): string | null => {
         if (!firstName.trim()) {
@@ -244,5 +254,13 @@ export default function CompleteProfile() {
                 </form>
             </div>
         </div>
+    );
+}
+
+export default function CompleteProfileSuspense(){
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <CompleteProfile />
+        </Suspense>
     );
 }

@@ -200,11 +200,16 @@ function Login() {
 
     useEffect(() => {
         if (!user) return;
-        if (redirectUrl) {
-            router.push(redirectUrl);
+
+        if(needsCompleteSetup){
+            router.push("/complete-profile" + (redirectUrl ? `?redirect=${redirectUrl}` : ""));
             return;
         }
-        router.push(needsCompleteSetup ? "/complete-profile" : "/");
+        if (redirectUrl) {
+            router.push(redirectUrl);
+        } else {
+            router.push("/");
+        }
     }, [user, needsCompleteSetup, redirectUrl, router]);
 
     return (
