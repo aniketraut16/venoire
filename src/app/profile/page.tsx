@@ -125,7 +125,7 @@ export default function MyProfilePage() {
             <div>
               <div className="bg-white p-4 border-b border-gray-200">
                 <div className="flex items-start space-x-4">
-                  <div className="w-20 h-20 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-100 flex-shrink-0">
+                  <div className="w-20 h-20 rounded-full border-2 border-gray-200 overflow-hidden bg-gray-100 shrink-0">
                     {profile?.profile_image_url ? (
                       <img
                         src={profile.profile_image_url}
@@ -180,39 +180,6 @@ export default function MyProfilePage() {
                       </span>
                     </button>
                   ))}
-                </div>
-              </div>
-
-              <div className="px-4 pb-4">
-                <div className="bg-gray-50 p-4 border-l-4 border-black">
-                  <h4 className="text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
-                    Account Info
-                  </h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Status:</span>
-                      <span className="text-gray-900 font-medium">
-                        {profile?.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Gender:</span>
-                      <span className="text-gray-900 font-medium capitalize">
-                        {profile?.gender || "Not specified"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Member Since:</span>
-                      <span className="text-gray-900 font-medium">
-                        {profile?.created_at
-                          ? new Date(profile.created_at).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short",
-                            })
-                          : "N/A"}
-                      </span>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -482,30 +449,6 @@ export default function MyProfilePage() {
               )}
             </div>
           </div>
-
-          {!isEditing && (
-            <div className="mt-6 md:mt-8 pt-6 md:pt-8 border-t border-gray-200">
-              <h3 className="text-sm font-medium tracking-wider uppercase text-gray-900 mb-4">Account Information</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-gray-50 p-4 border-l-2 border-black">
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Account Status</p>
-                  <p className="text-gray-900">{profile?.is_active ? "Active" : "Inactive"}</p>
-                </div>
-                <div className="bg-gray-50 p-4 border-l-2 border-black">
-                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-1">Member Since</p>
-                  <p className="text-gray-900 text-sm md:text-base">
-                    {profile?.created_at
-                      ? new Date(profile.created_at).toLocaleDateString("en-US", {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        })
-                      : "N/A"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

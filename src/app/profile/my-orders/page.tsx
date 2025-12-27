@@ -55,23 +55,39 @@ function MyOrders() {
   const [cancelComments, setCancelComments] = useState("");
   const [reviewsMap, setReviewsMap] = useState<Record<string, { rating: number; comment: string }>>({});
   const [existingReviews, setExistingReviews] = useState<Set<string>>(new Set());
+  const [isMobile, setIsMobile] = useState(false);
 
   const modalType = searchParams.get("modal");
   const orderId = searchParams.get("id");
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768); // md breakpoint
+    };
+    
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    
+    return () => {
+      window.removeEventListener("resize", checkMobile);
+    };
+  }, []);
 
   useEffect(() => {
     if (token) {
       setCurrentPage(1);
       fetchOrders(1);
     }
-  }, [token, statusFilter]);
+  }, [token, statusFilter, isMobile]);
 
   useEffect(() => {
-    if (token && currentPage > 1) {
+    // Skip pagination on mobile - all orders are fetched at once
+    if (token && currentPage > 1 && !isMobile) {
       fetchOrders(currentPage);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-  }, [currentPage]);
+  }, [currentPage, isMobile]);
 
   useEffect(() => {
     if (token && orderId && modalType) {
@@ -118,8 +134,8 @@ function MyOrders() {
     if (!token) return;
     startLoading();
     const params: any = {
-      page,
-      limit: 5,
+      page: isMobile ? 1 : page, // Always use page 1 on mobile
+      limit: isMobile ? 1000 : 5, // Fetch all orders on mobile (using large limit)
       sort: "created_at",
       order: "desc",
       search: searchQuery,
@@ -130,7 +146,19 @@ function MyOrders() {
     const response = await getOrders(token, params);
     if (response.success) {
       setOrders(response.data);
-      setPagination(response.pagination);
+      // On mobile, set pagination to show all orders are loaded
+      if (isMobile) {
+        setPagination({
+          current_page: 1,
+          total_pages: 1,
+          total_orders: response.data.length,
+          per_page: response.data.length,
+          has_next: false,
+          has_prev: false,
+        });
+      } else {
+        setPagination(response.pagination);
+      }
     }
     stopLoading();
   };
@@ -328,6 +356,21 @@ function MyOrders() {
     return icons[status] || <Package size={16} />;
   };
 
+  const getStatusDateText = (status: string, date: string) => {
+    const formattedDate = new Date(date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+    
+    if (status === "shipped") {
+      return `Shipped on ${formattedDate}`;
+    } else if (status === "delivered") {
+      return `Delivered on ${formattedDate}`;
+    } else {
+      return `Ordered on ${formattedDate}`;
+    }
+  };
+
   const filteredOrders = orders.filter((order) =>
     order.order_number.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -355,7 +398,7 @@ function MyOrders() {
           </button>
         </div>
 
-        <div className="mb-6 flex flex-col gap-4">
+        <div className="mb-6 flex gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <input
@@ -366,7 +409,7 @@ function MyOrders() {
               className="w-full pl-10 pr-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
             />
           </div>
-          <div className="relative">
+          <div className="relative w-32 sm:w-64">
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
             <select
               value={statusFilter}
@@ -393,102 +436,163 @@ function MyOrders() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredOrders.map((order) => (
-              <div key={order.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
-                <div className="p-3 md:p-4 bg-gray-50 border-b border-gray-200">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
-                    <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:space-x-6">
-                      <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Order Number</p>
-                        <p className="font-medium text-sm">{order.order_number}</p>
+            {filteredOrders.map((order) => {
+              // For 2x2 grid: show max 3 items, 4th position shows remaining count if > 3
+              const gridItems = order.items.slice(0, 3);
+              const showRemainingCount = order.items.length > 3;
+              const remainingItemsCount = order.items.length - 3;
+              
+              return (
+                <div key={order.id} className="border border-gray-200 hover:border-gray-300 transition-colors"
+                onClick={() => handleViewOrder(order.id)}
+                >
+                  {/* Mobile View - Simplified */}
+                  <div className="md:hidden p-4">
+                    <div className="flex items-center gap-4">
+                      {/* Product Images Grid - 2x2, max 25% width */}
+                      <div className="w-1/4 shrink-0">
+                        <div className="grid grid-cols-2 gap-1">
+                          {gridItems.map((item, index) => (
+                            <div key={index} className="aspect-square bg-gray-100 border border-gray-200">
+                              <img
+                                src={item.thumbnail_url}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                          {showRemainingCount && (
+                            <div className="aspect-square bg-gray-100 border border-gray-200 flex items-center justify-center">
+                              <span className="text-xs font-medium text-gray-600">+{remainingItemsCount}</span>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Date</p>
-                        <p className="text-sm">
-                          {new Date(order.created_at).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "short",
-                            day: "numeric",
-                          })}
+                      
+                      {/* Date and Order Info */}
+                      <div className="flex-1 min-w-0 ml-2">
+                        <p className="text-sm font-medium text-gray-900 mb-2">
+                          {getStatusDateText(order.status, order.created_at)}
+                        </p>
+                        {/* <p className="text-xs text-gray-500 mb-2">
+                          {order.items_count} {order.items_count === 1 ? "Item" : "Items"}
+                        </p> */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-1">{order.order_number}</p>
+                            <p className="text-sm font-medium">₹{Number(order.total_amount).toFixed(2)}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+          
+                            className="p-2 hover:bg-gray-100 transition-colors"
+                            aria-label="View order details"
+                          >
+                            <ChevronRight size={28} strokeWidth={1} className="text-gray-600" />
+                          </button>
+                    </div>
+                  </div>
+
+                  {/* Desktop View - Detailed */}
+                  <div className="hidden md:block">
+                    <div className="p-3 md:p-4 bg-gray-50 border-b border-gray-200">
+                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
+                        <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:space-x-6">
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Order Number</p>
+                            <p className="font-medium text-sm">{order.order_number}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Date</p>
+                            <p className="text-sm">
+                              {new Date(order.created_at).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total</p>
+                            <p className="font-medium">₹{Number(order.total_amount).toFixed(2)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center">
+                          <span
+                            className={`px-3 py-1 text-xs font-medium uppercase tracking-wider border flex items-center space-x-2 ${getStatusColor(
+                              order.status
+                            )}`}
+                          >
+                            {getStatusIcon(order.status)}
+                            <span>{order.status}</span>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-3 md:p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <p className="text-xs text-gray-500 uppercase tracking-wider">
+                          {order.items_count} {order.items_count === 1 ? "Item" : "Items"}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total</p>
-                        <p className="font-medium">₹{Number(order.total_amount).toFixed(2)}</p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4">
+                        {order.items.map((item, index) => (
+                          <div key={index} className="flex items-center space-x-3 p-3 border border-gray-200">
+                            <div className="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-gray-100 border border-gray-200">
+                              <img
+                                src={item.thumbnail_url}
+                                alt={item.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{item.name}</p>
+                              <p className="text-xs text-gray-500 truncate">{item.variant}</p>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                    <div className="flex items-center">
-                      <span
-                        className={`px-3 py-1 text-xs font-medium uppercase tracking-wider border flex items-center space-x-2 ${getStatusColor(
-                          order.status
-                        )}`}
-                      >
-                        {getStatusIcon(order.status)}
-                        <span>{order.status}</span>
-                      </span>
+
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <button
+                          onClick={() => handleViewOrder(order.id)}
+                          className="flex-1 bg-black text-white px-4 py-2 hover:bg-gray-900 transition-colors duration-200 flex items-center justify-center space-x-2"
+                        >
+                          <span className="text-sm uppercase tracking-wider">View Details</span>
+                          <ChevronRight size={16} />
+                        </button>
+                        {["confirmed", "processing", "shipped"].includes(order.status) && (
+                          <button
+                            onClick={() => handleTrackOrder(order.id)}
+                            className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
+                          >
+                            <Truck size={16} />
+                            <span className="text-sm uppercase tracking-wider">Track Order</span>
+                          </button>
+                        )}
+                        {order.status === "delivered" && (
+                          <button
+                            onClick={() => openModal("review", order.id)}
+                            className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
+                          >
+                            <Star size={16} />
+                            <span className="text-sm uppercase tracking-wider">Write Review</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="p-3 md:p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider">
-                      {order.items_count} {order.items_count === 1 ? "Item" : "Items"}
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4">
-                    {order.items.map((item, index) => (
-                      <div key={index} className="flex items-center space-x-3 p-3 border border-gray-200">
-                        <div className="w-12 h-12 md:w-16 md:h-16 flex-shrink-0 bg-gray-100 border border-gray-200">
-                          <img
-                            src={item.thumbnail_url}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                          <p className="text-xs text-gray-500 truncate">{item.variant}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <button
-                      onClick={() => handleViewOrder(order.id)}
-                      className="flex-1 bg-black text-white px-4 py-2 hover:bg-gray-900 transition-colors duration-200 flex items-center justify-center space-x-2"
-                    >
-                      <span className="text-sm uppercase tracking-wider">View Details</span>
-                      <ChevronRight size={16} />
-                    </button>
-                    {["confirmed", "processing", "shipped"].includes(order.status) && (
-                      <button
-                        onClick={() => handleTrackOrder(order.id)}
-                        className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
-                      >
-                        <Truck size={16} />
-                        <span className="text-sm uppercase tracking-wider">Track Order</span>
-                      </button>
-                    )}
-                    {order.status === "delivered" && (
-                      <button
-                        onClick={() => openModal("review", order.id)}
-                        className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
-                      >
-                        <Star size={16} />
-                        <span className="text-sm uppercase tracking-wider">Write Review</span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 
-        {filteredOrders.length > 0 && pagination.total_pages > 1 && (
+        {filteredOrders.length > 0 && pagination.total_pages > 1 && !isMobile && (
           <div className="mt-6 md:mt-8 flex flex-col gap-4 border-t border-gray-200 pt-4 md:pt-6">
             <div className="text-xs md:text-sm text-gray-600 text-center md:text-left">
               Showing page {pagination.current_page} of {pagination.total_pages} ({pagination.total_orders} total orders)
@@ -618,13 +722,13 @@ function OrderDetailsModal({
   return (
     <div 
       data-lenis-prevent="true" 
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4"
+      className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-0 md:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-white max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6 flex justify-between items-center">
+      <div className="bg-white max-w-4xl w-full h-[90vh] md:h-auto md:max-h-[90vh] overflow-y-auto rounded-t-2xl md:rounded-none animate-slide-up md:animate-none">
+        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6 flex justify-between items-center rounded-t-2xl md:rounded-none">
           <div>
             <h3 className="text-lg md:text-2xl font-light tracking-wide uppercase">Order Details</h3>
             <p className="text-xs md:text-sm text-gray-600 mt-1">{order.order_number}</p>
@@ -663,7 +767,7 @@ function OrderDetailsModal({
             <div className="space-y-3">
               {order.items.map((item) => (
                 <div key={item.id} className="flex items-center space-x-4 p-4 border border-gray-200">
-                  <div className="w-20 h-20 flex-shrink-0 bg-gray-100 border border-gray-200">
+                  <div className="w-20 h-20 shrink-0 bg-gray-100 border border-gray-200">
                     <img src={item.thumbnail_url} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1">
@@ -1143,7 +1247,7 @@ function WriteReviewsModal({
                   className={`border border-gray-200 p-4 ${hasReview ? 'bg-gray-50 opacity-50' : ''}`}
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="w-16 h-16 md:w-20 md:h-20 flex-shrink-0 bg-gray-100 border border-gray-200">
+                    <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-gray-100 border border-gray-200">
                       <img
                         src={item.thumbnail_url}
                         alt={item.name}
