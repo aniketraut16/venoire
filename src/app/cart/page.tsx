@@ -861,20 +861,22 @@ function ShoppingCartPage() {
           </div>
         </div>
       </div>
-      <CheckoutPageModal
-        open={showCheckoutModal}
-        onClose={() => {
+      {showCheckoutModal && (
+        <CheckoutPageModal
+          open={showCheckoutModal}
+          onClose={() => {
             const params = new URLSearchParams(searchParams.toString());
             params.delete('from');
             params.delete('checkoutmodal');
             const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
             router.push(newUrl);
             setShowCheckoutModal(false);
-        }}
-        pricing={pricing}
-        cartId={cartId}
-        appliedCoupon={null}
-      />
+          }}
+          pricing={pricing}
+          cartId={cartId}
+          appliedCoupon={null}
+        />
+      )}
     </>
   );
 }
