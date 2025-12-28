@@ -276,7 +276,7 @@ export default function Navbar() {
                             }}
                         >
                             {/* Shine effect overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                            <div className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                             
                             {/* Crown icon and text */}
                             <div className="relative flex items-center justify-center gap-3">

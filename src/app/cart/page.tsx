@@ -186,7 +186,7 @@ function ShoppingCartPage() {
               >
                 <div className="flex gap-3 p-4">
                   {/* Product Image */}
-                  <div className="w-32 h-48 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                  <div className="w-32 h-48 shrink-0 bg-gray-100 rounded-md overflow-hidden">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -504,7 +504,7 @@ function ShoppingCartPage() {
                       className="flex gap-4 pb-6 border-b last:border-b-0"
                     >
                       {/* Product Image */}
-                      <div className="w-32 h-40 flex-shrink-0">
+                      <div className="w-32 h-40 shrink-0">
                         <img
                           src={item.image}
                           alt={item.name}

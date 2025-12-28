@@ -284,7 +284,7 @@ export default function AddtoCartModal({
           <div className="flex flex-col md:grid md:grid-cols-[160px_1fr] gap-4 md:gap-6">
             {/* Product Image */}
             <div className="flex md:block gap-4">
-              <div className="w-24 md:w-full flex-shrink-0">
+              <div className="w-24 md:w-full shrink-0">
                 <div className="aspect-square rounded-lg overflow-hidden border bg-gray-100">
                   <img
                     src={modalParams.productImage}

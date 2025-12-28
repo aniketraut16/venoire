@@ -182,12 +182,12 @@ export default function LoginPopUp({ isOpen, onClose, onLogin }: LoginPopUpProps
       {/* Overlay */}
       <div 
         data-lenis-prevent="true"
-        className="fixed inset-0 bg-black/50 z-[9998] transition-opacity duration-300"
+        className="fixed inset-0 bg-black/50 z-9998 transition-opacity duration-300"
         onClick={onClose}
       />
       
       {/* Login Modal */}
-      <div data-lenis-prevent="true" className="fixed inset-0 z-[9999] flex items-end md:items-center justify-center md:p-4">
+      <div data-lenis-prevent="true" className="fixed inset-0 z-9999 flex items-end md:items-center justify-center md:p-4">
         <div 
           className="bg-white rounded-t-3xl md:rounded-2xl shadow-2xl w-full h-[70vh] md:h-auto md:max-w-md md:max-h-[90vh] overflow-y-auto animate-in slide-in-from-bottom md:slide-in-from-top-4 duration-300"
           onClick={(e) => e.stopPropagation()}
@@ -223,21 +223,21 @@ export default function LoginPopUp({ isOpen, onClose, onLogin }: LoginPopUpProps
           <div className="px-8 pb-8">
             <div className="space-y-4">
               <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-black mt-1 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-4 h-4 text-black mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span className="text-gray-900 text-base leading-relaxed">Easy order tracking</span>
               </div>
               
               <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-black mt-1 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-4 h-4 text-black mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span className="text-gray-900 text-base leading-relaxed">Manage return and exchange within 15-days</span>
               </div>
               
               <div className="flex items-start gap-2">
-                <svg className="w-4 h-4 text-black mt-1 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg className="w-4 h-4 text-black mt-1 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
                 <span className="text-gray-900 text-base leading-relaxed">Exclusive deals and additional benefit</span>

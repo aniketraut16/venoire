@@ -202,7 +202,7 @@ function MockPaymentGateway(props: {
             </button>
           </div>
 
-          <div className="bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl p-6 mb-6 text-white">
+          <div className="bg-linear-to-r from-blue-500 to-purple-600 rounded-xl p-6 mb-6 text-white">
             <p className="text-sm opacity-90 mb-1">Amount to Pay</p>
             <p className="text-3xl font-bold">₹{props.amount.toFixed(2)}</p>
           </div>
@@ -246,7 +246,7 @@ function MockPaymentGateway(props: {
               <button
                 onClick={simulatePayment}
                 disabled={isProcessing}
-                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                className="w-full bg-linear-to-r from-blue-500 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {isProcessing ? (
                   <span className="flex items-center justify-center gap-2">

@@ -204,7 +204,7 @@ export default function OneProductPage() {
                   {allImages.map((image, index) => (
                     <SwiperSlide key={index}>
                       <div
-                        className="aspect-[3/5] bg-gray-50 overflow-hidden relative"
+                        className="aspect-3/5 bg-gray-50 overflow-hidden relative"
                         onClick={() => {
                           setShowImageModal(true);
                           setCurrentImageIndex(index);
@@ -432,7 +432,7 @@ export default function OneProductPage() {
                     !selectedVariant ||
                     selectedVariant.availabilityStatus === "out_of_stock"
                   }
-                  className="w-full bg-gradient-to-r from-[#d4b500] to-[#af7834] text-white py-3 px-6 lato-bold uppercase tracking-wide disabled:bg-gray-300 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
+                  className="w-full bg-linear-to-r from-[#d4b500] to-[#af7834] text-white py-3 px-6 lato-bold uppercase tracking-wide disabled:bg-gray-300 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
                 >
                   {selectedVariant?.availabilityStatus === "out_of_stock"
                     ? "Out of Stock"
@@ -479,9 +479,9 @@ export default function OneProductPage() {
                     {product.offers.map((offer, index) => (
                       <div
                         key={index}
-                        className="flex items-start gap-3 p-3 bg-gradient-to-r from-green-50 to-transparent border border-green-200 hover:border-green-300 transition-colors"
+                        className="flex items-start gap-3 p-3 bg-linear-to-r from-green-50 to-transparent border border-green-200 hover:border-green-300 transition-colors"
                       >
-                        <div className="flex-shrink-0 w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5"></div>
+                        <div className="shrink-0 w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5"></div>
                         <div className="flex-1">
                           <h4 className="lato-bold text-gray-900 text-xs md:text-sm mb-0.5">
                             {offer.offer_name}
@@ -503,7 +503,7 @@ export default function OneProductPage() {
                 </h2>
 
                 <div className="flex items-start md:items-center gap-3 mb-4 md:mb-6">
-                  <Truck className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-0.5 md:mt-0 flex-shrink-0" />
+                  <Truck className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-0.5 md:mt-0 shrink-0" />
                   <div>
                     <span className="text-green-600 lato-bold text-sm md:text-base">
                       Express Delivery available
@@ -519,7 +519,7 @@ export default function OneProductPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div className="flex items-start gap-3">
-                    <Package className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-1 flex-shrink-0" />
+                    <Package className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-1 shrink-0" />
                     <div>
                       <h4 className="lato-bold text-gray-900 text-sm md:text-base">
                         Free Delivery
@@ -531,7 +531,7 @@ export default function OneProductPage() {
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <Calendar className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-1 flex-shrink-0" />
+                    <Calendar className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-1 shrink-0" />
                     <div>
                       <h4 className="lato-bold text-gray-900 text-sm md:text-base">
                         7 Days Free Return & Exchange*
@@ -575,7 +575,7 @@ export default function OneProductPage() {
               <div className="mb-4 md:mb-8">
                 <h3 className="text-xl md:text-3xl pt-serif-bold text-gray-900 mb-3 relative">
                   About This Product
-                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-gradient-to-r from-gray-900 to-gray-600"></div>
+                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-linear-to-r from-gray-900 to-gray-600"></div>
                 </h3>
               </div>
 
@@ -633,7 +633,7 @@ export default function OneProductPage() {
               <div className="mb-6 md:mb-8">
                 <h3 className="text-xl md:text-3xl pt-serif-bold text-gray-900 mb-2 relative inline-block">
                   Similar Products
-                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-gradient-to-r from-gray-900 to-gray-600"></div>
+                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-linear-to-r from-gray-900 to-gray-600"></div>
                 </h3>
                 <p className="text-sm md:text-base text-gray-600 lato-regular mt-4">
                   Discover more products you might love
@@ -737,7 +737,7 @@ export default function OneProductPage() {
             <div className="flex items-center justify-between gap-6">
               {/* Product Info */}
               <div className="flex items-center gap-4 flex-1">
-                <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
+                <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden shrink-0">
                   <img
                     src={product.thumbnail || ""}
                     alt={product.name}

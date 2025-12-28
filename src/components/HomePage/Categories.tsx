@@ -42,7 +42,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
                                         e.currentTarget.src = '/fallback.png'
                                     }}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 pointer-events-none"></div>
+                                <div className="absolute inset-0 bg-linear-to-br from-black/10 to-black/5 pointer-events-none"></div>
                             </div>
                             <h3 className="text-base font-semibold text-gray-900 tracking-wide whitespace-nowrap">
                                 {category.name}
@@ -77,7 +77,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
                                     e.currentTarget.src = '/fallback.png'
                                 }}
                             />
-                            <div className="absolute inset-0 bg-gradient-to-br from-black/10 to-black/5 pointer-events-none"></div>
+                            <div className="absolute inset-0 bg-linear-to-br from-black/10 to-black/5 pointer-events-none"></div>
                         </div>
                         <h3 className="text-2xl font-semibold text-gray-900 mb-2 tracking-wide">
                             {category.name}

@@ -6,7 +6,7 @@ export default function FeaturedProduct() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-14 items-center">
           {/* Image */}
-          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+          <div className="relative aspect-4/3 overflow-hidden rounded-lg">
             <img
               src="/perfume/perfume-personlize.png"
               alt="Create Your Signature Scent"

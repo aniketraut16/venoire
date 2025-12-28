@@ -83,7 +83,7 @@ function MyReviews() {
               <div key={review.id} className="border border-gray-200 hover:border-gray-300 transition-colors">
                 <div className="p-4 md:p-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-20 h-20 md:w-24 md:h-24 flex-shrink-0 bg-gray-100 border border-gray-200">
+                    <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 bg-gray-100 border border-gray-200">
                       {review.product_thumbnail && (
                         <img
                           src={review.product_thumbnail}

@@ -81,7 +81,7 @@ export default function MyAddresses() {
           <div className="flex items-start gap-3 flex-1">
             <button
               onClick={() => router.push("/profile")}
-              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300 mt-0.5 flex-shrink-0"
+              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300 mt-0.5 shrink-0"
               aria-label="Back to profile"
             >
               <ChevronLeft size={20} />
@@ -133,7 +133,7 @@ export default function MyAddresses() {
 
                 <div className="mb-4">
                   <div className="flex items-start space-x-3 mb-3">
-                    <div className="p-2 bg-gray-100 border border-gray-200 flex-shrink-0">
+                    <div className="p-2 bg-gray-100 border border-gray-200 shrink-0">
                       {addr.is_default ? (
                         <Home size={18} className="text-black md:w-5 md:h-5" />
                       ) : (

@@ -29,7 +29,7 @@ export default function OrderPendingPage() {
                         {/* Info Box */}
                         <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                             <div className="flex items-start">
-                                <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-3 flex-shrink-0" />
+                                <Info className="w-5 h-5 text-blue-600 mt-0.5 mr-3 shrink-0" />
                                 <div>
                                     <h3 className="text-sm font-semibold text-blue-900 mb-1">
                                         Transaction in Progress
@@ -57,19 +57,19 @@ export default function OrderPendingPage() {
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">What should you do?</h2>
                             <ul className="space-y-2 text-gray-700">
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>Wait for 2-5 minutes for the payment to be confirmed</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>Check your email for order confirmation</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>You can safely close this page and check your orders later</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>If the status doesn't update after 5 minutes, please contact support</span>
                                 </li>
                             </ul>

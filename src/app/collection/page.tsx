@@ -30,12 +30,12 @@ export default function CollectionsPage() {
   return (
     <div className="min-h-screen bg-white pt-20">
       <div 
-        className="relative w-full flex items-center justify-center overflow-hidden bg-gradient-to-br from-gray-100 via-gray-50 to-white"
+        className="relative w-full flex items-center justify-center overflow-hidden bg-linear-to-br from-gray-100 via-gray-50 to-white"
         style={{ height: '60vh' }}
       >
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1600')] bg-cover bg-center opacity-10"></div>
         
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-white"></div>
+        <div className="absolute inset-0 bg-linear-to-b from-transparent via-white/50 to-white"></div>
 
         <div className="relative z-10 text-center px-4 sm:px-6 max-w-4xl mx-auto">
           <motion.div
@@ -78,7 +78,7 @@ export default function CollectionsPage() {
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="aspect-[3/4] bg-gray-200 animate-pulse rounded-sm"></div>
+              <div key={i} className="aspect-3/4 bg-gray-200 animate-pulse rounded-sm"></div>
             ))}
           </div>
         ) : collections.length === 0 ? (
@@ -100,7 +100,7 @@ export default function CollectionsPage() {
                 onClick={() => handleCollectionClick(collection)}
                 className="relative overflow-hidden rounded-none group cursor-pointer"
               >
-                <div className="aspect-[3/4] overflow-hidden bg-gray-100">
+                <div className="aspect-3/4 overflow-hidden bg-gray-100">
                   <img
                     src={collection.image || '/fallback.png'}
                     alt={collection.name}
@@ -111,7 +111,7 @@ export default function CollectionsPage() {
                   />
                 </div>
                 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 
                 <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6">
                   <motion.div

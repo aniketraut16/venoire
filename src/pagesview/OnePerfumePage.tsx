@@ -134,7 +134,7 @@ export default function OnePerfumePage() {
             alt={perfume.name}
             className="object-cover w-full h-full"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-black/20 via-black/10 to-black/5"></div>
+          <div className="absolute inset-0 bg-linear-to-br from-black/20 via-black/10 to-black/5"></div>
           <div className="absolute inset-0 bg-black/30"></div>
         </div>
 
@@ -351,8 +351,8 @@ export default function OnePerfumePage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Top Notes */}
-                <div className="relative bg-gradient-to-br from-amber-50 to-orange-50 p-8 border border-amber-200/50">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-400"></div>
+                <div className="relative bg-linear-to-br from-amber-50 to-orange-50 p-8 border border-amber-200/50">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-orange-400"></div>
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
                       <svg
@@ -384,8 +384,8 @@ export default function OnePerfumePage() {
                 </div>
 
                 {/* Heart Notes */}
-                <div className="relative bg-gradient-to-br from-rose-50 to-pink-50 p-8 border border-rose-200/50">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-rose-400 to-pink-400"></div>
+                <div className="relative bg-linear-to-br from-rose-50 to-pink-50 p-8 border border-rose-200/50">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-rose-400 to-pink-400"></div>
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
                       <svg
@@ -415,8 +415,8 @@ export default function OnePerfumePage() {
                 </div>
 
                 {/* Base Notes */}
-                <div className="relative bg-gradient-to-br from-slate-50 to-stone-50 p-8 border border-slate-200/50">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-600 to-stone-600"></div>
+                <div className="relative bg-linear-to-br from-slate-50 to-stone-50 p-8 border border-slate-200/50">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-slate-600 to-stone-600"></div>
                   <div className="flex flex-col items-center text-center space-y-4">
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
                       <svg
@@ -603,11 +603,11 @@ export default function OnePerfumePage() {
         </div>
       </div>
 
-      {/* <div className="bg-gradient-to-b from-white to-orange-50/30 py-6 border-b border-orange-100">
+      {/* <div className="bg-linear-to-b from-white to-orange-50/30 py-6 border-b border-orange-100">
                 <div className="max-w-7xl mx-auto px-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
+                            <div className="bg-linear-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
                                 <FiPackage className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -616,7 +616,7 @@ export default function OnePerfumePage() {
                             </div>
                         </div>
                         <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
+                            <div className="bg-linear-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
                                 <FiTruck className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -625,7 +625,7 @@ export default function OnePerfumePage() {
                             </div>
                         </div>
                         <div className="flex items-center gap-3 bg-white/60 backdrop-blur-sm p-4 rounded-xl border border-orange-100/50 hover:shadow-md transition-shadow">
-                            <div className="bg-gradient-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
+                            <div className="bg-linear-to-br from-orange-400 to-orange-600 p-2.5 rounded-lg">
                                 <FiRefreshCw className="w-5 h-5 text-white" />
                             </div>
                             <div>
@@ -648,7 +648,7 @@ export default function OnePerfumePage() {
             <div className="flex items-center justify-between gap-8">
               {/* Product Info */}
               <div className="flex items-center gap-4 flex-1">
-                <div className="w-14 h-14 bg-gray-50 overflow-hidden flex-shrink-0">
+                <div className="w-14 h-14 bg-gray-50 overflow-hidden shrink-0">
                   <img
                     src={perfume.coverImage}
                     alt={perfume.name}

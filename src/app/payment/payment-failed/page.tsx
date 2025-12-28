@@ -29,7 +29,7 @@ export default function PaymentFailedPage() {
                         {/* Alert Box */}
                         <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6">
                             <div className="flex items-start">
-                                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 mr-3 flex-shrink-0" />
+                                <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5 mr-3 shrink-0" />
                                 <div>
                                     <h3 className="text-sm font-semibold text-amber-900 mb-1">
                                         If money was deducted from your account
@@ -54,19 +54,19 @@ export default function PaymentFailedPage() {
                             <h2 className="text-lg font-semibold text-gray-900 mb-3">What should you do?</h2>
                             <ul className="space-y-2 text-gray-700">
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>Try placing your order again after a few minutes</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>Check your bank statement to confirm if any amount was deducted</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>Review our refund policy for more information</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                                    <span className="inline-block w-1.5 h-1.5 bg-gray-400 rounded-full mt-2 mr-3 shrink-0"></span>
                                     <span>Contact our support team if you need assistance</span>
                                 </li>
                             </ul>

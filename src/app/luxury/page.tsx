@@ -9,7 +9,7 @@ export default function LuxuryComingSoon() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-neutral-900 to-black relative overflow-hidden pt-30">
+    <div className="min-h-screen bg-linear-to-br from-zinc-900 via-neutral-900 to-black relative overflow-hidden pt-30">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(120,119,198,0.1),rgba(0,0,0,0))]"></div>
       
       <div className="absolute inset-0 opacity-20">
@@ -32,8 +32,8 @@ export default function LuxuryComingSoon() {
             className="mb-8"
           >
             <div className="inline-block relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 via-rose-400 to-purple-400 blur-2xl opacity-30"></div>
-              <h1 className="relative text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-light tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-rose-200 to-purple-200">
+              <div className="absolute inset-0 bg-linear-to-r from-amber-400 via-rose-400 to-purple-400 blur-2xl opacity-30"></div>
+              <h1 className="relative text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-light tracking-wider text-transparent bg-clip-text bg-linear-to-r from-amber-200 via-rose-200 to-purple-200">
                 LUXURY
               </h1>
             </div>
@@ -48,7 +48,7 @@ export default function LuxuryComingSoon() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-light text-gray-200 tracking-widest mb-4">
               COMING SOON
             </h2>
-            <div className="w-32 h-px bg-gradient-to-r from-transparent via-amber-400 to-transparent mx-auto"></div>
+            <div className="w-32 h-px bg-linear-to-r from-transparent via-amber-400 to-transparent mx-auto"></div>
           </motion.div>
 
           <motion.p
@@ -69,7 +69,7 @@ export default function LuxuryComingSoon() {
             className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16"
           >
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-rose-400 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+              <div className="absolute inset-0 bg-linear-to-r from-amber-400 to-rose-400 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
               <button className="relative px-8 py-3 bg-white text-gray-900 rounded-full font-medium tracking-wide hover:bg-gray-100 transition-colors">
                 Notify Me
               </button>
@@ -86,7 +86,7 @@ export default function LuxuryComingSoon() {
             className="grid grid-cols-3 gap-8 max-w-2xl mx-auto"
           >
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-rose-200 mb-2">
+              <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-linear-to-r from-amber-200 to-rose-200 mb-2">
                 100+
               </div>
               <div className="text-xs sm:text-sm text-gray-500 tracking-wider uppercase">
@@ -94,7 +94,7 @@ export default function LuxuryComingSoon() {
               </div>
             </div>
             <div className="text-center opacity-0">
-              <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-rose-200 to-purple-200 mb-2">
+              <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-linear-to-r from-rose-200 to-purple-200 mb-2">
                 25+
               </div>
               <div className="text-xs sm:text-sm text-gray-500 tracking-wider uppercase">
@@ -102,7 +102,7 @@ export default function LuxuryComingSoon() {
               </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-gradient-to-r from-purple-200 to-amber-200 mb-2">
+              <div className="text-3xl sm:text-4xl font-light text-transparent bg-clip-text bg-linear-to-r from-purple-200 to-amber-200 mb-2">
                 VIP
               </div>
               <div className="text-xs sm:text-sm text-gray-500 tracking-wider uppercase">
@@ -139,10 +139,10 @@ export default function LuxuryComingSoon() {
       </div>
 
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-amber-500/20 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent"></div>
-        <div className="absolute top-0 left-0 w-px h-full bg-gradient-to-b from-transparent via-rose-500/20 to-transparent"></div>
-        <div className="absolute top-0 right-0 w-px h-full bg-gradient-to-b from-transparent via-amber-500/20 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-full h-px bg-linear-to-r from-transparent via-amber-500/20 to-transparent"></div>
+        <div className="absolute bottom-0 left-0 w-full h-px bg-linear-to-r from-transparent via-purple-500/20 to-transparent"></div>
+        <div className="absolute top-0 left-0 w-px h-full bg-linear-to-b from-transparent via-rose-500/20 to-transparent"></div>
+        <div className="absolute top-0 right-0 w-px h-full bg-linear-to-b from-transparent via-amber-500/20 to-transparent"></div>
       </div>
     </div>
   );

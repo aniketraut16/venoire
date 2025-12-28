@@ -25,7 +25,7 @@ const Accordion: React.FC<AccordionProps> = ({ title, children }) => {
                 onClick={toggleAccordion}
             >
                 <span className="text-xs md:text-sm tracking-wide uppercase pr-2">{title}</span>
-                <span className="text-lg font-light w-6 h-6 flex items-center justify-center border border-white/20 flex-shrink-0">
+                <span className="text-lg font-light w-6 h-6 flex items-center justify-center border border-white/20 shrink-0">
                     {isOpen ? '−' : '+'}
                 </span>
             </button>

@@ -1,6 +1,6 @@
 export default function WomensPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-white to-purple-50">
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-pink-50 via-white to-purple-50">
       <div className="max-w-2xl mx-auto px-6 text-center">
         <div className="space-y-6">
           {/* Main heading */}
@@ -20,9 +20,9 @@ export default function WomensPage() {
           
           {/* Decorative element */}
           <div className="flex items-center justify-center gap-2 py-8">
-            <div className="h-px w-12 bg-gradient-to-r from-transparent to-pink-300"></div>
+            <div className="h-px w-12 bg-linear-to-r from-transparent to-pink-300"></div>
             <div className="h-2 w-2 rounded-full bg-pink-400"></div>
-            <div className="h-px w-12 bg-gradient-to-l from-transparent to-pink-300"></div>
+            <div className="h-px w-12 bg-linear-to-l from-transparent to-pink-300"></div>
           </div>
           
           {/* Back to home link */}

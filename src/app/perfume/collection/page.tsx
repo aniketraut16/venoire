@@ -128,13 +128,13 @@ const CollectionPageContent = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Banner with Cover Image */}
       {collection.slug !== "all" ? (
-        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-red-500 to-orange-500 overflow-hidden">
+        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-linear-to-r from-red-500 to-orange-500 overflow-hidden">
           <img
             src={collection.banner_image_url}
             alt={collection.name}
             className="object-cover w-full h-full opacity-90"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
+          <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
             <h1 className="text-5xl md:text-7xl font-bold tracking-wider mb-4 drop-shadow-lg">
               {collection.name}
@@ -143,8 +143,8 @@ const CollectionPageContent = () => {
           </div>
         </div>
       ) : (
-        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-gradient-to-r from-red-500 to-orange-500 overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
+        <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-linear-to-r from-red-500 to-orange-500 overflow-hidden">
+          <div className="absolute inset-0 bg-linear-to-b from-transparent to-black/50" />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-white px-4">
             <h1 className="text-5xl md:text-7xl font-bold tracking-wider mb-4 drop-shadow-lg">
               All Perfumes
@@ -162,7 +162,7 @@ const CollectionPageContent = () => {
               <a
                 key={col.id}
                 href={`/perfume/collection?slug=${col.slug}`}
-                className={`flex-shrink-0 h-10 px-6 flex items-center justify-center bg-red-50 font-medium transition-all border-2 rounded-md ${
+                className={`shrink-0 h-10 px-6 flex items-center justify-center bg-red-50 font-medium transition-all border-2 rounded-md ${
                   col.slug === (collectionSlug || "all")
                     ? "border-red-400 text-red-500 "
                     : "border-transparent text-gray-600 hover:text-gray-900"
@@ -172,7 +172,7 @@ const CollectionPageContent = () => {
               </a>
             ))}
             {/* Scroll Arrow Indicator */}
-            <div className="flex-shrink-0 px-2">
+            <div className="shrink-0 px-2">
               <FiChevronRight className="text-gray-400" />
             </div>
           </div>

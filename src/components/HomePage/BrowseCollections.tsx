@@ -83,7 +83,7 @@ export default function BrowseCollections({ collections }: { collections: Catego
                   ease: "easeOut" 
                 }}
               >
-                <div className="aspect-[3/4] overflow-hidden">
+                <div className="aspect-3/4 overflow-hidden">
                   <img
                     src={collection.image || '/fallback.png'}
                     alt={collection.name}
