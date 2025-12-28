@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaStar } from "react-icons/fa";
-import { Perfume } from "@/types/perfume";  
+import { Perfume } from "@/types/perfume";
 import { useCart } from "@/contexts/cartContext";
 
 interface OnePerfumecardProps {
@@ -69,11 +69,11 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image */}
-      <div className="relative w-full aspect-square overflow-hidden flex items-center justify-center rounded-sm">
+      <div className="relative w-full aspect-4/5 overflow-hidden flex items-center justify-center rounded-sm">
         <img
           src={allImages[currentImageIndex]}
           alt={perfume.name}
-          className="object-contain w-full h-full group-hover:scale-110 transition-transform duration-500"
+          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
@@ -103,26 +103,41 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
       </div>
 
       {/* Content */}
-      <div className="space-y-2 flex-grow flex flex-col mt-3">
+      <div className="space-y-1 grow flex flex-col mt-3">
         {/* Category Label */}
-        <p className="text-xs text-gray-500 uppercase tracking-wide">PERFUME</p>
+        <p className="text-[10px] text-gray-700 uppercase tracking-wide">
+          PERFUME
+        </p>
 
         {/* Product Name with Quantity */}
-        <h3 className="font-bold text-sm text-gray-900 line-clamp-2 leading-tight">
+        <h3 className="font-medium text-[15px] text-gray-900 tracking-[0.6px]">
           {perfume.name} - {lowestQuantity}ml
         </h3>
 
         {/* Rating */}
-        <div className="flex items-center gap-1">
-          <FaStar className="w-3.5 h-3.5 text-yellow-400" />
-          <span className="text-sm font-semibold text-gray-900">
+        <div className="flex items-center gap-1 text-[13px] font-medium">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+            className="icon icon-star"
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+          >
+            <path
+              d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"
+              fill="#FFB503"
+            ></path>
+          </svg>
+          <span className=" text-gray-900">
             {parseFloat(perfume.rating.toString()).toFixed(1)}
           </span>
-          <span className="text-xs text-gray-400">|</span>
-          {/* <FaCheckCircle className="w-3 h-3 text-blue-500" /> */}
+          <span className=" text-gray-400">|</span>
+
           <svg
             viewBox="0 0 18 18"
-            className="w-3 h-3 text-blue-500"
+            className="icon icon-whatsapp-verified"
             height="14"
             width="14"
             preserveAspectRatio="xMidYMid meet"
@@ -143,7 +158,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
               points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
             ></polygon>
           </svg>
-          <span className="text-xs text-gray-600">
+          <span className=" text-gray-600">
             (
             {perfume.rating_count >= 1000
               ? `${(perfume.rating_count / 1000).toFixed(1)}K`
@@ -153,11 +168,9 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
         </div>
 
         {/* Price */}
-        <div className="flex items-baseline gap-2 pt-1">
-          <span className="text-xl font-bold text-gray-900">
-            ₹{lowestPrice.toFixed(2)}
-          </span>
-          <span className="text-sm text-gray-400 line-through">
+        <div className="flex items-baseline gap-2 pt-1 text-[16px] font-medium">
+          <span className=" text-gray-900">₹{lowestPrice.toFixed(2)}</span>
+          <span className=" text-gray-400 line-through">
             ₹{lowestOriginalPrice.toFixed(2)}
           </span>
         </div>
@@ -180,7 +193,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
               })),
             });
           }}
-          className="w-full bg-black text-white font-semibold py-3 rounded hover:bg-gray-800 transition-colors duration-300 uppercase text-sm mt-2"
+          className="w-full bg-[#171615] text-white font-medium py-3 rounded hover:bg-gray-800 transition-colors duration-300 mt-2 tracking-[0.6px] text-[15px]"
         >
           ADD TO CART
         </button>

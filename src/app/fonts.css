@@ -147,3 +147,24 @@
   font-weight: 700;
   font-style: italic;
 }
+
+
+.text-display {
+  font-size: 40px;
+}
+
+.text-section {
+  font-size: 28px;
+}
+
+.text-title {
+  font-size: 18px;
+}
+
+.text-body {
+  font-size: 16px;
+}
+
+.text-meta {
+  font-size: 14px;
+}
