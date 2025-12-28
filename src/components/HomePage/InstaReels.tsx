@@ -9,17 +9,17 @@ import { siteConfig } from '@/variables/config'
 export default function InstaReels() {
 
   return (
-    <section className="w-full py-12 sm:py-16 md:py-20 lg:py-32 bg-white overflow-hidden">
+    <section className="w-full py-12 sm:py-16 md:py-20 bg-white overflow-hidden">
       <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
           <div className="inline-flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
             <Instagram size={28} className="text-pink-600 sm:w-8 sm:h-8" strokeWidth={1.5} />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light tracking-tight">
+            <h2 className="text-display font-light tracking-tight">
               Follow Our Journey
             </h2>
           </div>
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed max-w-2xl mx-auto px-4">
+          <p className="text-body text-gray-600 leading-relaxed max-w-2xl mx-auto px-4">
             Discover our latest collections, behind-the-scenes moments, and style inspiration on Instagram
           </p>
         </div>

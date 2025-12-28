@@ -64,7 +64,7 @@ export default function FewProducts() {
   }
 
   return (
-    <section className="py-8 sm:py-12 md:py-16 bg-gradient-to-b from-slate-900 to-slate-800 overflow-x-hidden mt-10 md:mt-0">
+    <section className="py-8 sm:py-12 md:py-16 bg-linear-to-b from-slate-900 to-slate-800 overflow-x-hidden mt-10 md:mt-0">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
         {/* Title */}
         <motion.div 
@@ -74,10 +74,10 @@ export default function FewProducts() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-yellow-400 mb-2 sm:mb-3 tracking-wide px-2">
+          <h2 className="text-display font-light text-yellow-400 mb-2 sm:mb-3 tracking-wide px-2">
             Trending Styles
           </h2>
-          <p className="text-sm sm:text-base text-gray-300 px-4">
+          <p className="text-body text-gray-300 px-4">
             Discover our curated collection of top-rated products
           </p>
         </motion.div>

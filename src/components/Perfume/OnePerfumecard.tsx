@@ -115,7 +115,7 @@ export default function OnePerfumecard({ perfume }: OnePerfumecardProps) {
         </h3>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 text-[13px] font-medium">
+        <div className="flex items-center gap-1 text-[13px] font-medium mt-auto">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"

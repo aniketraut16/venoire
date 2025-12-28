@@ -39,18 +39,18 @@ export default function ProductCard(product: Product) {
     >
       {/* Image Container */}
       <div
-        className="relative aspect-[2/3] overflow-hidden"
+        className="relative aspect-2/3 overflow-hidden"
         onContextMenu={(e) => e.preventDefault()} // Disables right-click context menu on the whole container
       >
         <img
           src={product.thumbnail}
           alt={product.name}
-          className="object-cover group-hover:scale-105 transition-transform duration-300 aspect-[2/3] select-none pointer-events-none"
+          className="object-cover group-hover:scale-105 transition-transform duration-300 aspect-2/3 select-none pointer-events-none"
           draggable="false" // Prevent drag-and-drop of image
         />
 
         <span
-          className={`absolute md:top-3 md:left-3 bottom-2 left-2 inline-flex items-center justify-center flex-shrink-0 h-auto max-h-7 px-1.5 py-0.5 md:px-3 md:py-1.5 rounded-full text-[10px] md:text-xs font-semibold border border-black bg-white whitespace-nowrap leading-none
+          className={`absolute md:top-3 md:left-3 bottom-2 left-2 inline-flex items-center justify-center shrink-0 h-auto max-h-7 px-1.5 py-0.5 md:px-3 md:py-1.5 rounded-full text-meta md:text-xs font-semibold border border-black bg-white whitespace-nowrap leading-none
                     ${getTextColor("text-black", "text-black")}`}
         >
           {product.catalog}
@@ -59,7 +59,7 @@ export default function ProductCard(product: Product) {
         {/* Availability Status Badge */}
         {product.availabilityStatus && product.availabilityStatus !== 'in_stock' && (
           <span
-            className={`absolute bottom-2 right-2 md:bottom-3 md:right-3 inline-flex items-center justify-center px-2 py-1 rounded text-[10px] md:text-xs font-bold whitespace-nowrap ${
+            className={`absolute bottom-2 right-2 md:bottom-3 md:right-3 inline-flex items-center justify-center px-2 py-1 rounded text-meta md:text-xs font-bold whitespace-nowrap ${
               product.availabilityStatus === 'out_of_stock'
                 ? 'bg-red-600 text-white'
                 : 'bg-orange-500 text-white'
@@ -85,7 +85,7 @@ export default function ProductCard(product: Product) {
               }).map((size) => (
                 <button
                   key={size.id}
-                  className="w-8 h-8 rounded-md text-sm font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                  className="w-8 h-8 rounded-md text-meta font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                 >
                   {size.size}
                 </button>
@@ -99,7 +99,7 @@ export default function ProductCard(product: Product) {
       <div className="py-3 md:py-4 space-y-1.5 md:space-y-2 pt-serif-regular">
         {/* Category */}
         <p
-          className={`text-xs md:text-sm font-medium uppercase tracking-wide ${getTextColor(
+          className={`text-meta font-medium uppercase tracking-wide ${getTextColor(
             "text-gray-600"
           )}`}
         >
@@ -108,7 +108,7 @@ export default function ProductCard(product: Product) {
 
         {/* Product Name */}
         <h3
-          className={`text-sm md:text-lg font-medium line-clamp-2 ${getTextColor(
+          className={`text-title font-medium line-clamp-2 ${getTextColor(
             "text-gray-900"
           )}`}
         >
@@ -118,7 +118,7 @@ export default function ProductCard(product: Product) {
         {/* Pricing */}
         <div className="flex items-center gap-1.5 md:gap-2">
           <span
-            className={`text-base md:text-lg font-bold ${getTextColor("text-gray-900")}`}
+            className={`text-title font-bold ${getTextColor("text-gray-900")}`}
           >
             Rs{" "}
             {product.price.toLocaleString("en-IN", {
@@ -128,7 +128,7 @@ export default function ProductCard(product: Product) {
           </span>
           {product.originalPrice && (
             <span
-              className={`text-xs md:text-sm line-through ${getTextColor("text-gray-500")}`}
+              className={`text-meta line-through ${getTextColor("text-gray-500")}`}
             >
               Rs{" "}
               {product.originalPrice.toLocaleString("en-IN", {
@@ -139,7 +139,7 @@ export default function ProductCard(product: Product) {
           )}
           {product.badgeText && (
             <span
-              className={`text-[10px] md:text-xs font-medium ${
+              className={`text-meta font-medium ${
                 mode === "light" ? "text-pink-300" : "text-red-600"
               }`}
             >

@@ -16,15 +16,15 @@ export default function Explore() {
                 transition={{ duration: 0.7, ease: "easeOut" }}
             >
                 <div className="max-w-md space-y-8 sm:space-y-12 md:space-y-16 flex flex-col justify-center">
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif text-gray-900 leading-tight">
+                    <h1 className="text-display font-serif text-gray-900 leading-tight">
                         Elevate your everyday elegance with Venoire's timeless collection
                     </h1>
-                    <p className="text-base sm:text-lg md:text-xl text-gray-700 leading-relaxed">
+                    <p className="text-body text-gray-700 leading-relaxed">
                         Designed to dress the world in quiet confidence and curated luxury, our collection embodies effortless refinement for every occasion.
                     </p>
                     <button 
                     onClick={() => router.push('/collection')}
-                    className="px-6 sm:px-8 py-2.5 sm:py-3 border border-gray-900 text-gray-900 text-sm sm:text-base uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors duration-300 w-full sm:w-auto">
+                    className="px-6 sm:px-8 py-2.5 sm:py-3 border border-gray-900 text-gray-900 text-meta uppercase tracking-wide hover:bg-gray-900 hover:text-white transition-colors duration-300 w-full sm:w-auto">
                         Shop Collection
                     </button>
                 </div>

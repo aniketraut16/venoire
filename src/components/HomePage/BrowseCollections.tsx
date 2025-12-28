@@ -25,10 +25,10 @@ export default function BrowseCollections({ collections }: { collections: Catego
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h1 className="text-2xl  lg:text-3xl xl:text-4xl font-semibold text-gray-900 mb-2 sm:mb-3 tracking-wide px-2">
+        <h1 className="text-section text-gray-900 mb-2 sm:mb-3 tracking-wide px-2">
           DISCOVER OUR ONLINE EXCLUSIVE COLLECTIONS
         </h1>
-        <p className="text-base text-gray-600 px-4">
+        <p className="text-body text-gray-600 px-4">
           Elevate Your Style: Shop the Freshest Styles from our Online Exclusive Collections
         </p>
       </motion.div>

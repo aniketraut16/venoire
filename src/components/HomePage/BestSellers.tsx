@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FaStar } from "react-icons/fa";
 import { useHomepage } from "@/contexts/HomepageContext";
 import { Perfume } from "@/types/perfume";
 import { Product } from "@/types/product";
 import { useCart } from "@/contexts/cartContext";
+import type { BestSellers } from "@/types/homepage";
 
 // Unified Card Component that handles both Perfume and Product
 interface BestSellerCardProps {
@@ -15,9 +15,9 @@ interface BestSellerCardProps {
 }
 
 function BestSellerCard({ item }: BestSellerCardProps) {
-  const router = useRouter();
   const [isHovered, setIsHovered] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
   const { openAddToCartModal } = useCart();
 
   // Type guard to check if item is a Perfume
@@ -153,7 +153,7 @@ function BestSellerCard({ item }: BestSellerCardProps) {
         </h3>
 
         {/* Rating */}
-        <div className="flex items-center gap-1 text-[13px] font-medium">
+        <div className="flex items-center gap-1 text-[13px] font-medium mt-auto">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
@@ -168,9 +168,7 @@ function BestSellerCard({ item }: BestSellerCardProps) {
               fill="#FFB503"
             ></path>
           </svg>
-          <span className=" text-gray-900">
-            {rating.toFixed(1)}
-          </span>
+          <span className=" text-gray-900">{rating.toFixed(1)}</span>
           <span className=" text-gray-400">|</span>
 
           <svg
@@ -253,13 +251,34 @@ function BestSellerCard({ item }: BestSellerCardProps) {
 // Main Best Sellers Component
 export default function BestSellers() {
   const { bestSellers, isLoading } = useHomepage();
+  const [currTab, setcurrTab] = useState<"perfumes" | "products">("perfumes");
+  const [filteredBestSellers, setFilteredBestSellers] =
+    useState<BestSellers[]>(bestSellers);
+
+  const isPerfume = (item: Perfume | Product): item is Perfume => {
+    return "coverImage" in item && "fragrance" in item;
+  };
+
+  useEffect(() => {
+    if (bestSellers) {
+      let filtered: (Perfume | Product)[] = [...bestSellers];
+      if (currTab === "perfumes") {
+        filtered = filtered.filter((item) => isPerfume(item));
+      } else {
+        filtered = filtered.filter((item) => !isPerfume(item));
+      }
+      setFilteredBestSellers(filtered);
+    }
+  }, [bestSellers, currTab]);
 
   if (isLoading) {
     return (
       <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <h2 className="text-section font-medium text-[#0f182c]">BEST SELLERS</h2>
+            <h2 className="text-section font-medium text-[#0f182c]">
+              BEST SELLERS
+            </h2>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[...Array(8)].map((_, i) => (
@@ -282,10 +301,27 @@ export default function BestSellers() {
     <section className="py-12 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
-          <h2 className="text-section font-medium text-[#0f182c]">BEST SELLERS</h2>
+          <h2 className="text-section font-medium text-[#0f182c] mb-2">
+            BEST SELLERS
+          </h2>
+          <h2 className="text-section  text-[#0f182c] flex items-center justify-center gap-2">
+            <span
+              className={`cursor-pointer font-light ${currTab === "perfumes" ? "text-[#0f182c]" : "text-gray-400 animate-pulse"}`}
+              onClick={() => setcurrTab("perfumes")}
+            >
+              PERFUMES
+            </span>
+            <span className="text-gray-400 font-light"> | </span>
+            <span
+              className={`cursor-pointer font-light ${currTab === "products" ? "text-[#0f182c]" : "text-gray-400 animate-pulse"}`}
+              onClick={() => setcurrTab("products")}
+            >
+              PRODUCTS
+            </span>
+          </h2>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {bestSellers.slice(0, 8).map((item) => (
+          {filteredBestSellers.slice(0, 8).map((item) => (
             <BestSellerCard key={item.id} item={item} />
           ))}
         </div>
@@ -293,10 +329,10 @@ export default function BestSellers() {
         {/* View All Button */}
         <div className="text-center mt-12">
           <Link
-            href="/search"
-            className="inline-block bg-white hover:bg-black text-black hover:text-white border border-black py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
+            href={ currTab === "products" ? "/search":"/perfume/collection"}
+            className="inline-block text-body bg-white hover:bg-black text-black hover:text-white border border-black py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            View All Products
+            View All {currTab === "products" ? "Products" : "Perfumes"}
           </Link>
         </div>
       </div>

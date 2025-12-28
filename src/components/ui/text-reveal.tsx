@@ -27,7 +27,7 @@ export const TextReveal: FC<TextRevealProps> = ({ children, className }) => {
 
       <div
         className={
-          "sticky top-20 mx-auto flex  max-w-5xl items-center bg-transparent px-[1rem]"
+          "sticky top-20 mx-auto flex  max-w-5xl items-center bg-transparent px-4"
         }
       >
         <span
@@ -40,7 +40,7 @@ export const TextReveal: FC<TextRevealProps> = ({ children, className }) => {
             const end = start + 1 / words.length
             return (
               <Word key={i} progress={scrollYProgress} range={[start, end]}>
-                {word}
+                {word === "finest" || word === "luxury" ? <span className="text-yellow-600 ">{word}</span> : word}
               </Word>
             )
           })}

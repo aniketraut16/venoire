@@ -10,23 +10,20 @@ export default function FewPerfumes() {
   const { featuredPerfumes: perfumes, isLoading: loading } = useHomepage();
   const displayPerfumes = perfumes.slice(0, 4) as unknown as Perfume[];
   return (
-    <section className="w-full py-8 sm:py-12 md:py-16 bg-gradient-to-b from-white to-gray-50">
+    <section className="w-full pb-8 sm:pb-12 md:pb-16 bg-linear-to-b from-white to-gray-50">
       {/* Header Section */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 py-12 sm:py-16 md:py-20 lg:py-32 text-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pb-8 sm:pb-12 md:pb-16 lg:pb-22 pt-4 text-center">
         <motion.h2
-          className="text-5xl xl:text-6xl font-light tracking-tight mb-4 sm:mb-5 md:mb-6"
+          className="text-section uppercase mb-4 sm:mb-5 md:mb-6"
           initial={{ opacity: 0, y: -30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Featured
-          <span className="block font-serif italic text-5xl xl:text-6xl mt-1 sm:mt-2">
-            Perfumes
-          </span>
+          Featured Perfumes
         </motion.h2>
         <motion.p
-          className="text-base md:text-lg lg:text-xl text-gray-600 leading-relaxed mb-6 sm:mb-7 md:mb-8 max-w-2xl mx-auto px-2"
+          className="text-body text-gray-600 leading-relaxed mb-6 sm:mb-7 md:mb-8 max-w-3xl mx-auto px-2"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
@@ -44,7 +41,7 @@ export default function FewPerfumes() {
         >
           <Link
             href="/perfume/collection"
-            className="inline-block px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-black text-white text-sm tracking-widest uppercase hover:bg-gray-800 transition-colors duration-300"
+            className="inline-block px-6 sm:px-7 md:px-8 py-3 sm:py-3.5 md:py-4 bg-black text-white text-body tracking-widest uppercase hover:bg-gray-800 transition-colors duration-300"
           >
             Explore Collection
           </Link>
@@ -78,7 +75,7 @@ export default function FewPerfumes() {
               <ScrollStackItem key={perfume.id} itemClassName={`bg-white`}>
                 <div className="flex flex-col lg:flex-row items-start justify-between h-full gap-4 md:gap-6 lg:gap-8 ">
                   {/* Left Side - Image with Badge */}
-                  <div className="relative flex-shrink-0 w-full lg:w-72 xl:w-80">
+                  <div className="relative shrink-0 w-full h-full lg:w-72 xl:w-80">
                     {/* Product Image */}
                     <div className="relative  overflow-hidden">
                       <img
@@ -93,13 +90,13 @@ export default function FewPerfumes() {
                   </div>
 
                   {/* Right Side - Product Details */}
-                  <div className="flex-1 space-y-2 md:space-y-3">
+                  <div className="flex-1 justify-between space-y-2">
                     {/* Title and Gender */}
                     <div>
-                      <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-gray-900 mb-1">
+                      <h3 className="text-display tracking-tight text-gray-900 mb-1">
                         {perfume.name}
                       </h3>
-                      <p className="text-lg sm:text-xl text-gray-600 uppercase tracking-wide">
+                      <p className="text-meta text-gray-600 uppercase tracking-wide">
                         FOR {perfume.gender}
                       </p>
                     </div>
@@ -107,10 +104,10 @@ export default function FewPerfumes() {
                     {/* Rating */}
                     <div className="flex items-center gap-1">
                       <FaStar className="w-3.5 h-3.5 text-yellow-400" />
-                      <span className="text-sm font-semibold text-gray-900">
+                      <span className="text-body font-semibold text-gray-900">
                         {parseFloat(perfume.rating.toString()).toFixed(1)}
                       </span>
-                      <span className="text-xs text-gray-400">|</span>
+                      <span className="text-body text-gray-400">|</span>
                       {/* <FaCheckCircle className="w-3 h-3 text-blue-500" /> */}
                       <svg
                         viewBox="0 0 18 18"
@@ -135,7 +132,7 @@ export default function FewPerfumes() {
                           points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
                         ></polygon>
                       </svg>
-                      <span className="text-xs text-gray-600">
+                      <span className="text-body text-gray-600">
                         (
                         {perfume.rating_count >= 1000
                           ? `${(perfume.rating_count / 1000).toFixed(1)}K`
@@ -145,43 +142,43 @@ export default function FewPerfumes() {
                     </div>
 
                     {/* Description */}
-                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed max-w-2xl">
+                    <p className="text-body text-gray-700 leading-relaxed max-w-2xl">
                       {perfume.description.slice(0, 160)}...
                     </p>
 
                     {/* Fragrance Notes */}
                     <div className="hidden sm:grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                       <div>
-                        <h4 className="text-xs font-bold text-gray-900 uppercase mb-1">
+                        <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
                           Fragrance Family:
                         </h4>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-meta text-gray-600">
                           {perfume.fragrance || "N/A"}
                         </p>
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-gray-900 uppercase mb-1">
+                        <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
                           Concentration:
                         </h4>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-meta text-gray-600">
                           {perfume.concentration || "N/A"}
                         </p>
                       </div>
                       <div>
-                        <h4 className="text-xs font-bold text-gray-900 uppercase mb-1">
+                        <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
                           Base Notes:
                         </h4>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-meta text-gray-600">
                           {perfume.base_notes?.replace(/\([^)]*\)/g, '').trim() || "N/A"}
                         </p>
                       </div>
                     </div>
 
                     {/* Add to Cart Button */}
-                    <div className="pt-2">
+                    <div className="pt-2 mt-auto">
                       <Link
                         href={`/perfume/${perfume.slug}`}
-                        className="w-full flex items-center justify-between bg-black text-white px-6 py-3 text-sm font-bold uppercase tracking-wider hover:bg-gray-800 transition-all duration-300"
+                        className="w-full flex items-center justify-between bg-black text-white px-6 py-3 text-body font-bold uppercase tracking-wider hover:bg-gray-800 transition-all duration-300"
                       >
                         <span>VIEW {perfume.price[0]?.quantity}ML</span>
                         <span className="flex items-center gap-3">
