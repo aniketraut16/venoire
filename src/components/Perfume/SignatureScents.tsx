@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export default function FeaturedProduct() {
+export default function SignatureScents() {
   return (
     <section className="py-7 md:py-9 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -16,13 +16,15 @@ export default function FeaturedProduct() {
 
           {/* Content */}
           <div className="space-y-6">
-            <h2 className="text-4xl md:text-5xl font-heading text-[#121212]">
-            Signature Scents That Define You
+            <h2 className="text-display text-[#121212]">
+            Signature Scents 
+            <span className="text-section text-[#121212]">                 </span>
+            That Define You
             </h2>
 
             
 
-            <p className="text-base leading-relaxed text-gray-700">
+            <p className="text-body leading-relaxed text-gray-700">
             Each Venoire perfume captures a moment — the warmth of twilight, the calm of rain, the spark of desire.
 Crafted for those who see fragrance as an expression, not an accessory — a quiet reflection of the self.
             </p>

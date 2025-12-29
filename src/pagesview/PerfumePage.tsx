@@ -1,9 +1,8 @@
 import HeroSlideshow from "@/components/Perfume/HeroSlideshow";
 import RichText from "@/components/Perfume/RichText";
-import FeaturedCollection from "@/components/Perfume/FeaturedCollection";
-import FeaturedProduct from "@/components/Perfume/FeaturedProduct";
-import MediaGallery from "@/components/Perfume/MediaGallery";
-// import Why from '@/components/Perfume/Why';
+import BestSellersPerfume from "@/components/Perfume/BestSellersPerfume";
+import SignatureScents from "@/components/Perfume/SignatureScents";
+import WhatMakesOurPerfumesUnique from "@/components/Perfume/WhatMakesOurPerfumesUnique";
 
 export default function PerfumePage() {
   return (
@@ -43,10 +42,9 @@ export default function PerfumePage() {
         ]}
       />
 
-      <FeaturedCollection />
-      <FeaturedProduct />
-      <MediaGallery />
-      {/* <Why /> */}
+      <BestSellersPerfume />
+      <SignatureScents />
+      <WhatMakesOurPerfumesUnique />
     </main>
   );
 }

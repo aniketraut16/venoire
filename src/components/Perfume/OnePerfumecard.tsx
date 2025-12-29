@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaStar } from "react-icons/fa";
 import { Perfume } from "@/types/perfume";
 import { useCart } from "@/contexts/cartContext";
 

@@ -17,10 +17,10 @@ export default function ReturnPolicyPage() {
                                     For clothing items, the following options are available: return, exchange, replacement, and refund. Please review the timelines and conditions below:
                                 </p>
                                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-4">
-                                    <li>Return requests must be initiated within 7 days of delivery</li>
-                                    <li>Exchange requests must be initiated within 7 days of delivery</li>
-                                    <li>Replacement requests must be initiated within 7 days of delivery</li>
-                                    <li>Order cancellations must be requested within 7 days of placing the order</li>
+                                    <li>Return requests must be initiated within 2 days of delivery</li>
+                                    <li>Exchange requests must be initiated within 2 days of delivery</li>
+                                    <li>Replacement requests must be initiated within 2 days of delivery</li>
+                                    <li>Order cancellations must be requested within 2 days of placing the order before the item is shipped</li>
                                 </ul>
                             </section>
 
@@ -99,7 +99,7 @@ export default function ReturnPolicyPage() {
                                 <h2 className="text-xl font-light tracking-wide uppercase mb-4 text-gray-900">Return Process for Clothing</h2>
                                 <p className="text-gray-700 leading-relaxed mb-4">If your clothing item qualifies for return:</p>
                                 <ul className="list-disc list-inside text-gray-700 space-y-2 ml-4">
-                                    <li>You must initiate your return request within 7 days of delivery.</li>
+                                    <li>You must initiate your return request within 2 days of delivery.</li>
                                     <li>After approval, you need to ship the item back to us in its original condition.</li>
                                     <li>Once we receive the returned item, it goes through a quality inspection.</li>
                                     <li>If it passes inspection, your refund will be processed within 7 days to your original payment method.</li>

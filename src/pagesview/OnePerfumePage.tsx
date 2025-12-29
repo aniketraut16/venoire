@@ -3,10 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
 import { getDetailedPerfume } from "@/utils/perfume";
 import { DetailedPerfume } from "@/types/perfume";
-import {
-  FiMinus,
-  FiPlus,
-} from "react-icons/fi";
+import { FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useCart } from "@/contexts/cartContext";
 
 export default function OnePerfumePage() {
@@ -32,6 +29,11 @@ export default function OnePerfumePage() {
   });
   const { addToCart } = useCart();
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
+  const thumbnailScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
+  const [reviewSortBy, setReviewSortBy] = useState("most_recent");
+  const [currentReviewPage, setCurrentReviewPage] = useState(1);
 
   const toggleAccordion = (
     section: "fragranceNotes" | "usageTips" | "brandInfo"
@@ -81,6 +83,97 @@ export default function OnePerfumePage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Check scroll position for thumbnail strip
+  const checkScrollPosition = () => {
+    if (thumbnailScrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } =
+        thumbnailScrollRef.current;
+      const hasScrollableContent = scrollWidth > clientWidth;
+      setCanScrollLeft(hasScrollableContent && scrollLeft > 1);
+      setCanScrollRight(
+        hasScrollableContent && scrollLeft < scrollWidth - clientWidth - 1
+      );
+    }
+  };
+
+  useEffect(() => {
+    // Check scroll position after container and images are rendered
+    const checkAfterRender = () => {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          checkScrollPosition();
+        }, 150);
+      });
+    };
+
+    checkAfterRender();
+
+    const scrollContainer = thumbnailScrollRef.current;
+    if (scrollContainer) {
+      scrollContainer.addEventListener("scroll", checkScrollPosition);
+      // Also check on resize
+      window.addEventListener("resize", checkAfterRender);
+
+      // Check when images load
+      const images = scrollContainer.querySelectorAll("img");
+      let loadedCount = 0;
+      const onImageLoad = () => {
+        loadedCount++;
+        if (loadedCount === images.length) {
+          checkAfterRender();
+        }
+      };
+
+      images.forEach((img) => {
+        if (img.complete) {
+          loadedCount++;
+        } else {
+          img.addEventListener("load", onImageLoad);
+          img.addEventListener("error", onImageLoad);
+        }
+      });
+
+      if (loadedCount === images.length) {
+        checkAfterRender();
+      }
+
+      return () => {
+        scrollContainer.removeEventListener("scroll", checkScrollPosition);
+        window.removeEventListener("resize", checkAfterRender);
+        images.forEach((img) => {
+          img.removeEventListener("load", onImageLoad);
+          img.removeEventListener("error", onImageLoad);
+        });
+      };
+    }
+  }, [perfume]);
+
+  const scrollThumbnails = (direction: "left" | "right") => {
+    if (thumbnailScrollRef.current) {
+      const container = thumbnailScrollRef.current;
+      const scrollAmount = container.clientWidth * 0.8;
+      const currentScroll = container.scrollLeft;
+      const scrollTo =
+        direction === "left"
+          ? Math.max(0, currentScroll - scrollAmount)
+          : Math.min(
+              container.scrollWidth - container.clientWidth,
+              currentScroll + scrollAmount
+            );
+
+      container.scrollTo({
+        left: scrollTo,
+        behavior: "smooth",
+      });
+
+      // Update scroll position after a short delay to ensure smooth scroll completes
+      setTimeout(() => {
+        checkScrollPosition();
+      }, 300);
+    }
+  };
+
   const handleQuantityDecrease = () => {
     if (quantity > 1) setQuantity(quantity - 1);
   };
@@ -106,21 +199,29 @@ export default function OnePerfumePage() {
 
   const handleAddToCart = async () => {
     if (!selectedSizeId) return;
-    const ok = await addToCart({ productVariantId: selectedSizeId, quantity: quantity });
+    const ok = await addToCart({
+      productVariantId: selectedSizeId,
+      quantity: quantity,
+    });
     if (ok) {
-    openAddToCartModal({
-      productId: perfume.id,
-      productName: perfume.name,
-      productImage: perfume.coverImage,
-      productType: "perfume",
-      productVariants: perfume.price.map((p) => ({
-        id: p.id,
-        price: p.price,
-        originalPrice: p.originalPrice,
-        badgeText: "",
-        ml_volume: p.quantity.toString(),
-      })),
-    }, "added", selectedSizeId);}
+      openAddToCartModal(
+        {
+          productId: perfume.id,
+          productName: perfume.name,
+          productImage: perfume.coverImage,
+          productType: "perfume",
+          productVariants: perfume.price.map((p) => ({
+            id: p.id,
+            price: p.price,
+            originalPrice: p.originalPrice,
+            badgeText: "",
+            ml_volume: p.quantity.toString(),
+          })),
+        },
+        "added",
+        selectedSizeId
+      );
+    }
   };
 
   return (
@@ -235,7 +336,7 @@ export default function OnePerfumePage() {
                 <div ref={ctaButtonsRef} className="pt-4">
                   <button
                     onClick={handleAddToCart}
-                    className="bg-gray-900 hover:bg-gray-800 text-white font-light py-3 px-12 transition-all duration-300 uppercase text-xs tracking-widest border border-gray-900 hover:border-gray-700"
+                    className="bg-white  text-gray-900  hover:bg-gray-50 font-light py-3 px-12 transition-all duration-300 uppercase text-xs tracking-widest border border-gray-900 hover:border-gray-700"
                   >
                     Add to Cart
                   </button>
@@ -247,9 +348,40 @@ export default function OnePerfumePage() {
           </div>
         </div>
       </div>
+      <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative">
+        <div className="flex items-center h-full">
+          <div className="flex whitespace-nowrap animate-marquee hover:paused">
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              🎁 Free shipping on orders over $100
+            </span>
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              ✨ Buy 2 Get 15% Off - Limited Time
+            </span>
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              💝 Free gift wrapping with every purchase
+            </span>
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              🌟 New arrivals - Explore our latest collection
+            </span>
+            {/* Duplicate for seamless loop */}
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              🎁 Free shipping on orders over $100
+            </span>
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              ✨ Buy 2 Get 15% Off - Limited Time
+            </span>
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              💝 Free gift wrapping with every purchase
+            </span>
+            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+              🌟 New arrivals - Explore our latest collection
+            </span>
+          </div>
+        </div>
+      </div>
 
-       {/* Special Offer - Inline Ribbon */}
-       {/* {perfume.offers && perfume.offers.length > 0 && (
+      {/* Special Offer - Inline Ribbon */}
+      {/* {perfume.offers && perfume.offers.length > 0 && (
          <div className="bg-white">
            <div className="max-w-7xl mx-auto px-4 py-4">
              <div className="group inline-flex items-center gap-2 hover:opacity-80 transition-opacity duration-300">
@@ -267,9 +399,9 @@ export default function OnePerfumePage() {
          </div>
        )} */}
 
-       {/* Product Gallery and Description Section */}
-       <div className="bg-white py-16">
-         <div className="max-w-7xl mx-auto px-4">
+      {/* Product Gallery and Description Section */}
+      <div className="bg-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
             {/* Left Side - Sticky Gallery */}
             <div className="order-1 lg:col-span-2">
@@ -282,31 +414,116 @@ export default function OnePerfumePage() {
                         perfume.images[selectedImageIndex] || perfume.coverImage
                       }
                       alt={perfume.name}
-                      className="w-full h-full object-contain transition-all duration-500"
+                      className="w-full h-full object-contain transition-all duration-500 rounded-md"
                     />
                   </div>
                 </div>
 
                 {/* Thumbnail Strip */}
-                <div className="grid grid-cols-4 gap-2">
-                  {perfume.images.slice(0, 4).map((image, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={`group relative aspect-square bg-gray-50 overflow-hidden transition-all duration-300 cursor-pointer border-2 ${
-                        selectedImageIndex === index
-                          ? "border-gray-900 opacity-100"
-                          : "border-transparent opacity-60 hover:opacity-100"
-                      }`}
+                <div className="relative w-full flex items-center gap-2">
+                  {/* Left Arrow */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const container = thumbnailScrollRef.current;
+                      if (container && container.scrollLeft > 0) {
+                        scrollThumbnails("left");
+                      }
+                    }}
+                    className={`shrink-0 w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-sm transition-all z-20 pointer-events-auto ${
+                      canScrollLeft
+                        ? "hover:bg-gray-50 cursor-pointer opacity-100"
+                        : "cursor-not-allowed opacity-50"
+                    }`}
+                    type="button"
+                  >
+                    <FiChevronLeft className="w-4 h-4 text-gray-700" />
+                  </button>
+
+                  {/* Scrollable Thumbnail Container - Shows exactly 6 thumbnails */}
+                  <div
+                    ref={thumbnailScrollRef}
+                    className="flex-1 overflow-x-auto pb-2 thumbnail-scrollbar"
+                    style={{
+                      width: "calc(6 * 4.5rem + 5 * 0.5rem)",
+                      maxWidth: "100%",
+                    }}
+                  >
+                    <div
+                      className="flex gap-2"
+                      style={{ width: "max-content" }}
                     >
-                      <img
-                        src={image}
-                        alt={`${perfume.name} - Thumbnail ${index + 1}`}
-                        className="object-cover w-full h-full"
-                      />
-                    </button>
-                  ))}
+                      {Array.from({ length: 1 }, (_, i) => {
+                        const originalIndex =
+                          i % perfume.images.slice(0, 4).length;
+                        const image = perfume.images.slice(0, 4)[originalIndex];
+                        return (
+                          <button
+                            key={i}
+                            onClick={() => setSelectedImageIndex(i)}
+                            className={`group shrink-0 w-18 h-18 relative bg-gray-50 overflow-hidden transition-all duration-300 cursor-pointer rounded-md border-2 ${
+                              selectedImageIndex === i
+                                ? "border-gray-900 opacity-100"
+                                : "border-transparent opacity-60 hover:opacity-100"
+                            }`}
+                          >
+                            <img
+                              src={image}
+                              alt={`${perfume.name} - Thumbnail ${i + 1}`}
+                              className="object-cover w-full h-full rounded-md"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right Arrow */}
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const container = thumbnailScrollRef.current;
+                      if (container) {
+                        const { scrollLeft, scrollWidth, clientWidth } =
+                          container;
+                        if (scrollLeft < scrollWidth - clientWidth - 1) {
+                          scrollThumbnails("right");
+                        }
+                      }
+                    }}
+                    className={`shrink-0 w-8 h-8 flex items-center justify-center bg-white border border-gray-300 rounded-full shadow-sm transition-all z-20 pointer-events-auto ${
+                      canScrollRight
+                        ? "hover:bg-gray-50 cursor-pointer opacity-100"
+                        : "cursor-not-allowed opacity-50"
+                    }`}
+                    type="button"
+                  >
+                    <FiChevronRight className="w-4 h-4 text-gray-700" />
+                  </button>
                 </div>
+
+                <style jsx>{`
+                  .thumbnail-scrollbar::-webkit-scrollbar {
+                    height: 8px;
+                  }
+                  .thumbnail-scrollbar::-webkit-scrollbar-track {
+                    background: #f3f4f6;
+                    border-radius: 4px;
+                  }
+                  .thumbnail-scrollbar::-webkit-scrollbar-thumb {
+                    background: #9ca3af;
+                    border-radius: 4px;
+                  }
+                  .thumbnail-scrollbar::-webkit-scrollbar-thumb:hover {
+                    background: #6b7280;
+                  }
+                  .thumbnail-scrollbar {
+                    scrollbar-width: thin;
+                    scrollbar-color: #9ca3af #f3f4f6;
+                  }
+                `}</style>
               </div>
             </div>
 
@@ -316,9 +533,140 @@ export default function OnePerfumePage() {
               <div className="space-y-10">
                 {/* Product Description */}
                 <div>
-                  <h2 className="text-xs uppercase tracking-widest text-gray-500 font-normal mb-5">
+                  <h2 className="text-section uppercase mb-5">
                     About This Fragrance
                   </h2>
+                  <div className="mb-8">
+                    <div className="max-w-5xl mx-auto">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        {/* Top Notes */}
+                        <div className="relative bg-linear-to-br from-amber-50 to-orange-50 p-5 border border-amber-200/50">
+                          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-orange-400"></div>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <svg
+                                className="w-5 h-5 text-amber-600 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                                />
+                              </svg>
+                              <div>
+                                <p className="text-xs uppercase tracking-widest text-amber-900 font-semibold">
+                                  Top Notes
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  First Impression
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
+                              {perfume.top_notes
+                                ?.split('•')
+                                .filter((note) => note.trim())
+                                .map((note, index) => (
+                                  <p key={index}> • {note.trim()}</p>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Heart Notes */}
+                        <div className="relative bg-linear-to-br from-rose-50 to-pink-50 p-5 border border-rose-200/50">
+                          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-rose-400 to-pink-400"></div>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <svg
+                                className="w-5 h-5 text-rose-600 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                                />
+                              </svg>
+                              <div>
+                                <p className="text-xs uppercase tracking-widest text-rose-900 font-semibold">
+                                  Heart Notes
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  The Soul
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
+                              {perfume.middle_notes
+                                ?.split('•')
+                                .filter((note) => note.trim())
+                                .map((note, index) => (
+                                  <p key={index}> • {note.trim()}</p>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Base Notes */}
+                        <div className="relative bg-linear-to-br from-slate-50 to-stone-50 p-5 border border-slate-200/50">
+                          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-slate-600 to-stone-600"></div>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3">
+                              <svg
+                                className="w-5 h-5 text-slate-700 shrink-0"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={1.5}
+                                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                                />
+                              </svg>
+                              <div>
+                                <p className="text-xs uppercase tracking-widest text-slate-900 font-semibold">
+                                  Base Notes
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Lasting Foundation
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
+                              {perfume.base_notes
+                                ?.split('•')
+                                .filter((note) => note.trim())
+                                .map((note, index) => (
+                                  <p key={index}> • {note.trim()}</p>
+                                ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Concentration Info */}
+                      {/* {perfume.concentration && (
+                <div className="mt-8 text-center">
+                  <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
+                    Concentration
+                  </p>
+                  <p className="text-sm text-gray-800 font-medium">
+                    {perfume.concentration}
+                  </p>
+                </div>
+              )} */}
+                    </div>
+                  </div>
                   <p className="text-gray-800 leading-relaxed text-base font-normal whitespace-pre-line">
                     {perfume.productDescription}
                   </p>
@@ -337,191 +685,302 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
-          {/* Fragrance Notes - Enhanced Composition */}
-          <div className="mt-16 pt-12 border-t border-gray-100">
-            <div className="max-w-5xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-2xl font-light text-gray-900 mb-2">
-                  Fragrance Composition
-                </h2>
-                <p className="text-sm text-gray-600">
-                  The art of perfumery in three layers
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {/* Top Notes */}
-                <div className="relative bg-linear-to-br from-amber-50 to-orange-50 p-8 border border-amber-200/50">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-orange-400"></div>
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                      <svg
-                        className="w-8 h-8 text-amber-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-widest text-amber-900 font-semibold mb-2">
-                        Top Notes
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">
-                        First Impression
-                      </p>
-                    </div>
-                    <p className="text-sm text-gray-800 font-normal leading-relaxed">
-                      {perfume.top_notes}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Heart Notes */}
-                <div className="relative bg-linear-to-br from-rose-50 to-pink-50 p-8 border border-rose-200/50">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-rose-400 to-pink-400"></div>
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                      <svg
-                        className="w-8 h-8 text-rose-600"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-widest text-rose-900 font-semibold mb-2">
-                        Heart Notes
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">The Soul</p>
-                    </div>
-                    <p className="text-sm text-gray-800 font-normal leading-relaxed">
-                      {perfume.middle_notes}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Base Notes */}
-                <div className="relative bg-linear-to-br from-slate-50 to-stone-50 p-8 border border-slate-200/50">
-                  <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-slate-600 to-stone-600"></div>
-                  <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm">
-                      <svg
-                        className="w-8 h-8 text-slate-700"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={1.5}
-                          d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                        />
-                      </svg>
-                    </div>
-                    <div>
-                      <p className="text-xs uppercase tracking-widest text-slate-900 font-semibold mb-2">
-                        Base Notes
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">
-                        Lasting Foundation
-                      </p>
-                    </div>
-                    <p className="text-sm text-gray-800 font-normal leading-relaxed">
-                      {perfume.base_notes}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Concentration Info */}
-              {perfume.concentration && (
-                <div className="mt-8 text-center">
-                  <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
-                    Concentration
-                  </p>
-                  <p className="text-sm text-gray-800 font-medium">
-                    {perfume.concentration}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* Reviews Section */}
           <div className="mt-16 pt-12 border-t border-gray-100">
             <div className="max-w-4xl mx-auto">
-              <div className="flex items-center justify-between mb-10">
-                <div>
+              {/* Header Section */}
+              <div className="flex items-start justify-between mb-10">
+                <div className="flex-1">
                   <h2 className="text-xs uppercase tracking-widest text-gray-500 font-normal mb-2">
                     Customer Reviews
                   </h2>
-                  <div className="flex items-baseline gap-3">
+                  <div className="flex items-baseline gap-3 mb-6">
                     <span className="text-3xl font-light">
-                      {Number(perfume.rating).toFixed(1)}
+                      {Number(perfume.rating).toFixed(2)}
                     </span>
                     <span className="text-sm text-gray-600 font-normal tracking-tight">
-
-<span>
-                        
-
-                      ({perfume.rating_count >= 1000 
-                        ? `${(perfume.rating_count / 1000).toFixed(1)}K` 
-                        : perfume.rating_count} reviews)
-                    
-                    
-                        </span>
+                      <span>
+                        (
+                        {perfume.rating_count >= 1000
+                          ? `${(perfume.rating_count / 1000).toFixed(1)}K`
+                          : perfume.rating_count}{" "}
+                        reviews)
+                      </span>
                     </span>
+                  </div>
+
+                  {/* Star Rating Breakdown */}
+                  <div className="space-y-2 mb-6">
+                    {[5, 4, 3, 2, 1].map((star) => {
+                      const count = Math.floor(
+                        (perfume.rating_count * (6 - star)) / 15
+                      );
+                      const percentage = (count / perfume.rating_count) * 100;
+                      return (
+                        <div key={star} className="flex items-center gap-3">
+                          <span className="text-xs text-gray-600 w-8">
+                            {star} star
+                          </span>
+                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-yellow-400 rounded-full"
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-600 w-12 text-right">
+                            {count}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <button className="bg-black text-white px-6 py-2 text-sm font-normal hover:bg-gray-800 transition-colors">
+                  Write a review
+                </button>
+              </div>
+
+              {/* Customer Photos & Videos Section */}
+              <div className="mb-10">
+                <h3 className="text-sm font-medium text-gray-900 mb-4">
+                  Customer photos & videos
+                </h3>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-2 flex-1 overflow-x-auto pb-2">
+                    {[...Array(8)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
+                      >
+                        <img
+                          src={perfume.images[i % perfume.images.length] || perfume.coverImage}
+                          alt={`Customer photo ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <a
+                    href="#"
+                    className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
+                  >
+                    See more
+                  </a>
+                </div>
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-sm font-medium text-gray-900">
+                  Reviews
+                </h3>
+                <select
+                  value={reviewSortBy}
+                  onChange={(e) => setReviewSortBy(e.target.value)}
+                  className="text-sm text-gray-700 border border-gray-300 px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                >
+                  <option value="most_recent">Most Recent</option>
+                  <option value="highest_rating">Highest Rating</option>
+                  <option value="lowest_rating">Lowest Rating</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+              </div>
+
+              {/* Individual Reviews */}
+              <div className="space-y-6 mb-8">
+                {/* Review 1 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-gray-900">
+                          Ritika Chopra
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-yellow-400 text-sm">
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        Boss Vibes
+                      </h4>
+                      <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                        CEO naam jaisa hi hai, pehno toh sab notice karte hain.
+                      </p>
+                    </div>
+                    <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
+                      <img
+                        src={perfume.coverImage}
+                        alt="Review image"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Review 2 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-gray-900">
+                          Vikrant Joshi
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-yellow-400 text-sm">
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
+                      <h4 className="font-medium text-gray-900 mb-2">
+                        Strong Yet Subtle
+                      </h4>
+                      <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                        Perfect balance of strength and smoothness in the
+                        fragrance.
+                      </p>
+                    </div>
+                    <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
+                      <img
+                        src={perfume.images[0] || perfume.coverImage}
+                        alt="Review image"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Review 3 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-gray-900">
+                        Rajeev Khurana
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className="text-yellow-400 text-sm">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      Sharp & Sophisticated
+                    </h4>
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      Has that rich, bossy vibe. Great for formal wear.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Review 4 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-gray-900">
+                        NIMISH GOEL
+                      </span>
+                      <span className="bg-black text-white text-xs px-2 py-0.5">
+                        Verified
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className="text-yellow-400 text-sm">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">5 months ago</p>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      Awsome fregnance
+                    </h4>
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      Awsome fregnance
+                    </p>
+                  </div>
+                </div>
+
+                {/* Review 5 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-gray-900">
+                        Varun Pratap
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(4)].map((_, i) => (
+                          <span key={i} className="text-yellow-400 text-sm">
+                            ★
+                          </span>
+                        ))}
+                        <span className="text-gray-300 text-sm">★</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">5 months ago</p>
+                    <h4 className="font-medium text-gray-900 mb-2">
+                      Smells Premium
+                    </h4>
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      Lasts decently, but not all day. Still very classy.
+                    </p>
                   </div>
                 </div>
               </div>
 
-              {/* Sample Reviews */}
-              <div className="space-y-6">
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i} className="text-gray-900 text-sm">
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-gray-800 font-normal leading-relaxed mb-2">
-                    "Long-lasting and sophisticated. Perfect for evening wear."
-                  </p>
-                  <p className="text-xs text-gray-500 font-normal">
-                    Verified Buyer
-                  </p>
-                </div>
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex items-center gap-1 mb-3">
-                    {[...Array(5)].map((_, i) => (
-                      <span key={i} className="text-gray-900 text-sm">
-                        ★
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-gray-800 font-normal leading-relaxed mb-2">
-                    "Elegant fragrance with great projection. Highly recommend."
-                  </p>
-                  <p className="text-xs text-gray-500 font-normal">
-                    Verified Buyer
-                  </p>
-                </div>
+              {/* Pagination */}
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setCurrentReviewPage(Math.max(1, currentReviewPage - 1))}
+                  disabled={currentReviewPage === 1}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &lt;&lt;
+                </button>
+                <button
+                  onClick={() => setCurrentReviewPage(Math.max(1, currentReviewPage - 1))}
+                  disabled={currentReviewPage === 1}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &lt;
+                </button>
+                {[1, 2, 3].map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentReviewPage(page)}
+                    className={`px-3 py-1 text-sm ${
+                      currentReviewPage === page
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentReviewPage(Math.min(3, currentReviewPage + 1))}
+                  disabled={currentReviewPage === 3}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &gt;
+                </button>
+                <button
+                  onClick={() => setCurrentReviewPage(Math.min(3, currentReviewPage + 1))}
+                  disabled={currentReviewPage === 3}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &gt;&gt;
+                </button>
               </div>
             </div>
           </div>
@@ -545,7 +1004,11 @@ export default function OnePerfumePage() {
                 {accordionOpen.usageTips && (
                   <div className="pb-5">
                     <p className="text-gray-700 leading-relaxed text-sm font-normal">
-                      {perfume.usageTips}
+                      {perfume.usageTips ?.split('•')
+                                .filter((note) => note.trim())
+                                .map((note, index) => (
+                                  <p key={index}> • {note.trim()}</p>
+                                ))}
                     </p>
                   </div>
                 )}
@@ -575,31 +1038,31 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
-           {/* Additional Offers Section - Only if more than 1 offer */}
-           {perfume.offers && perfume.offers.length > 1 && (
-             <div className="mt-16 pt-12 border-t border-gray-100">
-               <div className="max-w-4xl mx-auto">
-                 <h2 className="text-xs uppercase tracking-widest text-gray-500 font-normal mb-6">
-                   Additional Offers
-                 </h2>
-                 <div className="space-y-5">
-                   {perfume.offers.slice(1).map((offer, index) => (
-                     <div
-                       key={index}
-                       className="border-l-2 border-gray-200 pl-5"
-                     >
-                       <h4 className="text-sm text-gray-900 font-medium mb-2">
-                         {offer.offer_name}
-                       </h4>
-                       <p className="text-sm text-gray-700 font-normal leading-relaxed">
-                         {offer.text}
-                       </p>
-                     </div>
-                   ))}
-                 </div>
-               </div>
-             </div>
-           )}
+          {/* Additional Offers Section - Only if more than 1 offer */}
+          {perfume.offers && perfume.offers.length > 1 && (
+            <div className="mt-16 pt-12 border-t border-gray-100">
+              <div className="max-w-4xl mx-auto">
+                <h2 className="text-xs uppercase tracking-widest text-gray-500 font-normal mb-6">
+                  Additional Offers
+                </h2>
+                <div className="space-y-5">
+                  {perfume.offers.slice(1).map((offer, index) => (
+                    <div
+                      key={index}
+                      className="border-l-2 border-gray-200 pl-5"
+                    >
+                      <h4 className="text-sm text-gray-900 font-medium mb-2">
+                        {offer.offer_name}
+                      </h4>
+                      <p className="text-sm text-gray-700 font-normal leading-relaxed">
+                        {offer.text}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -656,7 +1119,7 @@ export default function OnePerfumePage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-sm font-light text-gray-900 line-clamp-1">
+                  <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
                     {perfume.name}
                   </h3>
                   <div className="flex items-baseline gap-2 mt-1">

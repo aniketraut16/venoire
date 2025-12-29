@@ -32,7 +32,7 @@ export default function RichText({
     >
       <div className="max-w-[1400px] mx-auto">
         <div className="text-center">
-          <h2 className="text-2xl md:text-4xl font-heading leading-tight mb-4 uppercase">
+          <h2 className="text-section leading-tight mb-4 uppercase">
             {titleParts ? (
               titleParts.map((part, index) => (
                 <span
@@ -70,7 +70,7 @@ export default function RichText({
             )}
           </h2>
 
-          <div className="text-base leading-relaxed max-w-3xl mx-auto">
+          <div className="text-body leading-relaxed max-w-3xl mx-auto">
             {descriptionParts ? (
               <p>
                 {descriptionParts.map((part, index) => (

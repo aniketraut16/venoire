@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useHomepage } from "@/contexts/HomepageContext";
 import { Perfume } from "@/types/perfume";
 import { Product } from "@/types/product";
