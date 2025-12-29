@@ -57,7 +57,7 @@ export const getOrders = async (
   params?: {
     page?: number;
     limit?: number;
-    status?: "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+    status?: "placed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
     sort?: "created_at" | "updated_at" | "total_amount" | "order_number";
     order?: "asc" | "desc";
     search?: string;
@@ -198,6 +198,29 @@ export const createProductReview = async (
         is_approved: false,
         created_at: new Date().toISOString(),
       },
+    };
+  }
+};
+
+export const requestReturnRefund = async (
+  orderId: string,
+  token: string,
+  args: { reason: string; comments: string }
+): Promise<{ success: boolean; message: string }> => {
+  try {
+    const response = await axios.post(
+      `${baseUrl}/user/orders/${orderId}/return`,
+      args,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+    return response.data as { success: boolean; message: string };
+  } catch (error: any) {
+    console.error("Error requesting return/refund:", error);
+    return {
+      success: false,
+      message: error?.response?.data?.error?.message || "Failed to submit return request",
     };
   }
 };

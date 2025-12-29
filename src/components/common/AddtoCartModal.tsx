@@ -110,7 +110,7 @@ export default function AddtoCartModal({
   if (showSuccess) {
     return (
       <div
-        className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4"
+        className="fixed inset-0 z-9999 bg-black/60 backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4"
         onClick={onClose}
       >
         <div
@@ -251,7 +251,7 @@ export default function AddtoCartModal({
   // Regular Add to Cart View
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4"
+      className="fixed inset-0 z-9999 bg-black/60 backdrop-blur-sm md:flex md:items-center md:justify-center md:p-4"
       onClick={onClose}
     >
       <div

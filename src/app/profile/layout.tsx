@@ -20,6 +20,9 @@ export default function ProfileLayout({
   };
 
   const isActive = (path: string) => {
+    if(path === "/profile/my-orders") {
+      return pathname.startsWith("/profile/order") || pathname === "/profile/my-orders";
+    }
     return pathname === path;
   };
 

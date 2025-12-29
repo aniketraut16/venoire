@@ -70,7 +70,7 @@ export default function CheckoutPageModal({
   if (!pricing || !cartId || cartId.trim() === '') {
     return (
       <div
-        className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+        className="fixed inset-0 z-9999 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
         onClick={onClose}
       >
         <div
@@ -184,7 +184,7 @@ export default function CheckoutPageModal({
 
   return (
     <div
-      className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center md:p-4"
+      className="fixed inset-0 z-9999 bg-black/60 backdrop-blur-sm flex items-end md:items-center justify-center md:p-4"
       onClick={onClose}
     >
       <div

@@ -25,8 +25,7 @@ export type Order = {
   id: string;
   order_number: string;
   status:
-    | "pending"
-    | "confirmed"
+    | "placed"
     | "processing"
     | "shipped"
     | "delivered"
@@ -86,8 +85,7 @@ export type DetailedOrder = {
   id: string;
   order_number: string;
   status:
-    | "pending"
-    | "confirmed"
+    | "placed"
     | "processing"
     | "shipped"
     | "delivered"
@@ -144,7 +142,7 @@ export type TrackOrderResponse = {
     carrier: string | null;
     estimated_delivery: string | null;
     timeline: {
-        status: "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
+        status: "placed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
         timestamp: string;
         message: string;
     }[];
@@ -198,3 +196,10 @@ export type CreateReviewResponse = {
     created_at: string;
   };
 };
+
+export type BuyAgainItems = {
+  id: string;
+  name: string;
+  slug: string;
+  thumbnail_url: string;
+}

@@ -105,7 +105,7 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
       />
       
       {/* Search Modal */}
-      <div className="fixed inset-0 z-[9999] flex items-start justify-center pt-16 sm:pt-20 md:pt-24 px-4">
+      <div className="fixed inset-0 z-9999 flex items-start justify-center pt-16 sm:pt-20 md:pt-24 px-4">
         <div 
           className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden animate-in slide-in-from-top-4 duration-300"
           onClick={(e) => e.stopPropagation()}

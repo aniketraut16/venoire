@@ -1,9 +1,22 @@
 "use client";
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
-import { getOrders, getOrder, cancelOrder, trackOrder, createProductReview } from "@/utils/orders";
-import { Order, DetailedOrder, TrackOrderResponse, CreateReviewArgs } from "@/types/orders";
+import Link from "next/link";
+import {
+  getOrders,
+  getOrder,
+  cancelOrder,
+  trackOrder,
+  createProductReview,
+  requestReturnRefund,
+} from "@/utils/orders";
+import {
+  Order,
+  DetailedOrder,
+  TrackOrderResponse,
+  BuyAgainItems,
+} from "@/types/orders";
 import toast from "react-hot-toast";
 import {
   Package,
@@ -20,8 +33,13 @@ import {
   RefreshCw,
   ChevronLeft,
   Star,
+  FilterIcon,
+  SearchIcon,
 } from "lucide-react";
 import { useLoading } from "@/contexts/LoadingContext";
+import CancleOrderModal from "@/components/Order/CancleOrder";
+import ReviewModal from "@/components/Order/ReviewModal";
+import ReturnRefundModal from "@/components/Order/ReturnRefundModal";
 
 export default function MyOrdersPage() {
   return (
@@ -31,10 +49,10 @@ export default function MyOrdersPage() {
   );
 }
 
-
 function MyOrders() {
   const { token } = useAuth();
   const router = useRouter();
+  const [buyAgainItems, setBuyAgainItems] = useState<BuyAgainItems[]>([]);
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const { startLoading, stopLoading } = useLoading();
@@ -49,13 +67,23 @@ function MyOrders() {
     has_next: false,
     has_prev: false,
   });
-  const [selectedOrder, setSelectedOrder] = useState<DetailedOrder | null>(null);
-  const [trackingData, setTrackingData] = useState<TrackOrderResponse | null>(null);
-  const [cancelReason, setCancelReason] = useState("");
-  const [cancelComments, setCancelComments] = useState("");
-  const [reviewsMap, setReviewsMap] = useState<Record<string, { rating: number; comment: string }>>({});
-  const [existingReviews, setExistingReviews] = useState<Set<string>>(new Set());
+  const [selectedOrder, setSelectedOrder] = useState<DetailedOrder | null>(
+    null
+  );
+  const [trackingData, setTrackingData] = useState<TrackOrderResponse | null>(
+    null
+  );
+  const [reviewsMap, setReviewsMap] = useState<
+    Record<string, { rating: number; comment: string }>
+  >({});
+  const [existingReviews, setExistingReviews] = useState<Set<string>>(
+    new Set()
+  );
   const [isMobile, setIsMobile] = useState(false);
+  const buyAgainCarouselRef = useRef<HTMLDivElement>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showReturnModal, setShowReturnModal] = useState(false);
 
   const modalType = searchParams.get("modal");
   const orderId = searchParams.get("id");
@@ -65,10 +93,10 @@ function MyOrders() {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768); // md breakpoint
     };
-    
+
     checkMobile();
     window.addEventListener("resize", checkMobile);
-    
+
     return () => {
       window.removeEventListener("resize", checkMobile);
     };
@@ -146,6 +174,23 @@ function MyOrders() {
     const response = await getOrders(token, params);
     if (response.success) {
       setOrders(response.data);
+
+      // Collect unique buy again items
+      const uniqueItems = new Map<string, BuyAgainItems>();
+      response.data.forEach((order) => {
+        order.items.forEach((item) => {
+          const itemId = item.variant;
+          if (itemId && !uniqueItems.has(itemId)) {
+            uniqueItems.set(itemId, {
+              id: itemId,
+              name: item.name,
+              slug: item.name.toLowerCase().replace(/ /g, "-"),
+              thumbnail_url: item.thumbnail_url,
+            });
+          }
+        });
+      });
+      setBuyAgainItems(Array.from(uniqueItems.values()));
       // On mobile, set pagination to show all orders are loaded
       if (isMobile) {
         setPagination({
@@ -163,51 +208,38 @@ function MyOrders() {
     stopLoading();
   };
 
+  const scrollBuyAgainCarousel = (direction: "left" | "right") => {
+    if (buyAgainCarouselRef.current) {
+      const scrollAmount = 200;
+      const currentScroll = buyAgainCarouselRef.current.scrollLeft;
+      const scrollTo =
+        direction === "left"
+          ? currentScroll - scrollAmount
+          : currentScroll + scrollAmount;
+      buyAgainCarouselRef.current.scrollTo({
+        left: scrollTo,
+        behavior: "smooth",
+      });
+    }
+  };
+
   const handleModalFromUrl = async (modal: string, id: string) => {
     if (!token) return;
-    
-    if (modal === "detail") {
-      startLoading();
-      const response = await getOrder(id, token);
-      if (response.success && response.data) {
-        setSelectedOrder(response.data);
-      }
-      stopLoading();
-    } else if (modal === "tracking") {
+
+    if (modal === "tracking") {
       startLoading();
       const trackResponse = await trackOrder(id, token);
       if (trackResponse.success && trackResponse.data) {
         setTrackingData(trackResponse.data);
       }
       stopLoading();
-    } else if (modal === "cancel") {
-      startLoading();
-      const response = await getOrder(id, token);
-      if (response.success && response.data) {
-        setSelectedOrder(response.data);
-      }
-      stopLoading();
-    } else if (modal === "review") {
-      startLoading();
-      const response = await getOrder(id, token);
-      if (response.success && response.data) {
-        setSelectedOrder(response.data);
-        
-        // Check which products already have reviews
-        const productIds = response.data.items.map(item => {
-          return item.product_id || item.product_variant_id;
-        });
-        
-        // In a real scenario, fetch existing reviews for this order
-        // For now, we'll just initialize empty
-        setExistingReviews(new Set());
-        setReviewsMap({});
-      }
-      stopLoading();
     }
   };
 
-  const openModal = (type: "detail" | "tracking" | "cancel" | "review", id: string) => {
+  const openModal = (
+    type: "detail" | "tracking" | "cancel" | "review",
+    id: string
+  ) => {
     router.push(`/profile/my-orders?modal=${type}&id=${id}`, { scroll: false });
   };
 
@@ -215,46 +247,68 @@ function MyOrders() {
     router.push("/profile/my-orders", { scroll: false });
     setSelectedOrder(null);
     setTrackingData(null);
-    setCancelReason("");
-    setCancelComments("");
+    setShowCancelModal(false);
+    setShowReviewModal(false);
+    setShowReturnModal(false);
     setReviewsMap({});
     setExistingReviews(new Set());
   };
 
   const handleViewOrder = (orderId: string) => {
-    openModal("detail", orderId);
+    router.push(`/profile/order?orderId=${orderId}`);
   };
 
   const handleTrackOrder = (orderId: string) => {
     openModal("tracking", orderId);
   };
 
-  const handleOpenCancelModal = () => {
-    if (!selectedOrder) return;
-    openModal("cancel", selectedOrder.id);
-  };
-
-  const handleCancelOrder = async () => {
+  const handleCancelOrder = async (reason: string, comments: string) => {
     if (!token || !selectedOrder) return;
     startLoading();
     const response = await cancelOrder(selectedOrder.id, token, {
-      reason: cancelReason,
-      comments: cancelComments,
+      reason,
+      comments,
     });
     stopLoading();
-    
+
     if (response.success) {
       toast.success("Order cancelled successfully", { duration: 3000 });
-      closeModal();
+      setShowCancelModal(false);
+      setSelectedOrder(null);
       fetchOrders();
     } else {
-      toast.error(response.message || "Failed to cancel order", { duration: 4000 });
+      toast.error(response.message || "Failed to cancel order", {
+        duration: 4000,
+      });
     }
   };
 
-  const handleSubmitReviews = async () => {
+  const handleReturnRefund = async (reason: string, comments: string) => {
     if (!token || !selectedOrder) return;
-    
+    startLoading();
+    const response = await requestReturnRefund(selectedOrder.id, token, {
+      reason,
+      comments,
+    });
+    stopLoading();
+
+    if (response.success) {
+      toast.success("Return request submitted successfully", { duration: 3000 });
+      setShowReturnModal(false);
+      setSelectedOrder(null);
+      fetchOrders();
+    } else {
+      toast.error(response.message || "Failed to submit return request", {
+        duration: 4000,
+      });
+    }
+  };
+
+  const handleSubmitReviews = async (
+    reviewsMap: Record<string, { rating: number; comment: string }>
+  ) => {
+    if (!token || !selectedOrder) return;
+
     const reviewsToSubmit = Object.entries(reviewsMap);
     if (reviewsToSubmit.length === 0) {
       toast.error("Please rate at least one product");
@@ -264,89 +318,115 @@ function MyOrders() {
     startLoading();
     let successCount = 0;
     let errorMessages: string[] = [];
-    
+
     for (const [productId, reviewData] of reviewsToSubmit) {
       if (existingReviews.has(productId)) continue;
-      
+
       const response = await createProductReview(token, {
         product_id: productId,
         order_id: selectedOrder.id,
         rating: reviewData.rating,
         comment: reviewData.comment || undefined,
       });
-      
+
       if (response.success) {
         successCount++;
       } else {
         // Check if it's a duplicate review error
-        if (response.message && response.message.toLowerCase().includes("already reviewed")) {
-          const productName = selectedOrder.items.find(
-            item => (item.product_id || item.product_variant_id) === productId
-          )?.name || "Product";
+        if (
+          response.message &&
+          response.message.toLowerCase().includes("already reviewed")
+        ) {
+          const productName =
+            selectedOrder.items.find(
+              (item) =>
+                (item.product_id || item.product_variant_id) === productId
+            )?.name || "Product";
           errorMessages.push(`${productName}: Already reviewed`);
         } else {
           errorMessages.push(response.message || "Failed to submit review");
         }
       }
     }
-    
+
     stopLoading();
-    
+
     if (successCount > 0) {
-      toast.success(`${successCount} review(s) submitted successfully! Pending admin approval.`, {
-        duration: 4000,
-      });
+      toast.success(
+        `${successCount} review(s) submitted successfully! Pending admin approval.`,
+        {
+          duration: 4000,
+        }
+      );
     }
-    
+
     if (errorMessages.length > 0) {
       errorMessages.forEach((msg) => {
         toast.error(msg, { duration: 4000 });
       });
     }
-    
+
     if (successCount > 0 || errorMessages.length > 0) {
-      closeModal();
+      setShowReviewModal(false);
+      setSelectedOrder(null);
+      setReviewsMap({});
       fetchOrders();
     }
   };
 
-  const handleRatingChange = (productId: string, rating: number) => {
-    setReviewsMap(prev => ({
-      ...prev,
-      [productId]: {
-        rating,
-        comment: prev[productId]?.comment || ""
-      }
-    }));
+  const handleOpenCancelModal = async (orderId: string) => {
+    if (!token) return;
+    startLoading();
+    const response = await getOrder(orderId, token);
+    if (response.success && response.data) {
+      setSelectedOrder(response.data);
+      setShowCancelModal(true);
+    }
+    stopLoading();
   };
 
-  const handleCommentChange = (productId: string, comment: string) => {
-    setReviewsMap(prev => ({
-      ...prev,
-      [productId]: {
-        rating: prev[productId]?.rating || 0,
-        comment
-      }
-    }));
+  const handleOpenReviewModal = async (orderId: string) => {
+    if (!token) return;
+    startLoading();
+    const response = await getOrder(orderId, token);
+    if (response.success && response.data) {
+      setSelectedOrder(response.data);
+      // Check which products already have reviews
+      const productIds = response.data.items.map((item) => {
+        return item.product_id || item.product_variant_id;
+      });
+      setExistingReviews(new Set());
+      setShowReviewModal(true);
+    }
+    stopLoading();
+  };
+
+  const handleOpenReturnModal = async (orderId: string) => {
+    if (!token) return;
+    startLoading();
+    const response = await getOrder(orderId, token);
+    if (response.success && response.data) {
+      setSelectedOrder(response.data);
+      setShowReturnModal(true);
+    }
+    stopLoading();
   };
 
   const getStatusColor = (status: string) => {
     const colors: Record<string, string> = {
-      pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-      confirmed: "bg-blue-100 text-blue-800 border-blue-200",
+      placed: "bg-yellow-100 text-yellow-800 border-yellow-200",
       processing: "bg-purple-100 text-purple-800 border-purple-200",
       shipped: "bg-indigo-100 text-indigo-800 border-indigo-200",
       delivered: "bg-green-100 text-green-800 border-green-200",
       cancelled: "bg-red-100 text-red-800 border-red-200",
       refunded: "bg-gray-100 text-gray-800 border-gray-200",
-    }
+    };
     return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
   };
 
   const getStatusIcon = (status: string) => {
     const icons: Record<string, React.ReactNode> = {
-      pending: <Clock size={16} />,
-      confirmed: <CheckCircle size={16} />,
+      placed: <Clock size={16} />,
       processing: <RefreshCw size={16} className="animate-spin" />,
       shipped: <Truck size={16} />,
       delivered: <CheckCircle size={16} />,
@@ -361,7 +441,7 @@ function MyOrders() {
       month: "short",
       day: "numeric",
     });
-    
+
     if (status === "shipped") {
       return `Shipped on ${formattedDate}`;
     } else if (status === "delivered") {
@@ -371,127 +451,158 @@ function MyOrders() {
     }
   };
 
+  const canCancelOrder = (status: string) => {
+    return status === "placed";
+  };
+
+  const canReturnOrder = (order: Order) => {
+    if (order.status !== "delivered") return false;
+    // Check if delivered within last 2 days
+    const deliveredDate = new Date(order.updated_at);
+    const now = new Date();
+    const daysDiff = Math.floor(
+      (now.getTime() - deliveredDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+    return daysDiff <= 2;
+  };
+
+  const canReviewOrder = (status: string) => {
+    return status === "delivered";
+  };
+
   const filteredOrders = orders.filter((order) =>
     order.order_number.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
-    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
-      <div className="max-w-6xl">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 md:mb-8 gap-3">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/profile")}
-              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
-              aria-label="Back to profile"
-            >
-              <ChevronLeft size={20} />
-            </button>
+    <div className="bg-white lg:border lg:border-gray-200">
+        <div className="flex md:hidden items-center gap-3 bg-[#0f182c] text-white py-4 px-4 pt-8 w-full"
+        style={{
+          transform: window.innerWidth < 768 ? "translateY(-30px)" : "translateY(0%)",
+        }}
+        >
+          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
+            My Orders
+          </h2>
+        </div>
+      <div className="max-w-6xl pt-0 md:p-8"
+      style={{
+        transform: window.innerWidth < 768 ? "translateY(-30px)" : "translateY(0%)",
+      }}
+      >
+        <div className="hidden md:flex flex-row justify-between items-center mb-6 md:mb-8 gap-3">
+        <div className="items-center gap-3 hidden md:flex">
             <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Orders</h2>
           </div>
-          <button
-            onClick={() => fetchOrders(currentPage)}
-            className="flex items-center justify-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 w-full sm:w-auto"
-          >
-            <RefreshCw size={16} />
-            <span className="text-sm uppercase tracking-wider">Refresh</span>
+          <button className="p-2 hover:bg-gray-100 transition-colors rounded-xs   hidden md:flex items-center gap-2">
+            <FilterIcon size={20} strokeWidth={1} className="text-gray-600" />
+            <span className="text-sm uppercase tracking-wider">Filters</span>
           </button>
         </div>
+        <div className="md:hidden border-b border-gray-200">
+          <div className="flex items-center bg-white px-2">
+            {/* Search Input Area */}
+            <div className="flex items-center flex-1 px-3 py-3">
+              <SearchIcon
+                size={20}
+                strokeWidth={1.5}
+                className="text-gray-600 shrink-0"
+              />
+              <input
+                type="text"
+                placeholder="Search all orders"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1 ml-2 focus:outline-none text-sm text-gray-900 placeholder:text-gray-400"
+              />
+            </div>
 
-        <div className="mb-6 flex gap-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search by order number..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200"
-            />
-          </div>
-          <div className="relative w-32 sm:w-64">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full pl-10 pr-8 py-3 border border-gray-300 focus:border-black focus:outline-none transition-colors duration-200 appearance-none bg-white"
-            >
-              <option value="all">All Orders</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
-              <option value="delivered">Delivered</option>
-              <option value="cancelled">Cancelled</option>
-              <option value="refunded">Refunded</option>
-            </select>
+            {/* Vertical Divider */}
+            <div className="w-px h-6 bg-gray-200"></div>
+
+            {/* Filter Button */}
+            <button className="px-4 py-3 flex items-center gap-2 hover:bg-gray-50 transition-colors">
+              <span className="text-sm font-medium text-gray-900">Filter</span>
+              <ChevronRight size={16} strokeWidth={2} className="text-gray-900" />
+            </button>
           </div>
         </div>
-
         {filteredOrders.length === 0 ? (
           <div className="text-center py-12">
             <Package size={48} className="mx-auto text-gray-300 mb-4" />
             <p className="text-gray-600">No orders found</p>
-            <p className="text-sm text-gray-400 mt-2">Your order history will appear here</p>
+            <p className="text-sm text-gray-400 mt-2">
+              Your order history will appear here
+            </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-4 p-4 md:p-0">
             {filteredOrders.map((order) => {
               // For 2x2 grid: show max 3 items, 4th position shows remaining count if > 3
               const gridItems = order.items.slice(0, 3);
               const showRemainingCount = order.items.length > 3;
               const remainingItemsCount = order.items.length - 3;
-              
+
               return (
-                <div key={order.id} className="border border-gray-200 hover:border-gray-300 transition-colors"
-                onClick={() => handleViewOrder(order.id)}
+                <div
+                  key={order.id}
+                  className="border border-gray-200 hover:border-gray-300 transition-colors rounded-lg md:rounded-none"
+                  onClick={() => handleViewOrder(order.id)}
                 >
                   {/* Mobile View - Simplified */}
-                  <div className="md:hidden p-4">
-                    <div className="flex items-center gap-4">
-                      {/* Product Images Grid - 2x2, max 25% width */}
-                      <div className="w-1/4 shrink-0">
+                  <div className="md:hidden">
+                    <div className="flex items-stretch gap-4 h-full">
+                      <div className="w-1/4 bg-gray-100 p-3 flex items-center">
                         <div className="grid grid-cols-2 gap-1">
                           {gridItems.map((item, index) => (
-                            <div key={index} className="aspect-square bg-gray-100 border border-gray-200">
+                            <div
+                              key={index}
+                              className="aspect-square bg-gray-100 border border-gray-200"
+                            >
                               <img
                                 src={item.thumbnail_url}
                                 alt={item.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover rounded-xs"
                               />
                             </div>
                           ))}
                           {showRemainingCount && (
-                            <div className="aspect-square bg-gray-100 border border-gray-200 flex items-center justify-center">
-                              <span className="text-xs font-medium text-gray-600">+{remainingItemsCount}</span>
+                            <div className="aspect-square bg-gray-300 border border-gray-200 flex items-center justify-center">
+                              <span className="text-xs font-medium text-gray-700 rounded-xs">
+                                +{remainingItemsCount}
+                              </span>
                             </div>
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Date and Order Info */}
-                      <div className="flex-1 min-w-0 ml-2">
+                      <div className="flex-1 min-w-0 ml-2 py-3">
                         <p className="text-sm font-medium text-gray-900 mb-2">
                           {getStatusDateText(order.status, order.created_at)}
                         </p>
-                        {/* <p className="text-xs text-gray-500 mb-2">
-                          {order.items_count} {order.items_count === 1 ? "Item" : "Items"}
-                        </p> */}
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xs text-gray-500 mb-1">{order.order_number}</p>
-                            <p className="text-sm font-medium">₹{Number(order.total_amount).toFixed(2)}</p>
+                            <p className="text-xs text-gray-500 mb-1">
+                              {order.order_number}
+                            </p>
+                            <p className="text-sm font-medium">
+                              ₹{Number(order.total_amount).toFixed(2)}
+                            </p>
                           </div>
                         </div>
                       </div>
 
                       <button
-          
-                            className="p-2 hover:bg-gray-100 transition-colors"
-                            aria-label="View order details"
-                          >
-                            <ChevronRight size={28} strokeWidth={1} className="text-gray-600" />
-                          </button>
+                        className="p-2 hover:bg-gray-100 transition-colors"
+                        aria-label="View order details"
+                      >
+                        <ChevronRight
+                          size={28}
+                          strokeWidth={1}
+                          className="text-gray-600"
+                        />
+                      </button>
                     </div>
                   </div>
 
@@ -501,22 +612,35 @@ function MyOrders() {
                       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3">
                         <div className="grid grid-cols-2 sm:flex sm:items-center gap-3 sm:space-x-6">
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Order Number</p>
-                            <p className="font-medium text-sm">{order.order_number}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Date</p>
-                            <p className="text-sm">
-                              {new Date(order.created_at).toLocaleDateString("en-US", {
-                                year: "numeric",
-                                month: "short",
-                                day: "numeric",
-                              })}
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                              Order Number
+                            </p>
+                            <p className="font-medium text-sm">
+                              {order.order_number}
                             </p>
                           </div>
                           <div>
-                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total</p>
-                            <p className="font-medium">₹{Number(order.total_amount).toFixed(2)}</p>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                              Date
+                            </p>
+                            <p className="text-sm">
+                              {new Date(order.created_at).toLocaleDateString(
+                                "en-US",
+                                {
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric",
+                                }
+                              )}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                              Total
+                            </p>
+                            <p className="font-medium">
+                              ₹{Number(order.total_amount).toFixed(2)}
+                            </p>
                           </div>
                         </div>
                         <div className="flex items-center">
@@ -535,13 +659,17 @@ function MyOrders() {
                     <div className="p-3 md:p-4">
                       <div className="flex items-center justify-between mb-3">
                         <p className="text-xs text-gray-500 uppercase tracking-wider">
-                          {order.items_count} {order.items_count === 1 ? "Item" : "Items"}
+                          {order.items_count}{" "}
+                          {order.items_count === 1 ? "Item" : "Items"}
                         </p>
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 mb-4">
                         {order.items.map((item, index) => (
-                          <div key={index} className="flex items-center space-x-3 p-3 border border-gray-200">
+                          <div
+                            key={index}
+                            className="flex items-center space-x-3 p-3 border border-gray-200"
+                          >
                             <div className="w-12 h-12 md:w-16 md:h-16 shrink-0 bg-gray-100 border border-gray-200">
                               <img
                                 src={item.thumbnail_url}
@@ -550,8 +678,12 @@ function MyOrders() {
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-xs md:text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                              <p className="text-xs text-gray-500 truncate">{item.variant}</p>
+                              <p className="text-xs md:text-sm font-medium text-gray-900 truncate">
+                                {item.name}
+                              </p>
+                              <p className="text-xs text-gray-500 truncate">
+                                {item.variant}
+                              </p>
                             </div>
                           </div>
                         ))}
@@ -562,25 +694,64 @@ function MyOrders() {
                           onClick={() => handleViewOrder(order.id)}
                           className="flex-1 bg-black text-white px-4 py-2 hover:bg-gray-900 transition-colors duration-200 flex items-center justify-center space-x-2"
                         >
-                          <span className="text-sm uppercase tracking-wider">View Details</span>
+                          <span className="text-sm uppercase tracking-wider">
+                            View Details
+                          </span>
                           <ChevronRight size={16} />
                         </button>
-                        {["confirmed", "processing", "shipped"].includes(order.status) && (
+                        {["confirmed", "processing", "shipped"].includes(
+                          order.status
+                        ) && (
                           <button
                             onClick={() => handleTrackOrder(order.id)}
                             className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
                           >
                             <Truck size={16} />
-                            <span className="text-sm uppercase tracking-wider">Track Order</span>
+                            <span className="text-sm uppercase tracking-wider">
+                              Track Order
+                            </span>
                           </button>
                         )}
-                        {order.status === "delivered" && (
+                        {canReturnOrder(order) && (
                           <button
-                            onClick={() => openModal("review", order.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenReturnModal(order.id);
+                            }}
+                            className="flex-1 border border-orange-600 text-orange-600 px-4 py-2 hover:bg-orange-50 transition-colors duration-200 flex items-center justify-center space-x-2"
+                          >
+                            <XCircle size={16} />
+                            <span className="text-sm uppercase tracking-wider">
+                              Return / Refund
+                            </span>
+                          </button>
+                        )}
+                        {canReviewOrder(order.status) && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenReviewModal(order.id);
+                            }}
                             className="flex-1 border border-gray-300 text-gray-700 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
                           >
                             <Star size={16} />
-                            <span className="text-sm uppercase tracking-wider">Write Review</span>
+                            <span className="text-sm uppercase tracking-wider">
+                              Write Review
+                            </span>
+                          </button>
+                        )}
+                        {canCancelOrder(order.status) && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleOpenCancelModal(order.id);
+                            }}
+                            className="flex-1 border border-red-600 text-red-600 px-4 py-2 hover:bg-red-50 transition-colors duration-200 flex items-center justify-center space-x-2"
+                          >
+                            <XCircle size={16} />
+                            <span className="text-sm uppercase tracking-wider">
+                              Cancel Order
+                            </span>
                           </button>
                         )}
                       </div>
@@ -592,78 +763,145 @@ function MyOrders() {
           </div>
         )}
 
-        {filteredOrders.length > 0 && pagination.total_pages > 1 && !isMobile && (
-          <div className="mt-6 md:mt-8 flex flex-col gap-4 border-t border-gray-200 pt-4 md:pt-6">
-            <div className="text-xs md:text-sm text-gray-600 text-center md:text-left">
-              Showing page {pagination.current_page} of {pagination.total_pages} ({pagination.total_orders} total orders)
-            </div>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-              <button
-                onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
-                disabled={!pagination.has_prev}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-              >
-                <ChevronLeft size={16} />
-                <span className="text-sm uppercase tracking-wider">Previous</span>
-              </button>
-
-              <div className="hidden sm:flex items-center space-x-1">
-                {Array.from({ length: pagination.total_pages }, (_, i) => i + 1)
-                  .filter((page) => {
-                    const current = pagination.current_page;
-                    return (
-                      page === 1 ||
-                      page === pagination.total_pages ||
-                      (page >= current - 1 && page <= current + 1)
-                    );
-                  })
-                  .map((page, index, array) => {
-                    const prevPage = array[index - 1];
-                    const showEllipsis = prevPage && page - prevPage > 1;
-
-                    return (
-                      <React.Fragment key={page}>
-                        {showEllipsis && (
-                          <span className="px-3 py-2 text-gray-400">...</span>
-                        )}
-                        <button
-                          onClick={() => setCurrentPage(page)}
-                          className={`min-w-[40px] px-3 py-2 text-sm font-medium transition-colors duration-200 ${
-                            page === pagination.current_page
-                              ? "bg-black text-white"
-                              : "border border-gray-300 text-gray-700 hover:bg-gray-100"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      </React.Fragment>
-                    );
-                  })}
+        {filteredOrders.length > 0 &&
+          pagination.total_pages > 1 &&
+          !isMobile && (
+            <div className="mt-6 md:mt-8 flex flex-col gap-4 border-t border-gray-200 pt-4 md:pt-6">
+              <div className="text-xs md:text-sm text-gray-600 text-center md:text-left">
+                Showing page {pagination.current_page} of{" "}
+                {pagination.total_pages} ({pagination.total_orders} total
+                orders)
               </div>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(1, prev - 1))
+                  }
+                  disabled={!pagination.has_prev}
+                  className="w-full sm:w-auto flex items-center justify-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                >
+                  <ChevronLeft size={16} />
+                  <span className="text-sm uppercase tracking-wider">
+                    Previous
+                  </span>
+                </button>
 
-              <button
-                onClick={() => setCurrentPage((prev) => prev + 1)}
-                disabled={!pagination.has_next}
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
-              >
-                <span className="text-sm uppercase tracking-wider">Next</span>
-                <ChevronRight size={16} />
-              </button>
+                <div className="hidden sm:flex items-center space-x-1">
+                  {Array.from(
+                    { length: pagination.total_pages },
+                    (_, i) => i + 1
+                  )
+                    .filter((page) => {
+                      const current = pagination.current_page;
+                      return (
+                        page === 1 ||
+                        page === pagination.total_pages ||
+                        (page >= current - 1 && page <= current + 1)
+                      );
+                    })
+                    .map((page, index, array) => {
+                      const prevPage = array[index - 1];
+                      const showEllipsis = prevPage && page - prevPage > 1;
+
+                      return (
+                        <React.Fragment key={page}>
+                          {showEllipsis && (
+                            <span className="px-3 py-2 text-gray-400">...</span>
+                          )}
+                          <button
+                            onClick={() => setCurrentPage(page)}
+                            className={`min-w-[40px] px-3 py-2 text-sm font-medium transition-colors duration-200 ${
+                              page === pagination.current_page
+                                ? "bg-black text-white"
+                                : "border border-gray-300 text-gray-700 hover:bg-gray-100"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        </React.Fragment>
+                      );
+                    })}
+                </div>
+
+                <button
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                  disabled={!pagination.has_next}
+                  className="w-full sm:w-auto flex items-center justify-center space-x-2 border border-gray-300 px-4 py-2 hover:bg-gray-100 transition-colors duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
+                >
+                  <span className="text-sm uppercase tracking-wider">Next</span>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </div>
 
-      {modalType === "detail" && selectedOrder && (
-        <OrderDetailsModal
-          order={selectedOrder}
-          onClose={closeModal}
-          onCancel={handleOpenCancelModal}
-          onTrack={() => handleTrackOrder(selectedOrder.id)}
-          getStatusColor={getStatusColor}
-          getStatusIcon={getStatusIcon}
-        />
-      )}
+        {buyAgainItems.length > 0 && (
+          <div className="p-4 md:p-0 block md:hidden">
+            <div className="flex flex-row justify-between items-start mb-4">
+              <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase text-gray-900">
+                Buy again
+              </h2>
+              <Link
+                href="/profile/buy-again"
+                className="text-sm text-gray-600 hover:text-gray-700 transition-colors"
+              >
+                See more
+              </Link>
+            </div>
+            <div className="relative group">
+          
+              <button
+                onClick={() => scrollBuyAgainCarousel("left")}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white border border-gray-200 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Scroll left"
+              >
+                <ChevronLeft size={20} strokeWidth={1} className="text-gray-700" />
+              </button>
+
+             
+              <div
+                ref={buyAgainCarouselRef}
+                className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+                style={{
+                  scrollbarWidth: "none",
+                  msOverflowStyle: "none",
+                }}
+              >
+                {buyAgainItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/product/${item.slug}`}
+                    className="shrink-0 w-24 h-24 bg-white border border-gray-200 rounded-sm overflow-hidden group/item cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+                  >
+                    <div className="w-full h-full p-2 flex items-center justify-center">
+                      <img
+                        src={item.thumbnail_url}
+                        alt={item.name}
+                        className="w-full h-full object-contain transition-transform duration-300 group-hover/item:scale-105"
+                      />
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              
+              <button
+                onClick={() => scrollBuyAgainCarousel("right")}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white border border-gray-200 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
+                aria-label="Scroll right"
+              >
+                <ChevronRight size={20} strokeWidth={1} className="text-gray-700" />
+              </button>
+            </div>
+
+            <style jsx>{`
+              .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+          </div>
+        )}
 
       {modalType === "tracking" && trackingData && (
         <TrackingModal
@@ -674,325 +912,46 @@ function MyOrders() {
         />
       )}
 
-      {modalType === "cancel" && selectedOrder && (
-        <CancelOrderModal
-          orderNumber={selectedOrder.order_number}
-          reason={cancelReason}
-          comments={cancelComments}
-          onReasonChange={setCancelReason}
-          onCommentsChange={setCancelComments}
-          onCancel={closeModal}
+      {/* Cancel Order Modal */}
+      {selectedOrder && (
+        <CancleOrderModal
+          isOpen={showCancelModal}
+          onClose={() => {
+            setShowCancelModal(false);
+            setSelectedOrder(null);
+          }}
+          order={selectedOrder}
           onConfirm={handleCancelOrder}
         />
       )}
 
-      {modalType === "review" && selectedOrder && (
-        <WriteReviewsModal
+      {/* Review Modal */}
+      {selectedOrder && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          onClose={() => {
+            setShowReviewModal(false);
+            setSelectedOrder(null);
+            setReviewsMap({});
+          }}
           order={selectedOrder}
-          reviewsMap={reviewsMap}
-          existingReviews={existingReviews}
-          onRatingChange={handleRatingChange}
-          onCommentChange={handleCommentChange}
-          onCancel={closeModal}
           onConfirm={handleSubmitReviews}
+          existingReviews={existingReviews}
         />
       )}
-    </div>
-  );
-}
 
-function OrderDetailsModal({
-  order,
-  onClose,
-  onCancel,
-  onTrack,
-  getStatusColor,
-  getStatusIcon,
-}: {
-  order: DetailedOrder;
-  onClose: () => void;
-  onCancel: () => void;
-  onTrack: () => void;
-  getStatusColor: (status: string) => string;
-  getStatusIcon: (status: string) => React.ReactNode;
-}) {
-  const canCancel = ["pending", "confirmed"].includes(order.status);
-  const canTrack = ["confirmed", "processing", "shipped"].includes(order.status);
-
-  return (
-    <div 
-      data-lenis-prevent="true" 
-      className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-0 md:p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div className="bg-white max-w-4xl w-full h-[90vh] md:h-auto md:max-h-[90vh] overflow-y-auto rounded-t-2xl md:rounded-none animate-slide-up md:animate-none">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6 flex justify-between items-center rounded-t-2xl md:rounded-none">
-          <div>
-            <h3 className="text-lg md:text-2xl font-light tracking-wide uppercase">Order Details</h3>
-            <p className="text-xs md:text-sm text-gray-600 mt-1">{order.order_number}</p>
-          </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="p-4 md:p-6 space-y-4 md:space-y-6">
-          <div className="flex items-center justify-between pb-4 border-b border-gray-200">
-            <div>
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Order Date</p>
-              <p className="text-sm">
-                {new Date(order.created_at).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-            <span
-              className={`px-4 py-2 text-sm font-medium uppercase tracking-wider border flex items-center space-x-2 ${getStatusColor(
-                order.status
-              )}`}
-            >
-              {getStatusIcon(order.status)}
-              <span>{order.status}</span>
-            </span>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium uppercase tracking-wider mb-4">Order Items</h4>
-            <div className="space-y-3">
-              {order.items.map((item) => (
-                <div key={item.id} className="flex items-center space-x-4 p-4 border border-gray-200">
-                  <div className="w-20 h-20 shrink-0 bg-gray-100 border border-gray-200">
-                    <img src={item.thumbnail_url} alt={item.name} className="w-full h-full object-cover" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="text-sm text-gray-600">{item.variant}</p>
-                    <p className="text-xs text-gray-500 mt-1">Quantity: {item.quantity}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-medium">₹{Number(item.total_price).toFixed(2)}</p>
-                    <p className="text-xs text-gray-500">₹{Number(item.unit_price).toFixed(2)} each</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-            <div>
-              <h4 className="text-xs md:text-sm font-medium uppercase tracking-wider mb-3 flex items-center space-x-2">
-                <MapPin size={16} />
-                <span>Shipping Address</span>
-              </h4>
-              <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black">
-                <p className="text-xs md:text-sm text-gray-900">{order.shipping_address.address_line1}</p>
-                {order.shipping_address.address_line2 && (
-                  <p className="text-xs md:text-sm text-gray-900">{order.shipping_address.address_line2}</p>
-                )}
-                <p className="text-xs md:text-sm text-gray-900">
-                  {order.shipping_address.city}, {order.shipping_address.state}{" "}
-                  {order.shipping_address.postal_code}
-                </p>
-                <p className="text-xs md:text-sm text-gray-900">{order.shipping_address.country}</p>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="text-xs md:text-sm font-medium uppercase tracking-wider mb-3 flex items-center space-x-2">
-                <MapPin size={16} />
-                <span>Billing Address</span>
-              </h4>
-              <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black">
-                <p className="text-xs md:text-sm text-gray-900">{order.billing_address.address_line1}</p>
-                {order.billing_address.address_line2 && (
-                  <p className="text-xs md:text-sm text-gray-900">{order.billing_address.address_line2}</p>
-                )}
-                <p className="text-xs md:text-sm text-gray-900">
-                  {order.billing_address.city}, {order.billing_address.state}{" "}
-                  {order.billing_address.postal_code}
-                </p>
-                <p className="text-xs md:text-sm text-gray-900">{order.billing_address.country}</p>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-xs md:text-sm font-medium uppercase tracking-wider mb-3 flex items-center space-x-2">
-              <CreditCard size={16} />
-              <span>Payment Information</span>
-            </h4>
-            <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Method</p>
-                  <p className="text-xs md:text-sm text-gray-900 capitalize">
-                    {order.payment.payment_method.replace("_", " ")}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Payment Status</p>
-                  <p className="text-xs md:text-sm text-gray-900 capitalize">{order.payment.payment_status}</p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Transaction ID</p>
-                  <p className="text-xs md:text-sm text-gray-900 font-mono break-all">{order.payment.transaction_id}</p>
-                </div>
-                {order.payment.paid_at && (
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Paid At</p>
-                    <p className="text-xs md:text-sm text-gray-900">
-                      {new Date(order.payment.paid_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium uppercase tracking-wider mb-3">Order Summary</h4>
-            <div className="bg-gray-50 p-4 space-y-2 border-l-2 border-black">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
-                <span className="text-gray-900">₹{parseFloat(order.subtotal).toFixed(2)}</span>
-              </div>
-              {parseFloat(order.discount_amount) > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Discount</span>
-                  <span className="text-green-600">-₹{parseFloat(order.discount_amount).toFixed(2)}</span>
-                </div>
-              )}
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Tax</span>
-                <span className="text-gray-900">₹{parseFloat(order.tax_amount).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Shipping</span>
-                <span className="text-gray-900">₹{parseFloat(order.shipping_amount).toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between text-base font-medium pt-2 border-t border-gray-300">
-                <span className="text-gray-900 uppercase tracking-wider">Total</span>
-                <span className="text-gray-900">₹{parseFloat(order.total_amount).toFixed(2)}</span>
-              </div>
-            </div>
-          </div>
-
-          {order.status === "cancelled" && order.refund && (
-            <div>
-              <h4 className="text-sm font-medium uppercase tracking-wider mb-3">Refund Information</h4>
-              <div className="bg-red-50 p-4 border-l-2 border-red-600 space-y-3">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Status</p>
-                    <p className="text-sm text-gray-900 capitalize">
-                      {order.refund.refund_status.replace(/_/g, " ")}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Amount</p>
-                    <p className="text-sm text-gray-900 font-medium">
-                      ₹{parseFloat(order.refund.refund_amount).toFixed(2)}
-                    </p>
-                  </div>
-                  {order.refund.refund_transaction_id && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Transaction ID</p>
-                      <p className="text-sm text-gray-900 font-mono">{order.refund.refund_transaction_id}</p>
-                    </div>
-                  )}
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Initiated At</p>
-                    <p className="text-sm text-gray-900">
-                      {new Date(order.refund.refund_initiated_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  {order.refund.refund_completed_at && (
-                    <div>
-                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Completed At</p>
-                      <p className="text-sm text-gray-900">
-                        {new Date(order.refund.refund_completed_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </p>
-                    </div>
-                  )}
-                </div>
-                {order.refund.refund_reason && (
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Reason</p>
-                    <p className="text-sm text-gray-900">{order.refund.refund_reason}</p>
-                  </div>
-                )}
-                {order.refund.refund_notes && (
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Refund Notes</p>
-                    <p className="text-sm text-gray-900">{order.refund.refund_notes}</p>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {order.notes && (
-            <div>
-              <h4 className="text-sm font-medium uppercase tracking-wider mb-3">Order Notes</h4>
-              <div className="bg-gray-50 p-4 border-l-2 border-black">
-                <p className="text-sm text-gray-700">{order.notes}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            {canTrack && (
-              <button
-                onClick={onTrack}
-                className="flex-1 border border-gray-300 text-gray-700 px-4 md:px-6 py-2 md:py-3 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
-              >
-                <Truck size={16} />
-                <span className="text-sm uppercase tracking-wider">Track Order</span>
-              </button>
-            )}
-            {order.status === "delivered" && (
-              <button
-                onClick={() => window.location.href = `/profile/my-review?orderId=${order.id}`}
-                className="flex-1 border border-gray-300 text-gray-700 px-4 md:px-6 py-2 md:py-3 hover:bg-gray-100 transition-colors duration-200 flex items-center justify-center space-x-2"
-              >
-                <Star size={16} />
-                <span className="text-sm uppercase tracking-wider">Write Review</span>
-              </button>
-            )}
-            {canCancel && (
-              <button
-                onClick={onCancel}
-                className="flex-1 border border-red-600 text-red-600 px-4 md:px-6 py-2 md:py-3 hover:bg-red-50 transition-colors duration-200 flex items-center justify-center space-x-2"
-              >
-                <XCircle size={16} />
-                <span className="text-sm uppercase tracking-wider">Cancel Order</span>
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Return/Refund Modal */}
+      {selectedOrder && (
+        <ReturnRefundModal
+          isOpen={showReturnModal}
+          onClose={() => {
+            setShowReturnModal(false);
+            setSelectedOrder(null);
+          }}
+          order={selectedOrder}
+          onConfirm={handleReturnRefund}
+        />
+      )}
     </div>
   );
 }
@@ -1009,8 +968,8 @@ function TrackingModal({
   getStatusIcon: (status: string) => React.ReactNode;
 }) {
   return (
-    <div 
-      data-lenis-prevent="true" 
+    <div
+      data-lenis-prevent="true"
       className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
@@ -1019,10 +978,17 @@ function TrackingModal({
       <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6 flex justify-between items-center">
           <div>
-            <h3 className="text-lg md:text-2xl font-light tracking-wide uppercase">Track Order</h3>
-            <p className="text-xs md:text-sm text-gray-600 mt-1">{tracking.order_number}</p>
+            <h3 className="text-lg md:text-2xl font-light tracking-wide uppercase">
+              Track Order
+            </h3>
+            <p className="text-xs md:text-sm text-gray-600 mt-1">
+              {tracking.order_number}
+            </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 p-2">
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600 p-2"
+          >
             <X size={24} />
           </button>
         </div>
@@ -1030,7 +996,9 @@ function TrackingModal({
         <div className="p-4 md:p-6 space-y-4 md:space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-gray-50 p-4 border-l-2 border-black">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Status</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                Current Status
+              </p>
               <span
                 className={`inline-flex px-3 py-1 text-sm font-medium uppercase tracking-wider border items-center space-x-2 ${getStatusColor(
                   tracking.current_status
@@ -1042,13 +1010,18 @@ function TrackingModal({
             </div>
             {tracking.estimated_delivery && (
               <div className="bg-gray-50 p-4 border-l-2 border-black">
-                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Estimated Delivery</p>
+                <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                  Estimated Delivery
+                </p>
                 <p className="text-sm text-gray-900">
-                  {new Date(tracking.estimated_delivery).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                  {new Date(tracking.estimated_delivery).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    }
+                  )}
                 </p>
               </div>
             )}
@@ -1056,21 +1029,32 @@ function TrackingModal({
 
           {tracking.tracking_number && (
             <div className="bg-gray-50 p-4 border-l-2 border-black">
-              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Tracking Number</p>
-              <p className="text-sm text-gray-900 font-mono">{tracking.tracking_number}</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                Tracking Number
+              </p>
+              <p className="text-sm text-gray-900 font-mono">
+                {tracking.tracking_number}
+              </p>
               {tracking.carrier && (
-                <p className="text-xs text-gray-500 mt-1">Carrier: {tracking.carrier}</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Carrier: {tracking.carrier}
+                </p>
               )}
             </div>
           )}
 
           <div>
-            <h4 className="text-sm font-medium uppercase tracking-wider mb-4">Tracking Timeline</h4>
+            <h4 className="text-sm font-medium uppercase tracking-wider mb-4">
+              Tracking Timeline
+            </h4>
             <div className="relative">
               <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
               <div className="space-y-6">
                 {tracking.timeline.map((event, index) => (
-                  <div key={index} className="relative flex items-start space-x-4">
+                  <div
+                    key={index}
+                    className="relative flex items-start space-x-4"
+                  >
                     <div
                       className={`relative z-10 w-8 h-8 rounded-full border-2 flex items-center justify-center bg-white ${
                         index === 0 ? "border-black" : "border-gray-300"
@@ -1080,14 +1064,19 @@ function TrackingModal({
                     </div>
                     <div className="flex-1 pt-1">
                       <div className="flex justify-between items-start mb-1">
-                        <p className="font-medium text-gray-900 capitalize">{event.status.replace("_", " ")}</p>
+                        <p className="font-medium text-gray-900 capitalize">
+                          {event.status.replace("_", " ")}
+                        </p>
                         <p className="text-xs text-gray-500">
-                          {new Date(event.timestamp).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}
+                          {new Date(event.timestamp).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            }
+                          )}
                         </p>
                       </div>
                       <p className="text-sm text-gray-600">{event.message}</p>
@@ -1103,253 +1092,3 @@ function TrackingModal({
   );
 }
 
-function CancelOrderModal({
-  orderNumber,
-  reason,
-  comments,
-  onReasonChange,
-  onCommentsChange,
-  onCancel,
-  onConfirm,
-}: {
-  orderNumber: string;
-  reason: string;
-  comments: string;
-  onReasonChange: (value: string) => void;
-  onCommentsChange: (value: string) => void;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  return (
-    <div 
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
-    >
-      <div className="bg-white max-w-md w-full">
-        <div className="border-b border-gray-200 p-4 md:p-6">
-          <h3 className="text-lg md:text-xl font-light tracking-wide uppercase">Cancel Order</h3>
-          <p className="text-xs md:text-sm text-gray-600 mt-1">{orderNumber}</p>
-        </div>
-
-        <div className="p-4 md:p-6 space-y-4">
-          <p className="text-sm text-gray-600">
-            Are you sure you want to cancel this order? This action cannot be undone.
-          </p>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
-              Reason for Cancellation
-            </label>
-            <select
-              value={reason}
-              onChange={(e) => onReasonChange(e.target.value)}
-              className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none transition-colors duration-200"
-            >
-              <option value="">Select a reason</option>
-              <option value="changed_mind">Changed my mind</option>
-              <option value="found_better_price">Found better price</option>
-              <option value="ordered_by_mistake">Ordered by mistake</option>
-              <option value="delivery_too_long">Delivery taking too long</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-900 uppercase tracking-wider mb-2">
-              Additional Comments (Optional)
-            </label>
-            <textarea
-              value={comments}
-              onChange={(e) => onCommentsChange(e.target.value)}
-              rows={3}
-              className="w-full border border-gray-300 px-4 py-3 focus:border-black focus:outline-none transition-colors duration-200 resize-none"
-              placeholder="Any additional details..."
-            ></textarea>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
-            <button
-              onClick={onCancel}
-              className="flex-1 border border-gray-300 text-gray-700 px-4 md:px-6 py-2 md:py-3 hover:bg-gray-100 transition-colors duration-200 uppercase tracking-wider text-sm"
-            >
-              Go Back
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={!reason}
-              className="flex-1 bg-red-600 text-white px-4 md:px-6 py-2 md:py-3 hover:bg-red-700 transition-colors duration-200 uppercase tracking-wider text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              Confirm Cancel
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function WriteReviewsModal({
-  order,
-  reviewsMap,
-  existingReviews,
-  onRatingChange,
-  onCommentChange,
-  onCancel,
-  onConfirm,
-}: {
-  order: DetailedOrder;
-  reviewsMap: Record<string, { rating: number; comment: string }>;
-  existingReviews: Set<string>;
-  onRatingChange: (productId: string, rating: number) => void;
-  onCommentChange: (productId: string, comment: string) => void;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  const [hoveredRatings, setHoveredRatings] = useState<Record<string, number>>({});
-
-  return (
-    <div 
-      data-lenis-prevent="true"
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 md:p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
-    >
-      <div className="bg-white max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 p-4 md:p-6 flex justify-between items-center">
-          <div>
-            <h3 className="text-lg md:text-2xl font-light tracking-wide uppercase">Write Reviews</h3>
-            <p className="text-xs md:text-sm text-gray-600 mt-1">Order #{order.order_number}</p>
-          </div>
-          <button onClick={onCancel} className="text-gray-400 hover:text-gray-600 p-2">
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="p-4 md:p-6 space-y-6">
-          <p className="text-sm text-gray-600">
-            Rate the products from your order. Your reviews help other customers make informed decisions.
-          </p>
-
-          <div className="space-y-4">
-            {order.items.map((item) => {
-              const productId = item.product_id || item.product_variant_id;
-              const hasReview = existingReviews.has(productId);
-              const currentRating = reviewsMap[productId]?.rating || 0;
-              const currentComment = reviewsMap[productId]?.comment || "";
-              const hoveredRating = hoveredRatings[productId] || 0;
-
-              return (
-                <div
-                  key={item.id}
-                  className={`border border-gray-200 p-4 ${hasReview ? 'bg-gray-50 opacity-50' : ''}`}
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-16 h-16 md:w-20 md:h-20 shrink-0 bg-gray-100 border border-gray-200">
-                      <img
-                        src={item.thumbnail_url}
-                        alt={item.name}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{item.name}</p>
-                      <p className="text-sm text-gray-600">{item.variant}</p>
-                      {hasReview && (
-                        <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
-                          <CheckCircle size={12} />
-                          Already reviewed
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {!hasReview && (
-                    <div className="space-y-3">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 uppercase tracking-wider mb-2">
-                          Rating *
-                        </label>
-                        <div className="flex items-center gap-2">
-                          {Array.from({ length: 5 }).map((_, index) => {
-                            const starValue = index + 1;
-                            return (
-                              <button
-                                key={index}
-                                type="button"
-                                onClick={() => onRatingChange(productId, starValue)}
-                                onMouseEnter={() => setHoveredRatings(prev => ({ ...prev, [productId]: starValue }))}
-                                onMouseLeave={() => setHoveredRatings(prev => ({ ...prev, [productId]: 0 }))}
-                                className="transition-transform hover:scale-110"
-                              >
-                                <Star
-                                  size={24}
-                                  className={
-                                    starValue <= (hoveredRating || currentRating)
-                                      ? "fill-yellow-400 text-yellow-400"
-                                      : "text-gray-300"
-                                  }
-                                />
-                              </button>
-                            );
-                          })}
-                          {currentRating > 0 && (
-                            <span className="ml-2 text-sm text-gray-600">
-                              {currentRating} of 5 stars
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 uppercase tracking-wider mb-2">
-                          Review (Optional)
-                        </label>
-                        <textarea
-                          value={currentComment}
-                          onChange={(e) => onCommentChange(productId, e.target.value)}
-                          rows={3}
-                          maxLength={500}
-                          className="w-full border border-gray-300 px-3 py-2 focus:border-black focus:outline-none transition-colors resize-none text-sm"
-                          placeholder="Share your experience with this product..."
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          {currentComment.length}/500 characters
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-            <button
-              onClick={onCancel}
-              className="flex-1 border border-gray-300 text-gray-700 px-4 md:px-6 py-2 md:py-3 hover:bg-gray-100 transition-colors duration-200 uppercase tracking-wider text-sm"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={() => {
-                const hasAnyRating = Object.values(reviewsMap).some(r => r.rating > 0);
-                if (!hasAnyRating) {
-                  toast.error("Please rate at least one product before submitting", { duration: 3000 });
-                  return;
-                }
-                onConfirm();
-              }}
-              disabled={Object.keys(reviewsMap).length === 0 || Object.values(reviewsMap).every(r => r.rating === 0)}
-              className="flex-1 bg-black text-white px-4 md:px-6 py-2 md:py-3 hover:bg-gray-900 transition-colors duration-200 uppercase tracking-wider text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              Submit Reviews
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}

@@ -727,7 +727,7 @@ export default function OnePerfumePage() {
                               className="h-full bg-yellow-400 rounded-full"
                               style={{ width: `${percentage}%` }}
                             />
-                          </div>
+                </div>
                           <span className="text-xs text-gray-600 w-12 text-right">
                             {count}
                           </span>
@@ -798,18 +798,18 @@ export default function OnePerfumePage() {
                           Ritika Chopra
                         </span>
                         <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
+                    {[...Array(5)].map((_, i) => (
                             <span key={i} className="text-yellow-400 text-sm">
-                              ★
-                            </span>
-                          ))}
-                        </div>
+                        ★
+                      </span>
+                    ))}
+                  </div>
                       </div>
                       <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
                       <h4 className="font-medium text-gray-900 mb-2">
                         Boss Vibes
                       </h4>
-                      <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                  <p className="text-gray-800 font-normal leading-relaxed mb-2">
                         CEO naam jaisa hi hai, pehno toh sab notice karte hain.
                       </p>
                     </div>
@@ -846,8 +846,8 @@ export default function OnePerfumePage() {
                       <p className="text-gray-800 font-normal leading-relaxed mb-2">
                         Perfect balance of strength and smoothness in the
                         fragrance.
-                      </p>
-                    </div>
+                  </p>
+                </div>
                     <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
                       <img
                         src={perfume.images[0] || perfume.coverImage}
@@ -866,18 +866,18 @@ export default function OnePerfumePage() {
                         Rajeev Khurana
                       </span>
                       <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
+                    {[...Array(5)].map((_, i) => (
                           <span key={i} className="text-yellow-400 text-sm">
-                            ★
-                          </span>
-                        ))}
-                      </div>
+                        ★
+                      </span>
+                    ))}
+                  </div>
                     </div>
                     <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
                     <h4 className="font-medium text-gray-900 mb-2">
                       Sharp & Sophisticated
                     </h4>
-                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                  <p className="text-gray-800 font-normal leading-relaxed mb-2">
                       Has that rich, bossy vibe. Great for formal wear.
                     </p>
                   </div>
@@ -907,8 +907,8 @@ export default function OnePerfumePage() {
                     </h4>
                     <p className="text-gray-800 font-normal leading-relaxed mb-2">
                       Awsome fregnance
-                    </p>
-                  </div>
+                  </p>
+                </div>
                 </div>
 
                 {/* Review 5 */}
