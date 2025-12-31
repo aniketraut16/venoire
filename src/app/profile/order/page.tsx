@@ -32,11 +32,11 @@ import ReviewModal from "@/components/Order/ReviewModal";
 import ReturnRefundModal from "@/components/Order/ReturnRefundModal";
 
 function OrderPageContent() {
-  const urlParams = useSearchParams();
+    const urlParams = useSearchParams();
   const router = useRouter();
   const { token } = useAuth();
   const { startLoading, stopLoading } = useLoading();
-  const orderId = urlParams.get("orderId");
+    const orderId = urlParams.get("orderId");
   const [order, setOrder] = useState<DetailedOrder | null>(null);
   const [trackingData, setTrackingData] = useState<TrackOrderResponse | null>(
     null
@@ -460,8 +460,8 @@ function OrderPageContent() {
                           currentStatusIndex !== -1 &&
                           index <= currentStatusIndex;
                         const stepDate = getStepDate(step);
-
-                        return (
+    
+  return (
                           <div
                             key={step}
                             className="relative flex items-start pb-8 last:pb-0"
@@ -481,7 +481,7 @@ function OrderPageContent() {
                             <div
                               className={`relative z-10 w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${
                                 isCompleted
-                                  ? "bg-green-500 text-white"
+                                  ? "bg-yellow-500 text-white"
                                   : "bg-white border-2 border-gray-300 text-gray-400"
                               }`}
                             >
@@ -967,7 +967,7 @@ function OrderPageContent() {
 
 function OrderPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div>Loading...</div>}> 
       <OrderPageContent />
     </Suspense>
   );

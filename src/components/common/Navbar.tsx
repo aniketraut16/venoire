@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, User, ShoppingBag, Menu, X, ListOrdered, Package } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, X, ListOrdered, Package, ArrowLeft, ArrowRight, ChevronRight, ChevronLeft } from "lucide-react";
 import { usePathname } from "next/navigation";
 import SearchPopup from "./SearchPopup";
 import { MenuItem } from "@/types/homepage";
@@ -17,10 +17,38 @@ export default function Navbar() {
     null
   );
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
   const { user, needsCompleteSetup } = useAuth();
   const { count } = useCart();
+  const [promoidx, setpromoidx] = useState<number>(0);
+  const promoItems = ["Flat 10% Off On All Orders", "Free Shipping On All Orders", "100% Money Back Guarantee", "24/7 Customer Support"];
   const { navbarContent } = useHomepage();
+
+  const increasepromoidx = () => {
+    
+    if (promoidx === promoItems.length - 1) {
+      setpromoidx(0);
+    }else{
+      setpromoidx(promoidx + 1);
+    }
+  };
+  const decreasepromoidx = () => {
+    
+    if (promoidx <= 0) {
+      setpromoidx(promoItems.length - 1);
+    }else{
+      setpromoidx(promoidx - 1);
+    }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      increasepromoidx();
+    }, 1500);
+
+    return () => clearInterval(interval);
+  }, [promoidx]);
 
   const menuItems = navbarContent?.menuItems || [];
 
@@ -50,9 +78,19 @@ export default function Navbar() {
       : (scrollPosition - startFade) / (endFade - startFade)
     : 1;
 
-  const isTransparent = shouldUseScrollEffect && bgOpacity < 0.5;
-  const textColor = isTransparent ? "text-white" : "text-black";
-  const borderColor = isTransparent ? "border-white/20" : "border-gray-200";
+  // Determine if navbar should be in white theme (hovered or scrolled)
+  const isWhiteTheme = isHovered || (shouldUseScrollEffect && bgOpacity >= 0.5) || (!shouldUseScrollEffect && bgOpacity >= 1);
+  const isTransparent = !isWhiteTheme && shouldUseScrollEffect && bgOpacity < 0.5;
+  
+  // Background color: black/20 by default, white when hovered or scrolled
+  const backgroundColor = isWhiteTheme 
+    ? `rgba(255, 255, 255, 1)`
+    : shouldUseScrollEffect && bgOpacity < 0.5
+    ? `rgba(255, 255, 255, ${bgOpacity})`
+    : `rgba(0, 0, 0, 0.2)`; // bg-black/20
+  
+  const textColor = isWhiteTheme ? "text-black" : "text-white";
+  const borderColor = isWhiteTheme ? "border-gray-200" : (isTransparent ? "border-white/20" : "border-white/20");
 
   const hrefGenerator = (type: string, slug: string) => {
     switch (type) {
@@ -71,14 +109,23 @@ export default function Navbar() {
 
   return (
     <>
+    <div className={`fixed ${ scrollPosition > 758 ? "-top-9" : "top-0" } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out`}>
+      <button>
+        <ChevronLeft size={16} onClick={decreasepromoidx} />
+      </button>
+      <span className="text-white text-xs font-medium tracking-widest">{promoItems[promoidx]}</span>
+      <button>
+        <ChevronRight size={16} onClick={increasepromoidx} />
+      </button>
+    </div>
       <nav
-        className={`fixed top-0 left-0 right-0 ${borderColor} z-50 transition-colors duration-300 ${
-          bgOpacity > 0.5 ? "shadow-lg" : ""
-        }`}
-        style={{ backgroundColor: `rgba(255, 255, 255, ${bgOpacity})` }}
+        className={`fixed ${ scrollPosition > 758 ? "top-0" : "top-9" } left-0 right-0 ${isWhiteTheme ? "border-b" : ""} ${borderColor} z-50 transition-all duration-300 ease-in-out`}
+        style={{ backgroundColor }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
         <div className="max-w-[1920px] mx-auto px-4 sm:px-6 md:px-12 lg:px-16 h-16 sm:h-18 md:h-20">
-          <div className="flex items-center justify-between h-full relative">
+          <div className="flex items-center justify-between h-full relative ">
             {/* Mobile Menu Button (Left Side) */}
             <div className="flex items-center gap-3 md:hidden">
               <button
@@ -107,9 +154,9 @@ export default function Navbar() {
                     <Link
                       href="/perfume"
                       className={`text-sm font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${
-                        isTransparent
-                          ? "hover:text-gray-300"
-                          : "hover:text-gray-600"
+                        isWhiteTheme
+                          ? "hover:text-gray-600"
+                          : "hover:text-gray-300"
                       }`}
                     >
                       {item.name}
@@ -117,9 +164,9 @@ export default function Navbar() {
                   ) : (
                     <button
                       className={`text-sm font-medium tracking-widest transition-colors py-5 uppercase ${textColor} ${
-                        isTransparent
-                          ? "hover:text-gray-300"
-                          : "hover:text-gray-600"
+                        isWhiteTheme
+                          ? "hover:text-gray-600"
+                          : "hover:text-gray-300"
                       }`}
                     >
                       {item.name}
@@ -139,7 +186,7 @@ export default function Navbar() {
                   height={50}
                   className="h-8 sm:h-9 md:h-10 w-auto object-contain"
                   style={
-                    isTransparent ? { filter: "brightness(0) invert(1)" } : {}
+                    isWhiteTheme ? {} : { filter: "brightness(0) invert(1)" }
                   }
                 />
               </Link>
@@ -151,7 +198,7 @@ export default function Navbar() {
               <Link
                 href="/t/new-arrival"
                 className={`text-sm font-medium tracking-widest transition-colors uppercase ${textColor} ${
-                  isTransparent ? "hover:text-gray-300" : "hover:text-gray-600"
+                  isWhiteTheme ? "hover:text-gray-600" : "hover:text-gray-300"
                 }`}
               >
                 NEW ARRIVALS
@@ -159,7 +206,7 @@ export default function Navbar() {
               <Link
                 href="/luxury"
                 className={`text-xl league-script-regular font-medium tracking-widest transition-colors  ${textColor} ${
-                  isTransparent ? "hover:text-gray-300" : "hover:text-gray-600"
+                  isWhiteTheme ? "hover:text-gray-600" : "hover:text-gray-300"
                 }`}
               >
                 Explore Luxury

@@ -12,7 +12,7 @@ export default function FewPerfumes() {
   return (
     <section className="w-full pb-8 sm:pb-12 md:pb-16 bg-linear-to-b from-white to-gray-50">
       {/* Header Section */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pb-8 sm:pb-12 md:pb-16 lg:pb-22 pt-4 text-center">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12 pb-8 sm:pb-12 md:pb-14 pt-4 text-center">
         <motion.h2
           className="text-section uppercase mb-4 sm:mb-5 md:mb-6"
           initial={{ opacity: 0, y: -30 }}

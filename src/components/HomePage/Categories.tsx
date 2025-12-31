@@ -53,7 +53,7 @@ export default function Categories({ categories }: { categories: CategoryorColle
             </div>
 
             {/* Desktop: Flex Layout - Centered */}
-            <div className="hidden md:flex flex-wrap justify-center gap-18 max-w-7xl mx-auto">
+            <div className="hidden md:flex flex-wrap justify-center gap-22 max-w-7xl mx-auto">
                 {categories.map((category: CategoryorCollection, index: number) => (
                     <motion.div
                         key={category.slug}

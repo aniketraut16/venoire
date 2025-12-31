@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { getDetailedPerfume } from "@/utils/perfume";
 import { DetailedPerfume } from "@/types/perfume";
 import { FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { Star, CheckCircle2 } from "lucide-react";
 import { useCart } from "@/contexts/cartContext";
 
 export default function OnePerfumePage() {
@@ -673,8 +674,8 @@ export default function OnePerfumePage() {
                 </div>
 
                 {/* Scent Story */}
-                <div className="border-l-2 border-gray-200 pl-6">
-                  <h2 className="text-xs uppercase tracking-widest text-gray-500 font-normal mb-5">
+                <div className="border-l-2 border-yellow-600 pl-6">
+                  <h2 className="text-sm uppercase tracking-widest text-yellow-600 font-normal mb-5">
                     The Story
                   </h2>
                   <p className="text-gray-700 leading-relaxed text-base font-normal italic whitespace-pre-line">
@@ -689,65 +690,131 @@ export default function OnePerfumePage() {
           {/* Reviews Section */}
           <div className="mt-16 pt-12 border-t border-gray-100">
             <div className="max-w-4xl mx-auto">
-              {/* Header Section */}
-              <div className="flex items-start justify-between mb-10">
-                <div className="flex-1">
-                  <h2 className="text-xs uppercase tracking-widest text-gray-500 font-normal mb-2">
-                    Customer Reviews
-                  </h2>
-                  <div className="flex items-baseline gap-3 mb-6">
-                    <span className="text-3xl font-light">
-                      {Number(perfume.rating).toFixed(2)}
-                    </span>
-                    <span className="text-sm text-gray-600 font-normal tracking-tight">
-                      <span>
-                        (
-                        {perfume.rating_count >= 1000
-                          ? `${(perfume.rating_count / 1000).toFixed(1)}K`
-                          : perfume.rating_count}{" "}
-                        reviews)
-                      </span>
-                    </span>
-                  </div>
+              {/* Title - Centered */}
+              <h2 className="text-center text-section uppercase tracking-widest text-black font-normal mb-10">
+                Customer Reviews
+              </h2>
 
-                  {/* Star Rating Breakdown */}
-                  <div className="space-y-2 mb-6">
-                    {[5, 4, 3, 2, 1].map((star) => {
-                      const count = Math.floor(
-                        (perfume.rating_count * (6 - star)) / 15
-                      );
-                      const percentage = (count / perfume.rating_count) * 100;
-                      return (
-                        <div key={star} className="flex items-center gap-3">
-                          <span className="text-xs text-gray-600 w-8">
-                            {star} star
-                          </span>
-                          <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-yellow-400 rounded-full"
-                              style={{ width: `${percentage}%` }}
+              {/* Header Section - 3 Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-center">
+                {/* Left: Overall Rating */}
+                <div className="flex flex-col items-center">
+                  {/* Stars above rating */}
+                  <div className="flex items-center gap-0.5 mb-2">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const rating = Number(perfume.rating);
+                      const fullStars = Math.floor(rating);
+                      const hasHalfStar = rating % 1 >= 0.5;
+                      
+                      if (i < fullStars) {
+                        return (
+                          <Star
+                            key={i}
+                            size={20}
+                            className="fill-yellow-400 text-yellow-400"
+                          />
+                        );
+                      } else if (i === fullStars && hasHalfStar) {
+                        return (
+                          <div key={i} className="relative w-5 h-5">
+                            <Star
+                              size={20}
+                              className="absolute inset-0 text-gray-300"
                             />
-                </div>
-                          <span className="text-xs text-gray-600 w-12 text-right">
-                            {count}
-                          </span>
-                        </div>
-                      );
+                            <div className="absolute inset-0" style={{ clipPath: 'inset(0 50% 0 0)' }}>
+                              <Star
+                                size={20}
+                                className="fill-yellow-400 text-yellow-400"
+                              />
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <Star
+                            key={i}
+                            size={20}
+                            className="text-gray-300"
+                          />
+                        );
+                      }
                     })}
                   </div>
+                  
+                  {/* Rating Number */}
+                  <span className="text-6xl font-normal text-gray-900 mb-2">
+                    {Number(perfume.rating).toFixed(2)}
+                  </span>
+                  
+                  {/* Review Count with Checkmark */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-title text-gray-600">
+                      Based on {perfume.rating_count >= 1000
+                        ? `${(perfume.rating_count / 1000).toFixed(1)}K`
+                        : perfume.rating_count} reviews
+                    </span>
+                    <CheckCircle2 size={14} className="text-green-600" />
+                  </div>
                 </div>
-                <button className="bg-black text-white px-6 py-2 text-sm font-normal hover:bg-gray-800 transition-colors">
-                  Write a review
-                </button>
+
+                {/* Middle: Star Rating Breakdown */}
+                <div className="space-y-2 border-l-0 border-r-0 md:border-l-2 md:border-r-2 border-gray-200 pl-6 pr-6">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = Math.floor(
+                      (perfume.rating_count * (6 - star)) / 15
+                    );
+                    const percentage = perfume.rating_count > 0 
+                      ? (count / perfume.rating_count) * 100 
+                      : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-2">
+                        {/* Visual Stars */}
+                        <div className="flex items-center gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              className={
+                                i < star
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
+                              }
+                            />
+                          ))}
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-yellow-400 rounded-full"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+                        
+                        {/* Review Count */}
+                        <span className="text-meta text-gray-800 w-16 text-right">
+                          {count}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Right: Write Review Button */}
+                <div className="flex items-start justify-center">
+                  <button className="bg-black text-white px-6 py-2.5 text-sm font-normal hover:bg-gray-800 transition-colors">
+                    Write a review
+                  </button>
+                </div>
               </div>
 
               {/* Customer Photos & Videos Section */}
-              <div className="mb-10">
+              <div className="mb-10 pt-6 border-t border-gray-200">
                 <h3 className="text-sm font-medium text-gray-900 mb-4">
                   Customer photos & videos
                 </h3>
                 <div className="flex items-center gap-2">
-                  <div className="flex gap-2 flex-1 overflow-x-auto pb-2">
+                  <div className="flex gap-2 flex-1 overflow-x-auto pb-2 scrollbar-hide">
                     {[...Array(8)].map((_, i) => (
                       <div
                         key={i}
@@ -772,13 +839,13 @@ export default function OnePerfumePage() {
 
               {/* Sort Dropdown */}
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-sm font-medium text-gray-900">
+                <h3 className="text-md font-medium text-gray-900">
                   Reviews
                 </h3>
                 <select
                   value={reviewSortBy}
                   onChange={(e) => setReviewSortBy(e.target.value)}
-                  className="text-sm text-gray-700 border border-gray-300 px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                  className="text-md text-gray-700 border border-gray-300 px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-gray-400"
                 >
                   <option value="most_recent">Most Recent</option>
                   <option value="highest_rating">Highest Rating</option>
@@ -994,16 +1061,16 @@ export default function OnePerfumePage() {
                   onClick={() => toggleAccordion("usageTips")}
                   className="w-full flex items-center justify-between py-5 transition-colors text-left"
                 >
-                  <h2 className="text-xs uppercase tracking-widest text-gray-900 font-medium">
+                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
                     Usage Tips
                   </h2>
-                  <div className="text-gray-400 text-2xl font-light leading-none">
+                  <div className="text-gray-400 text-section font-medium leading-none">
                     {accordionOpen.usageTips ? "−" : "+"}
                   </div>
                 </button>
                 {accordionOpen.usageTips && (
                   <div className="pb-5">
-                    <p className="text-gray-700 leading-relaxed text-sm font-normal">
+                    <p className="text-gray-700 leading-relaxed text-body font-normal">
                       {perfume.usageTips ?.split('•')
                                 .filter((note) => note.trim())
                                 .map((note, index) => (
@@ -1020,16 +1087,16 @@ export default function OnePerfumePage() {
                   onClick={() => toggleAccordion("brandInfo")}
                   className="w-full flex items-center justify-between py-5 transition-colors text-left"
                 >
-                  <h2 className="text-xs uppercase tracking-widest text-gray-900 font-medium">
+                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
                     Brand Information
                   </h2>
-                  <div className="text-gray-400 text-2xl font-light leading-none">
+                  <div className="text-gray-400 text-section font-medium leading-none">
                     {accordionOpen.brandInfo ? "−" : "+"}
                   </div>
                 </button>
                 {accordionOpen.brandInfo && (
                   <div className="pb-5">
-                    <p className="text-gray-700 text-sm leading-relaxed font-normal">
+                    <p className="text-gray-700 text-body leading-relaxed font-normal">
                       {perfume.brandAndManufacturerInfo}
                     </p>
                   </div>

@@ -427,7 +427,7 @@ function MyOrders() {
   const getStatusIcon = (status: string) => {
     const icons: Record<string, React.ReactNode> = {
       placed: <Clock size={16} />,
-      processing: <RefreshCw size={16} className="animate-spin" />,
+      processing: <RefreshCw size={16} />,
       shipped: <Truck size={16} />,
       delivered: <CheckCircle size={16} />,
       cancelled: <XCircle size={16} />,
@@ -476,7 +476,7 @@ function MyOrders() {
 
   return (
     <div className="bg-white lg:border lg:border-gray-200">
-        <div className="flex md:hidden items-center gap-3 bg-[#0f182c] text-white py-4 px-4 pt-8 w-full"
+        <div className="flex md:hidden items-center gap-3 bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full"
         style={{
           transform: window.innerWidth < 768 ? "translateY(-30px)" : "translateY(0%)",
         }}

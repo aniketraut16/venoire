@@ -19,7 +19,7 @@ export default function BrowseCollections({ collections }: { collections: Catego
     <div className="w-full bg-white">
       {/* Header Section */}
       <motion.div 
-        className="text-center py-8 sm:py-10 md:py-12 px-4 sm:px-6"
+        className="text-center py-8 sm:py-10 md:py-12 px-4 sm:px-6 mb-14"
         initial={{ opacity: 0, y: -30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
