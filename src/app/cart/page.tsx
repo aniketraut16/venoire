@@ -175,7 +175,7 @@ function ShoppingCartPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 pt-20 pb-32 md:pb-8">
+      <div className="min-h-screen bg-gray-50 pt-28 pb-32 md:pb-8">
         <div className="max-w-7xl mx-auto px-4 py-4 md:py-8">
           {/* Mobile: Cart Items */}
           <div className="space-y-4 md:hidden">
@@ -200,24 +200,24 @@ function ShoppingCartPage() {
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1 pr-2">
                         <p className="text-xs font-semibold text-gray-900 uppercase tracking-wide mb-1">
-                          {item.name.split(" ")[0]}
+                          {item.name.length >23 ? `${item.name.substring(0,23)}...` : item.name}
                         </p>
-                        <p className="text-sm text-gray-800 font-medium leading-tight line-clamp-2">
+                        <p className="text-xs text-gray-800 font-medium leading-tight line-clamp-2">
                           {item.description || item.name}
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex">
                         <button
                           onClick={() => moveToWishlist(item)}
-                          className="p-2 hover:bg-pink-50 rounded-full transition-colors"
+                          className="p-2  rounded-full transition-colors"
                         >
-                          <Heart className="w-5 h-5 text-gray-600" />
+                          <Heart className="w-5 h-5 text-pink-600" />
                         </button>
                         <button
                           onClick={() => removeFromCart(item.id)}
-                          className="p-2 hover:bg-red-50 rounded-full transition-colors"
+                          className="p-2 rounded-full transition-colors"
                         >
-                          <Trash2 className="w-5 h-5 text-gray-600" />
+                          <Trash2 className="w-5 h-5 text-red-600" />
                         </button>
                       </div>
                     </div>
@@ -225,8 +225,13 @@ function ShoppingCartPage() {
                     {/* Pricing */}
                     <div className="mb-2">
                       {/* Total Price - Most Prominent */}
-                      <p className="text-xl font-bold text-gray-900 mb-1">
+                      <p className="text-xl font-bold text-gray-900 mb-1 flex items-center">
                         ₹ {Number(item.price * item.quantity).toLocaleString()}
+                        {item.badgeText && (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs ml-2 font-semibold bg-green-100 text-green-800 rounded">
+                          {item.badgeText}
+                        </span>
+                      )}
                       </p>
 
                       {/* Unit Price - Secondary */}
@@ -236,13 +241,7 @@ function ShoppingCartPage() {
                         </p>
                       )}
 
-                      {/* Original Price - Tertiary */}
-                      {item.originalPrice &&
-                        Number(item.originalPrice) > Number(item.price) && (
-                          <p className="text-xs text-gray-400 line-through mb-1">
-                            ₹ {Number(item.originalPrice).toLocaleString()}
-                          </p>
-                        )}
+                      
 
                       {/* Savings - Accent */}
                       {item.price > 0 && item.originalPrice > item.price && (
@@ -257,12 +256,8 @@ function ShoppingCartPage() {
                     </div>
 
                     {/* Offer Badges */}
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {item.badgeText && (
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-green-100 text-green-800 rounded">
-                          {item.badgeText}
-                        </span>
-                      )}
+                    <div className="flex flex-wrap gap-2 mb-1">
+                  
                       {item.buyXGetYOffer.applicable &&
                         item.buyXGetYOffer.x > item.quantity && (
                           <span className="inline-flex items-center px-2 py-0.5 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
@@ -342,7 +337,7 @@ function ShoppingCartPage() {
                         <label className="block text-xs font-medium text-gray-700 mb-1">
                           Qty:
                         </label>
-                        <div className="flex items-center border border-gray-300 rounded max-w-[120px]">
+                        <div className="flex items-center border border-gray-300 rounded max-w-[120px] h-9">
                           <button
                             onClick={() => {
                               const currentQty =
@@ -589,7 +584,7 @@ function ShoppingCartPage() {
                               </label>
                               <div className="relative">
                                 <select
-                                  className="w-20 h-10 px-3 pr-8 border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="w-20 h-10 px-3 pr-8 rounded border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   value={
                                     selectedSizes[item.id] ??
                                     item.size?.size ??
@@ -622,7 +617,7 @@ function ShoppingCartPage() {
                               </label>
                               <div className="relative">
                                 <select
-                                  className="w-24 h-10 px-3 pr-8 border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  className="w-24 h-10 px-3 rounded pr-8 border border-gray-300 bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500"
                                   value={
                                     selectedVolumes[item.id] ??
                                     item.ml_volume?.ml_volume ??
@@ -704,14 +699,14 @@ function ShoppingCartPage() {
                         <div className="flex gap-4 items-end justify-end text-sm">
                           <button
                             onClick={() => moveToWishlist(item)}
-                            className="flex items-center gap-2 px-3 py-2 border border-gray-300 bg-white hover:bg-pink-50 hover:border-pink-300 text-gray-700 hover:text-pink-600 transition-colors cursor-pointer"
+                            className="flex items-center rounded gap-2 px-3 py-2 border border-gray-300 bg-pink-50 hover:bg-pink-100 hover:border-pink-400 text-pink-600 hover:text-pink-700 transition-colors cursor-pointer"
                           >
                             <Heart className="w-4 h-4" />
                             MOVE TO WISHLIST
                           </button>
                           <button
                             onClick={() => removeFromCart(item.id)}
-                            className="flex items-center gap-2 px-3 py-2 border border-gray-300 bg-white hover:bg-red-50 hover:border-red-300 text-gray-700 hover:text-red-600 transition-colors cursor-pointer"
+                            className="flex items-center rounded gap-2 px-3 py-2 border border-gray-300 bg-red-50 hover:bg-red-100 hover:border-red-400 text-red-600 hover:text-red-700 transition-colors cursor-pointer"
                           >
                             <Trash2 className="w-4 h-4" />
                             REMOVE
@@ -803,7 +798,7 @@ function ShoppingCartPage() {
                       onClick={handleCheckout}
                       className="w-full bg-black text-white py-3 font-medium text-sm hover:bg-gray-800 transition-colors mb-4"
                     >
-                      CHECK OUT (₹ {pricing?.total.toLocaleString()})
+                      CHECK OUT
                     </button>
 
                     {/* Coupon Link */}
@@ -848,15 +843,15 @@ function ShoppingCartPage() {
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg z-50">
           <div className="flex items-center justify-between mb-2">
             <div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xl font-medium text-gray-700">
                 Total: ₹ {payableAmount.toLocaleString()}
               </p>
             </div>
             <button
               onClick={handleCheckout}
-              className="bg-black text-white px-8 py-3 rounded font-semibold text-sm hover:bg-gray-800 transition-colors"
+              className="bg-black text-white px-12 py-3 rounded font-semibold text-sm hover:bg-gray-800 transition-colors"
             >
-              CHECK OUT (₹ {pricing?.total.toLocaleString()})
+              CHECK OUT
             </button>
           </div>
         </div>
