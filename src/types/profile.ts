@@ -1,3 +1,5 @@
+import { BuyAgainItems, Order } from "./orders";
+
 export type Profile = {
     id: string;
     email: string;
@@ -18,4 +20,9 @@ export type UpdateProfileArgs = {
     last_name: string;
     phone: string;
     gender: 'male' | 'female' | 'other';
+}
+
+export type UserOverview = {
+    orders: Order[];
+    buynowitems: BuyAgainItems[];
 }

@@ -84,6 +84,14 @@ export default function FewPerfumes() {
                         className="w-full h-full object-contain aspect-square rounded-xl"
                         style={{
                           mixBlendMode: "multiply",
+                          filter: "none",
+                          WebkitFilter: "none",
+                          backdropFilter: "none",
+                          WebkitBackdropFilter: "none",
+                          imageRendering: "-webkit-optimize-contrast",
+                          backfaceVisibility: "visible",
+                          transform: "translateZ(0)",
+                          WebkitTransform: "translateZ(0)"
                         }}
                       />
                     </div>

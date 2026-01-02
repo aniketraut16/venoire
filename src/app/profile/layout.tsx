@@ -31,7 +31,7 @@ export default function ProfileLayout({
   };
 
   const navigationItems = [
-    { path: "/profile", label: "My Profile", icon: <User /> },
+    { path: "/profile", label: "My Account", icon: <User /> },
     { path: "/profile/my-orders", label: "My Orders", icon: <ShoppingBag /> },
     { path: "/profile/my-addresses", label: "My Addresses", icon: <MapPin /> },
     { path: "/profile/my-whishlist", label: "My Wishlist", icon: <Heart /> },
@@ -39,11 +39,11 @@ export default function ProfileLayout({
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20 md:pt-45 pb-10 md:pb-15">
-      <div className="max-w-7xl mx-auto px-0 md:px-0">
+    <div className="min-h-screen bg-gray-50 pt-30 md:pt-40 pb-10 md:pb-15">
+      <div className="md:max-w-[90vw] mx-auto px-0 md:px-0">
         <div className="flex flex-col lg:flex-row gap-0 lg:gap-0">
           {/* Desktop Sidebar */}
-          <div className="hidden lg:block w-80 bg-white border-r border-gray-200 sticky top-45 self-start">
+          <div className="hidden lg:block w-80 bg-white border-r border-gray-200 sticky top-40 self-start">
             <div className="p-8 border-b border-gray-200">
               <h1 className="text-3xl font-light tracking-wide uppercase">My Account</h1>
               <p className="text-gray-600 mt-2 text-sm">Manage your profile and preferences</p>
@@ -90,7 +90,7 @@ export default function ProfileLayout({
           </div>
 
           {/* Main Content */}
-          <div className="flex-1 lg:px-8">{children}</div>
+          <div className="flex-1 lg:px-8 lg:pr-0">{children}</div>
         </div>
       </div>
     </div>

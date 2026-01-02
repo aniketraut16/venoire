@@ -62,7 +62,7 @@ export default function Navbar() {
   }, []);
 
   const isHomePage = pathname === "/";
-  const isPerfumePage = pathname?.startsWith("/perfume");
+  const isPerfumePage = pathname?.startsWith("/perfume") && window.innerWidth > 768;
   const shouldUseScrollEffect = isHomePage || isPerfumePage;
 
   const viewportHeight =

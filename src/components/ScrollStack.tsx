@@ -10,8 +10,14 @@ export const ScrollStackItem = ({ children, itemClassName = '' }: ScrollStackIte
   <div
     className={`scroll-stack-card relative w-full  my-8 p-6 rounded-3xl md:rounded-[40px] shadow-[0_0_40px_rgba(0,0,0,0.08)] box-border origin-top will-change-transform ${itemClassName}`.trim()}
     style={{
-      backfaceVisibility: 'hidden',
-      transformStyle: 'preserve-3d'
+      backfaceVisibility: 'visible',
+      transformStyle: 'preserve-3d',
+      filter: 'none',
+      WebkitFilter: 'none',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
+      imageRendering: '-webkit-optimize-contrast',
+      textRendering: 'optimizeLegibility'
     }}
   >
     {children}
@@ -157,19 +163,14 @@ const ScrollStack = ({
       const lastTransform = lastTransformsRef.current.get(i);
       const hasChanged =
         !lastTransform ||
-        Math.abs(lastTransform.translateY - newTransform.translateY) > 0.5 ||
-        Math.abs(lastTransform.scale - newTransform.scale) > 0.0001 ||
-        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.5 ||
+        Math.abs(lastTransform.translateY - newTransform.translateY) > 1 ||
+        Math.abs(lastTransform.scale - newTransform.scale) > 0.001 ||
+        Math.abs(lastTransform.rotation - newTransform.rotation) > 0.1 ||
         Math.abs(lastTransform.blur - newTransform.blur) > 0.5;
 
       if (hasChanged) {
-        const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale(${newTransform.scale}) rotate(${newTransform.rotation}deg)`;
-
+        const transform = `translate3d(0, ${newTransform.translateY}px, 0) scale3d(${newTransform.scale}, ${newTransform.scale}, 1) rotate(${newTransform.rotation}deg)`;
         card.style.transform = transform;
-        card.style.filter = 'none';
-        card.style.webkitFilter = 'none';
-        card.style.transition = 'transform 0.1s ease-out';
-
         lastTransformsRef.current.set(i, newTransform);
       }
 
@@ -283,15 +284,34 @@ const ScrollStack = ({
       }
       card.style.willChange = 'transform';
       card.style.transformOrigin = 'top center';
-      card.style.backfaceVisibility = 'hidden';
+      card.style.backfaceVisibility = 'visible';
       card.style.transform = 'translateZ(0)';
       card.style.webkitTransform = 'translateZ(0)';
       card.style.perspective = '1000px';
       card.style.webkitPerspective = '1000px';
       card.style.filter = 'none';
       card.style.webkitFilter = 'none';
-      (card.style as any).WebkitFontSmoothing = 'antialiased';
-      (card.style as any).MozOsxFontSmoothing = 'grayscale';
+      card.style.backdropFilter = 'none';
+      card.style.webkitBackdropFilter = 'none';
+      card.style.transition = 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+      card.style.imageRendering = '-webkit-optimize-contrast';
+      card.style.textRendering = 'optimizeLegibility';
+      (card.style as any).WebkitFontSmoothing = 'subpixel-antialiased';
+      (card.style as any).MozOsxFontSmoothing = 'auto';
+      
+      // Ensure all child images are crisp
+      const images = card.querySelectorAll('img');
+      images.forEach((img) => {
+        const imgEl = img as HTMLElement;
+        imgEl.style.filter = 'none';
+        imgEl.style.webkitFilter = 'none';
+        imgEl.style.imageRendering = '-webkit-optimize-contrast';
+        imgEl.style.backfaceVisibility = 'visible';
+        imgEl.style.transform = 'translateZ(0) scale(1)';
+        imgEl.style.webkitTransform = 'translateZ(0) scale(1)';
+        imgEl.style.willChange = 'auto';
+        imgEl.style.transition = 'none';
+      });
     });
 
     const cleanup = setupLenis();

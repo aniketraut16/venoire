@@ -226,9 +226,74 @@ export default function OnePerfumePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pb-20 md:pb-0">
       {/* Hero Section with Product Image as Background */}
-      <div className="relative w-full min-h-[65vh] overflow-hidden">
+
+      <div className="space-y-1 grow flex md:hidden flex-col mt-30 px-4">
+        {/* Category Label */}
+
+        {/* Product Name with Quantity */}
+        <h3 className="font-medium text-section text-gray-900 tracking-[0.6px]">
+          {perfume.name} - {perfume.price[selectedSize].quantity}ml
+        </h3>
+        <p className="text-[12px] text-gray-700 uppercase tracking-wide">
+          {perfume.concentration}
+        </p>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 text-[14px] font-medium mt-auto">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+            focusable="false"
+            className="icon icon-star"
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+          >
+            <path
+              d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"
+              fill="#FFB503"
+            ></path>
+          </svg>
+          <span className=" text-gray-900">
+            {parseFloat(perfume.rating.toString()).toFixed(1)}
+          </span>
+          <span className=" text-gray-400">|</span>
+
+          <svg
+            viewBox="0 0 18 18"
+            className="icon icon-whatsapp-verified"
+            height="14"
+            width="14"
+            preserveAspectRatio="xMidYMid meet"
+            version="1.1"
+            x="0px"
+            y="0px"
+            enableBackground="new 0 0 18 18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <polygon
+              id="Star-2"
+              fill="#005eff"
+              points="9,16 7.1,16.9 5.8,15.2 3.7,15.1 3.4,13 1.5,12 2.2,9.9 1.1,8.2 2.6,6.7 2.4,4.6 4.5,4 5.3,2 7.4,2.4 9,1.1 10.7,2.4 12.7,2 13.6,4 15.6,4.6 15.5,6.7 17,8.2 15.9,9.9 16.5,12 14.7,13 14.3,15.1 12.2,15.2 10.9,16.9 "
+            ></polygon>
+            <polygon
+              id="Check-Icon"
+              fill="#FFFFFF"
+              points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
+            ></polygon>
+          </svg>
+          <span className=" text-gray-600">
+            (
+            {perfume.rating_count >= 1000
+              ? `${(perfume.rating_count / 1000).toFixed(1)}K`
+              : perfume.rating_count}{" "}
+            Reviews)
+          </span>
+        </div>
+      </div>
+      <div className="relative w-full min-h-[65vh] overflow-hidden hidden md:block">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0">
           <img
@@ -349,7 +414,8 @@ export default function OnePerfumePage() {
           </div>
         </div>
       </div>
-      <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative">
+
+      <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative hidden md:block">
         <div className="flex items-center h-full">
           <div className="flex whitespace-nowrap animate-marquee hover:paused">
             <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
@@ -401,9 +467,9 @@ export default function OnePerfumePage() {
        )} */}
 
       {/* Product Gallery and Description Section */}
-      <div className="bg-white py-16">
+      <div className="bg-white py-4 md:py-16">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-12">
             {/* Left Side - Sticky Gallery */}
             <div className="order-1 lg:col-span-2">
               <div className="lg:sticky lg:top-24">
@@ -528,6 +594,65 @@ export default function OnePerfumePage() {
               </div>
             </div>
 
+            {/* Mobile Pricing Section - After Gallery */}
+            <div className="flex flex-col gap-2 md:hidden order-2">
+              {/* Pricing and Quantity Row */}
+              <div className="flex items-center justify-between gap-4 pt-2">
+                {/* Left Side - Pricing */}
+                <div className="flex-1">
+                 
+                
+                  {/* Current Price */}
+                  <div className="mb-1">
+                    <span className="text-2xl font-medium tracking-tight text-gray-900">
+                      ₹{totalPrice.toFixed(2)}
+                    </span>
+                  </div>
+                  
+                  {/* MRP and Taxes */}
+                  <div className="flex flex-col gap-0.5">
+                    {totalOriginalPrice > totalPrice && (
+                      <span className="text-xs text-gray-500 line-through">
+                        MRP: ₹{totalOriginalPrice.toFixed(2)}
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-500">
+                      Inclusive of all taxes
+                    </span>
+                  </div>
+                </div>
+
+                {/* Right Side - Quantity Selector */}
+                <div className="flex items-center bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
+                  <button
+                    onClick={handleQuantityDecrease}
+                    className="px-4 py-2.5 h-full hover:bg-gray-200 transition-colors flex items-center justify-center text-gray-700"
+                    disabled={quantity <= 1}
+                  >
+                    <FiMinus className="w-4 h-4" />
+                  </button>
+                  <span className="px-5 py-2.5 text-sm font-medium text-gray-900 border-x border-gray-200">
+                    {quantity}
+                  </span>
+                  <button
+                    onClick={handleQuantityIncrease}
+                    className="px-4 py-2.5 h-full hover:bg-gray-200 transition-colors flex items-center justify-center text-gray-700"
+                  >
+                    <FiPlus className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Badge Text - Subtle */}
+              {perfume.badgeText && (
+                <div className="pt-1">
+                  <span className="inline-block text-xs text-gray-600 font-light tracking-wide">
+                    {perfume.badgeText}
+                  </span>
+                </div>
+              )}
+            </div>
+
             {/* Right Side - Scrollable Content */}
             <div className="order-2 lg:col-span-3 space-y-12">
               {/* Product Description & Scent Story - Merged Flow */}
@@ -569,7 +694,7 @@ export default function OnePerfumePage() {
                             </div>
                             <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
                               {perfume.top_notes
-                                ?.split('•')
+                                ?.split("•")
                                 .filter((note) => note.trim())
                                 .map((note, index) => (
                                   <p key={index}> • {note.trim()}</p>
@@ -607,7 +732,7 @@ export default function OnePerfumePage() {
                             </div>
                             <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
                               {perfume.middle_notes
-                                ?.split('•')
+                                ?.split("•")
                                 .filter((note) => note.trim())
                                 .map((note, index) => (
                                   <p key={index}> • {note.trim()}</p>
@@ -645,7 +770,7 @@ export default function OnePerfumePage() {
                             </div>
                             <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
                               {perfume.base_notes
-                                ?.split('•')
+                                ?.split("•")
                                 .filter((note) => note.trim())
                                 .map((note, index) => (
                                   <p key={index}> • {note.trim()}</p>
@@ -686,6 +811,94 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
+          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 "
+          style={{
+            transform:"scale(1.2)",
+          }}
+          >
+            <div className="flex items-center h-full">
+              <div className="flex whitespace-nowrap animate-marquee hover:paused">
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  🎁 Free shipping on orders over $100
+                </span>
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  ✨ Buy 2 Get 15% Off - Limited Time
+                </span>
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  💝 Free gift wrapping with every purchase
+                </span>
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  🌟 New arrivals - Explore our latest collection
+                </span>
+                {/* Duplicate for seamless loop */}
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  🎁 Free shipping on orders over $100
+                </span>
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  ✨ Buy 2 Get 15% Off - Limited Time
+                </span>
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  💝 Free gift wrapping with every purchase
+                </span>
+                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
+                  🌟 New arrivals - Explore our latest collection
+                </span>
+              </div>
+            </div>
+          </div>
+          {/* Usage Tips & Brand Info - Minimal Accordion */}
+          <div className="mt-2 md:mt-16 pt-12 border-t border-gray-100">
+            <div className="max-w-4xl mx-auto">
+              {/* Usage Tips */}
+              <div className="border-b border-gray-100">
+                <button
+                  onClick={() => toggleAccordion("usageTips")}
+                  className="w-full flex items-center justify-between py-5 transition-colors text-left"
+                >
+                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
+                    Usage Tips
+                  </h2>
+                  <div className="text-gray-400 text-section font-medium leading-none">
+                    {accordionOpen.usageTips ? "−" : "+"}
+                  </div>
+                </button>
+                {accordionOpen.usageTips && (
+                  <div className="pb-5">
+                    <p className="text-gray-700 leading-relaxed text-body font-normal">
+                      {perfume.usageTips
+                        ?.split("•")
+                        .filter((note) => note.trim())
+                        .map((note, index) => (
+                          <p key={index}> • {note.trim()}</p>
+                        ))}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Brand Information */}
+              <div className="border-b border-gray-100">
+                <button
+                  onClick={() => toggleAccordion("brandInfo")}
+                  className="w-full flex items-center justify-between py-5 transition-colors text-left"
+                >
+                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
+                    Brand Information
+                  </h2>
+                  <div className="text-gray-400 text-section font-medium leading-none">
+                    {accordionOpen.brandInfo ? "−" : "+"}
+                  </div>
+                </button>
+                {accordionOpen.brandInfo && (
+                  <div className="pb-5">
+                    <p className="text-gray-700 text-body leading-relaxed font-normal">
+                      {perfume.brandAndManufacturerInfo}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
 
           {/* Reviews Section */}
           <div className="mt-16 pt-12 border-t border-gray-100">
@@ -705,7 +918,7 @@ export default function OnePerfumePage() {
                       const rating = Number(perfume.rating);
                       const fullStars = Math.floor(rating);
                       const hasHalfStar = rating % 1 >= 0.5;
-                      
+
                       if (i < fullStars) {
                         return (
                           <Star
@@ -721,7 +934,10 @@ export default function OnePerfumePage() {
                               size={20}
                               className="absolute inset-0 text-gray-300"
                             />
-                            <div className="absolute inset-0" style={{ clipPath: 'inset(0 50% 0 0)' }}>
+                            <div
+                              className="absolute inset-0"
+                              style={{ clipPath: "inset(0 50% 0 0)" }}
+                            >
                               <Star
                                 size={20}
                                 className="fill-yellow-400 text-yellow-400"
@@ -731,27 +947,25 @@ export default function OnePerfumePage() {
                         );
                       } else {
                         return (
-                          <Star
-                            key={i}
-                            size={20}
-                            className="text-gray-300"
-                          />
+                          <Star key={i} size={20} className="text-gray-300" />
                         );
                       }
                     })}
                   </div>
-                  
+
                   {/* Rating Number */}
                   <span className="text-6xl font-normal text-gray-900 mb-2">
                     {Number(perfume.rating).toFixed(2)}
                   </span>
-                  
+
                   {/* Review Count with Checkmark */}
                   <div className="flex items-center gap-1.5">
                     <span className="text-title text-gray-600">
-                      Based on {perfume.rating_count >= 1000
+                      Based on{" "}
+                      {perfume.rating_count >= 1000
                         ? `${(perfume.rating_count / 1000).toFixed(1)}K`
-                        : perfume.rating_count} reviews
+                        : perfume.rating_count}{" "}
+                      reviews
                     </span>
                     <CheckCircle2 size={14} className="text-green-600" />
                   </div>
@@ -763,9 +977,10 @@ export default function OnePerfumePage() {
                     const count = Math.floor(
                       (perfume.rating_count * (6 - star)) / 15
                     );
-                    const percentage = perfume.rating_count > 0 
-                      ? (count / perfume.rating_count) * 100 
-                      : 0;
+                    const percentage =
+                      perfume.rating_count > 0
+                        ? (count / perfume.rating_count) * 100
+                        : 0;
                     return (
                       <div key={star} className="flex items-center gap-2">
                         {/* Visual Stars */}
@@ -782,7 +997,7 @@ export default function OnePerfumePage() {
                             />
                           ))}
                         </div>
-                        
+
                         {/* Progress Bar */}
                         <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -790,7 +1005,7 @@ export default function OnePerfumePage() {
                             style={{ width: `${percentage}%` }}
                           />
                         </div>
-                        
+
                         {/* Review Count */}
                         <span className="text-meta text-gray-800 w-16 text-right">
                           {count}
@@ -821,7 +1036,10 @@ export default function OnePerfumePage() {
                         className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
                       >
                         <img
-                          src={perfume.images[i % perfume.images.length] || perfume.coverImage}
+                          src={
+                            perfume.images[i % perfume.images.length] ||
+                            perfume.coverImage
+                          }
                           alt={`Customer photo ${i + 1}`}
                           className="w-full h-full object-cover"
                         />
@@ -839,9 +1057,7 @@ export default function OnePerfumePage() {
 
               {/* Sort Dropdown */}
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-md font-medium text-gray-900">
-                  Reviews
-                </h3>
+                <h3 className="text-md font-medium text-gray-900">Reviews</h3>
                 <select
                   value={reviewSortBy}
                   onChange={(e) => setReviewSortBy(e.target.value)}
@@ -865,27 +1081,24 @@ export default function OnePerfumePage() {
                           Ritika Chopra
                         </span>
                         <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
+                          {[...Array(5)].map((_, i) => (
                             <span key={i} className="text-yellow-400 text-sm">
-                        ★
-                      </span>
-                    ))}
-                  </div>
+                              ★
+                            </span>
+                          ))}
+                        </div>
                       </div>
                       <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
-                      <h4 className="font-medium text-gray-900 mb-2">
-                        Boss Vibes
-                      </h4>
-                  <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
+                        <img
+                          src={perfume.coverImage}
+                          alt="Review image"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-gray-800 font-normal leading-relaxed my-2">
                         CEO naam jaisa hi hai, pehno toh sab notice karte hain.
                       </p>
-                    </div>
-                    <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
-                      <img
-                        src={perfume.coverImage}
-                        alt="Review image"
-                        className="w-full h-full object-cover"
-                      />
                     </div>
                   </div>
                 </div>
@@ -907,20 +1120,17 @@ export default function OnePerfumePage() {
                         </div>
                       </div>
                       <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
-                      <h4 className="font-medium text-gray-900 mb-2">
-                        Strong Yet Subtle
-                      </h4>
-                      <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
+                        <img
+                          src={perfume.images[0] || perfume.coverImage}
+                          alt="Review image"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-gray-800 font-normal leading-relaxed my-2">
                         Perfect balance of strength and smoothness in the
                         fragrance.
-                  </p>
-                </div>
-                    <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
-                      <img
-                        src={perfume.images[0] || perfume.coverImage}
-                        alt="Review image"
-                        className="w-full h-full object-cover"
-                      />
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -933,18 +1143,16 @@ export default function OnePerfumePage() {
                         Rajeev Khurana
                       </span>
                       <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
+                        {[...Array(5)].map((_, i) => (
                           <span key={i} className="text-yellow-400 text-sm">
-                        ★
-                      </span>
-                    ))}
-                  </div>
+                            ★
+                          </span>
+                        ))}
+                      </div>
                     </div>
                     <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
-                    <h4 className="font-medium text-gray-900 mb-2">
-                      Sharp & Sophisticated
-                    </h4>
-                  <p className="text-gray-800 font-normal leading-relaxed mb-2">
+
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
                       Has that rich, bossy vibe. Great for formal wear.
                     </p>
                   </div>
@@ -957,9 +1165,7 @@ export default function OnePerfumePage() {
                       <span className="font-medium text-gray-900">
                         NIMISH GOEL
                       </span>
-                      <span className="bg-black text-white text-xs px-2 py-0.5">
-                        Verified
-                      </span>
+
                       <div className="flex items-center gap-1">
                         {[...Array(5)].map((_, i) => (
                           <span key={i} className="text-yellow-400 text-sm">
@@ -969,13 +1175,11 @@ export default function OnePerfumePage() {
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mb-2">5 months ago</p>
-                    <h4 className="font-medium text-gray-900 mb-2">
-                      Awsome fregnance
-                    </h4>
+
                     <p className="text-gray-800 font-normal leading-relaxed mb-2">
                       Awsome fregnance
-                  </p>
-                </div>
+                    </p>
+                  </div>
                 </div>
 
                 {/* Review 5 */}
@@ -995,9 +1199,7 @@ export default function OnePerfumePage() {
                       </div>
                     </div>
                     <p className="text-xs text-gray-500 mb-2">5 months ago</p>
-                    <h4 className="font-medium text-gray-900 mb-2">
-                      Smells Premium
-                    </h4>
+
                     <p className="text-gray-800 font-normal leading-relaxed mb-2">
                       Lasts decently, but not all day. Still very classy.
                     </p>
@@ -1008,14 +1210,18 @@ export default function OnePerfumePage() {
               {/* Pagination */}
               <div className="flex items-center justify-center gap-2">
                 <button
-                  onClick={() => setCurrentReviewPage(Math.max(1, currentReviewPage - 1))}
+                  onClick={() =>
+                    setCurrentReviewPage(Math.max(1, currentReviewPage - 1))
+                  }
                   disabled={currentReviewPage === 1}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &lt;&lt;
                 </button>
                 <button
-                  onClick={() => setCurrentReviewPage(Math.max(1, currentReviewPage - 1))}
+                  onClick={() =>
+                    setCurrentReviewPage(Math.max(1, currentReviewPage - 1))
+                  }
                   disabled={currentReviewPage === 1}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
@@ -1035,72 +1241,23 @@ export default function OnePerfumePage() {
                   </button>
                 ))}
                 <button
-                  onClick={() => setCurrentReviewPage(Math.min(3, currentReviewPage + 1))}
+                  onClick={() =>
+                    setCurrentReviewPage(Math.min(3, currentReviewPage + 1))
+                  }
                   disabled={currentReviewPage === 3}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &gt;
                 </button>
                 <button
-                  onClick={() => setCurrentReviewPage(Math.min(3, currentReviewPage + 1))}
+                  onClick={() =>
+                    setCurrentReviewPage(Math.min(3, currentReviewPage + 1))
+                  }
                   disabled={currentReviewPage === 3}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &gt;&gt;
                 </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Usage Tips & Brand Info - Minimal Accordion */}
-          <div className="mt-16 pt-12 border-t border-gray-100">
-            <div className="max-w-4xl mx-auto">
-              {/* Usage Tips */}
-              <div className="border-b border-gray-100">
-                <button
-                  onClick={() => toggleAccordion("usageTips")}
-                  className="w-full flex items-center justify-between py-5 transition-colors text-left"
-                >
-                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
-                    Usage Tips
-                  </h2>
-                  <div className="text-gray-400 text-section font-medium leading-none">
-                    {accordionOpen.usageTips ? "−" : "+"}
-                  </div>
-                </button>
-                {accordionOpen.usageTips && (
-                  <div className="pb-5">
-                    <p className="text-gray-700 leading-relaxed text-body font-normal">
-                      {perfume.usageTips ?.split('•')
-                                .filter((note) => note.trim())
-                                .map((note, index) => (
-                                  <p key={index}> • {note.trim()}</p>
-                                ))}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Brand Information */}
-              <div className="border-b border-gray-100">
-                <button
-                  onClick={() => toggleAccordion("brandInfo")}
-                  className="w-full flex items-center justify-between py-5 transition-colors text-left"
-                >
-                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
-                    Brand Information
-                  </h2>
-                  <div className="text-gray-400 text-section font-medium leading-none">
-                    {accordionOpen.brandInfo ? "−" : "+"}
-                  </div>
-                </button>
-                {accordionOpen.brandInfo && (
-                  <div className="pb-5">
-                    <p className="text-gray-700 text-body leading-relaxed font-normal">
-                      {perfume.brandAndManufacturerInfo}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -1166,6 +1323,20 @@ export default function OnePerfumePage() {
                     </div>
                 </div>
             </div> */}
+
+      {/* Sticky Bottom Bar - Mobile Only */}
+      {perfume && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 md:hidden shadow-lg">
+          <div className="px-4 py-3">
+            <button
+              onClick={handleAddToCart}
+              className="w-full bg-black hover:bg-gray-900 text-white font-medium py-3.5 px-6 transition-all duration-300 uppercase text-sm tracking-wider"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Sticky Bottom Bar - Desktop Only */}
       {perfume && (

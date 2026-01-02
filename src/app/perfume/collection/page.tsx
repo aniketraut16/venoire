@@ -125,7 +125,7 @@ const CollectionPageContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 mt-9">
       {/* Hero Banner with Cover Image */}
       {collection.slug !== "all" ? (
         <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-linear-to-r from-red-500 to-orange-500 overflow-hidden">
