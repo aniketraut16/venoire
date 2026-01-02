@@ -226,7 +226,7 @@ export default function OnePerfumePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0">
+    <div className="min-h-screen bg-white pb-20 md:pb-0 overflow-x-hidden">
       {/* Hero Section with Product Image as Background */}
 
       <div className="space-y-1 grow flex md:hidden flex-col mt-30 px-4">
@@ -467,7 +467,7 @@ export default function OnePerfumePage() {
        )} */}
 
       {/* Product Gallery and Description Section */}
-      <div className="bg-white py-4 md:py-16">
+      <div className="bg-white py-4 md:py-16 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-12">
             {/* Left Side - Sticky Gallery */}
@@ -811,9 +811,11 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
-          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 "
+          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 -mx-4"
           style={{
             transform:"scale(1.2)",
+            transformOrigin: "center center",
+            width: "calc(100% + 2rem)"
           }}
           >
             <div className="flex items-center h-full">
@@ -846,6 +848,7 @@ export default function OnePerfumePage() {
               </div>
             </div>
           </div>
+
           {/* Usage Tips & Brand Info - Minimal Accordion */}
           <div className="mt-2 md:mt-16 pt-12 border-t border-gray-100">
             <div className="max-w-4xl mx-auto">

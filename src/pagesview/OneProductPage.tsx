@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ChevronUp,
   Percent,
+  CheckCircle2,
 } from "lucide-react";
 import { Lens } from "@/components/ui/lens";
 import OnproductImageView from "@/components/Product/OnproductImageView";
@@ -49,6 +50,8 @@ export default function OneProductPage() {
   const { startLoading, stopLoading } = useLoading();
   const { addToCart, addToWishlist } = useCart();
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
+  const [currentReviewPage, setCurrentReviewPage] = useState(1);
+  const [reviewSortBy, setReviewSortBy] = useState("most_recent");
 
   useEffect(() => {
     if (!slug) return;
@@ -192,7 +195,7 @@ export default function OneProductPage() {
             {/* Images - Carousel on Mobile, Grid on Desktop */}
             <div className="lg:col-span-3">
               {/* Mobile Carousel */}
-              <div className="block md:hidden">
+              <div className="block md:hidden mt-9">
                 <Swiper
                   modules={[Pagination, Navigation]}
                   spaceBetween={5}
@@ -570,7 +573,7 @@ export default function OneProductPage() {
           </div>
 
           {/* Attributes */}
-          <div className="mt-12 md:mt-28">
+          <div className="mt-12">
             <div className="bg-white p-4 md:p-12 border border-gray-100 relative overflow-hidden">
               <div className="mb-4 md:mb-8">
                 <h3 className="text-section pt-serif-bold text-gray-900 mb-3 relative">
@@ -622,6 +625,368 @@ export default function OneProductPage() {
                       Read More <ChevronDown className="h-4 w-4" />
                     </>
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-16">
+            <div className="max-w-7xl mx-auto">
+              {/* Title - Centered */}
+              <h2 className="text-center text-section uppercase tracking-widest text-black font-normal mb-10">
+                Customer Reviews
+              </h2>
+
+              {/* Header Section - 3 Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-center">
+                {/* Left: Overall Rating */}
+                <div className="flex flex-col items-center">
+                  {/* Stars above rating */}
+                  <div className="flex items-center gap-0.5 mb-2">
+                    {Array.from({ length: 5 }).map((_, i) => {
+                      const rating = Number(product.rating);
+                      const fullStars = Math.floor(rating);
+                      const hasHalfStar = rating % 1 >= 0.5;
+
+                      if (i < fullStars) {
+                        return (
+                          <Star
+                            key={i}
+                            size={20}
+                            className="fill-yellow-400 text-yellow-400"
+                          />
+                        );
+                      } else if (i === fullStars && hasHalfStar) {
+                        return (
+                          <div key={i} className="relative w-5 h-5">
+                            <Star
+                              size={20}
+                              className="absolute inset-0 text-gray-300"
+                            />
+                            <div
+                              className="absolute inset-0"
+                              style={{ clipPath: "inset(0 50% 0 0)" }}
+                            >
+                              <Star
+                                size={20}
+                                className="fill-yellow-400 text-yellow-400"
+                              />
+                            </div>
+                          </div>
+                        );
+                      } else {
+                        return (
+                          <Star key={i} size={20} className="text-gray-300" />
+                        );
+                      }
+                    })}
+                  </div>
+
+                  {/* Rating Number */}
+                  <span className="text-6xl font-normal text-gray-900 mb-2">
+                    {Number(product.rating).toFixed(2)}
+                  </span>
+
+                  {/* Review Count with Checkmark */}
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-title text-gray-600">
+                      Based on{" "}
+                      {product.rating_count >= 1000
+                        ? `${(product.rating_count / 1000).toFixed(1)}K`
+                        : product.rating_count}{" "}
+                      reviews
+                    </span>
+                    <CheckCircle2 size={14} className="text-green-600" />
+                  </div>
+                </div>
+
+                {/* Middle: Star Rating Breakdown */}
+                <div className="space-y-2 border-l-0 border-r-0 md:border-l-2 md:border-r-2 border-gray-200 pl-6 pr-6">
+                  {[5, 4, 3, 2, 1].map((star) => {
+                    const count = Math.floor(
+                      (product.rating_count * (6 - star)) / 15
+                    );
+                    const percentage =
+                      product.rating_count > 0
+                        ? (count / product.rating_count) * 100
+                        : 0;
+                    return (
+                      <div key={star} className="flex items-center gap-2">
+                        {/* Visual Stars */}
+                        <div className="flex items-center gap-0.5">
+                          {Array.from({ length: 5 }).map((_, i) => (
+                            <Star
+                              key={i}
+                              size={14}
+                              className={
+                                i < star
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "text-gray-300"
+                              }
+                            />
+                          ))}
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-yellow-400 rounded-full"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
+
+                        {/* Review Count */}
+                        <span className="text-meta text-gray-800 w-16 text-right">
+                          {count}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Right: Write Review Button */}
+                <div className="flex items-start justify-center">
+                  <button className="bg-black text-white px-6 py-2.5 text-sm font-normal hover:bg-gray-800 transition-colors">
+                    Write a review
+                  </button>
+                </div>
+              </div>
+
+              {/* Customer Photos & Videos Section */}
+              <div className="mb-10 pt-6 border-t border-gray-200">
+                <h3 className="text-sm font-medium text-gray-900 mb-4">
+                  Customer photos & videos
+                </h3>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-2 flex-1  pb-2 scrollbar-hide">
+                    {[...Array(8)].map((_, i) => (
+                      <div
+                        key={i}
+                        className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
+                      >
+                        <img
+                          src={
+                            product.images[i % product.images.length] ||
+                            product.thumbnail ||
+                            ""
+                          }
+                          alt={`Customer photo ${i + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                  <a
+                    href="#"
+                    className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
+                  >
+                    See more
+                  </a>
+                </div>
+              </div>
+
+              {/* Sort Dropdown */}
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-md font-medium text-gray-900">Reviews</h3>
+                <select
+                  value={reviewSortBy}
+                  onChange={(e) => setReviewSortBy(e.target.value)}
+                  className="text-md text-gray-700 border border-gray-300 px-3 py-1.5 bg-white focus:outline-none focus:ring-1 focus:ring-gray-400"
+                >
+                  <option value="most_recent">Most Recent</option>
+                  <option value="highest_rating">Highest Rating</option>
+                  <option value="lowest_rating">Lowest Rating</option>
+                  <option value="oldest">Oldest First</option>
+                </select>
+              </div>
+
+              {/* Individual Reviews */}
+              <div className="space-y-6 mb-8">
+                {/* Review 1 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-gray-900">
+                          Ritika Chopra
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-yellow-400 text-sm">
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
+                      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
+                        <img
+                          src={product.thumbnail || ""}
+                          alt="Review image"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-gray-800 font-normal leading-relaxed my-2">
+                        CEO naam jaisa hi hai, pehno toh sab notice karte hain.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Review 2 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-medium text-gray-900">
+                          Vikrant Joshi
+                        </span>
+                        <div className="flex items-center gap-1">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className="text-yellow-400 text-sm">
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
+                      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
+                        <img
+                          src={product.thumbnail || ""}
+                          alt="Review image"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <p className="text-gray-800 font-normal leading-relaxed my-2">
+                        Perfect balance of strength and smoothness in the
+                        fragrance.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Review 3 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-gray-900">
+                        Rajeev Khurana
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className="text-yellow-400 text-sm">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
+
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      Has that rich, bossy vibe. Great for formal wear.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Review 4 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-gray-900">
+                        NIMISH GOEL
+                      </span>
+
+                      <div className="flex items-center gap-1">
+                        {[...Array(5)].map((_, i) => (
+                          <span key={i} className="text-yellow-400 text-sm">
+                            ★
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">5 months ago</p>
+
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      Awsome fregnance
+                    </p>
+                  </div>
+                </div>
+
+                {/* Review 5 */}
+                <div className="border-b border-gray-100 pb-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-medium text-gray-900">
+                        Varun Pratap
+                      </span>
+                      <div className="flex items-center gap-1">
+                        {[...Array(4)].map((_, i) => (
+                          <span key={i} className="text-yellow-400 text-sm">
+                            ★
+                          </span>
+                        ))}
+                        <span className="text-gray-300 text-sm">★</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 mb-2">5 months ago</p>
+
+                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
+                      Lasts decently, but not all day. Still very classy.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pagination */}
+              <div className="flex items-center justify-center gap-2">
+                <button
+                  onClick={() =>
+                    setCurrentReviewPage(Math.max(1, currentReviewPage - 1))
+                  }
+                  disabled={currentReviewPage === 1}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &lt;&lt;
+                </button>
+                <button
+                  onClick={() =>
+                    setCurrentReviewPage(Math.max(1, currentReviewPage - 1))
+                  }
+                  disabled={currentReviewPage === 1}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &lt;
+                </button>
+                {[1, 2, 3].map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentReviewPage(page)}
+                    className={`px-3 py-1 text-sm ${
+                      currentReviewPage === page
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-600 hover:text-gray-900"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() =>
+                    setCurrentReviewPage(Math.min(3, currentReviewPage + 1))
+                  }
+                  disabled={currentReviewPage === 3}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &gt;
+                </button>
+                <button
+                  onClick={() =>
+                    setCurrentReviewPage(Math.min(3, currentReviewPage + 1))
+                  }
+                  disabled={currentReviewPage === 3}
+                  className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
+                >
+                  &gt;&gt;
                 </button>
               </div>
             </div>
