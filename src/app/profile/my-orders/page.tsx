@@ -52,7 +52,6 @@ export default function MyOrdersPage() {
 function MyOrders() {
   const { token } = useAuth();
   const router = useRouter();
-  const [buyAgainItems, setBuyAgainItems] = useState<BuyAgainItems[]>([]);
   const searchParams = useSearchParams();
   const [orders, setOrders] = useState<Order[]>([]);
   const { startLoading, stopLoading } = useLoading();
@@ -186,11 +185,11 @@ function MyOrders() {
               name: item.name,
               slug: item.name.toLowerCase().replace(/ /g, "-"),
               thumbnail_url: item.thumbnail_url,
+              product_type: item.product_type ?? "perfume",
             });
           }
         });
       });
-      setBuyAgainItems(Array.from(uniqueItems.values()));
       // On mobile, set pagination to show all orders are loaded
       if (isMobile) {
         setPagination({
@@ -836,72 +835,7 @@ function MyOrders() {
           )}
       </div>
 
-        {buyAgainItems.length > 0 && (
-          <div className="p-4 md:p-0 block md:hidden">
-            <div className="flex flex-row justify-between items-start mb-4">
-              <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase text-gray-900">
-                Buy again
-              </h2>
-              <Link
-                href="/profile/buy-again"
-                className="text-sm text-gray-600 hover:text-gray-700 transition-colors"
-              >
-                See more
-              </Link>
-            </div>
-            <div className="relative group">
-          
-              <button
-                onClick={() => scrollBuyAgainCarousel("left")}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white border border-gray-200 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
-                aria-label="Scroll left"
-              >
-                <ChevronLeft size={20} strokeWidth={1} className="text-gray-700" />
-              </button>
-
-             
-              <div
-                ref={buyAgainCarouselRef}
-                className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
-                style={{
-                  scrollbarWidth: "none",
-                  msOverflowStyle: "none",
-                }}
-              >
-                {buyAgainItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/product/${item.slug}`}
-                    className="shrink-0 w-24 h-24 bg-white border border-gray-200 rounded-sm overflow-hidden group/item cursor-pointer shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <div className="w-full h-full p-2 flex items-center justify-center">
-                      <img
-                        src={item.thumbnail_url}
-                        alt={item.name}
-                        className="w-full h-full object-contain transition-transform duration-300 group-hover/item:scale-105"
-                      />
-                    </div>
-                  </Link>
-                ))}
-              </div>
-
-              
-              <button
-                onClick={() => scrollBuyAgainCarousel("right")}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/95 hover:bg-white border border-gray-200 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100"
-                aria-label="Scroll right"
-              >
-                <ChevronRight size={20} strokeWidth={1} className="text-gray-700" />
-              </button>
-            </div>
-
-            <style jsx>{`
-              .scrollbar-hide::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-          </div>
-        )}
+      
 
       {modalType === "tracking" && trackingData && (
         <TrackingModal

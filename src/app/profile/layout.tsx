@@ -2,7 +2,7 @@
 import React from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
-import { User, ShoppingBag, MapPin, Heart, Star, LogOut } from "lucide-react";
+import { User, ShoppingBag, MapPin, Heart, Star, LogOut, HelpCircle } from "lucide-react";
 import { siteConfig } from "@/variables/config";
 
 export default function ProfileLayout({
@@ -35,7 +35,7 @@ export default function ProfileLayout({
     { path: "/profile/my-orders", label: "My Orders", icon: <ShoppingBag /> },
     { path: "/profile/my-addresses", label: "My Addresses", icon: <MapPin /> },
     { path: "/profile/my-whishlist", label: "My Wishlist", icon: <Heart /> },
-    { path: "/profile/my-review", label: "My Reviews", icon: <Star /> },
+    { path: "/profile/help-and-support", label: "Help & Support", icon: <HelpCircle /> },
   ];
 
   return (

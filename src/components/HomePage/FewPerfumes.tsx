@@ -73,11 +73,11 @@ export default function FewPerfumes() {
           >
             {displayPerfumes.map((perfume) => (
               <ScrollStackItem key={perfume.id} itemClassName={`bg-white`}>
-                <div className="flex flex-col lg:flex-row items-start justify-between h-full gap-4 md:gap-6 lg:gap-8 ">
+                <div className="flex flex-col lg:flex-row items-stretch justify-between h-full gap-4 md:gap-6 lg:gap-8">
                   {/* Left Side - Image with Badge */}
-                  <div className="relative shrink-0 w-full h-full lg:w-72 xl:w-80">
+                  <div className="relative shrink-0 w-full lg:w-72 xl:w-80 flex items-center justify-center">
                     {/* Product Image */}
-                    <div className="relative  overflow-hidden">
+                    <div className="relative w-full overflow-hidden">
                       <img
                         src={perfume.coverImage}
                         alt={perfume.name}
@@ -98,92 +98,95 @@ export default function FewPerfumes() {
                   </div>
 
                   {/* Right Side - Product Details */}
-                  <div className="flex-1 justify-between space-y-2">
-                    {/* Title and Gender */}
-                    <div>
-                      <h3 className="text-display tracking-tight text-gray-900 mb-1">
-                        {perfume.name}
-                      </h3>
-                      <p className="text-meta text-gray-600 uppercase tracking-wide">
-                        FOR {perfume.gender}
+                  <div className="flex-1 flex flex-col">
+                    {/* Top Content Group */}
+                    <div className="flex-1 space-y-3">
+                      {/* Title and Gender */}
+                      <div>
+                        <h3 className="text-display tracking-tight text-gray-900">
+                          {perfume.name}
+                        </h3>
+                        <p className="text-meta text-gray-600 uppercase tracking-wide">
+                          FOR {perfume.gender}
+                        </p>
+                      </div>
+
+                      {/* Rating */}
+                      <div className="flex items-center gap-1">
+                        <FaStar className="w-3.5 h-3.5 text-yellow-400" />
+                        <span className="text-body font-semibold text-gray-900">
+                          {parseFloat(perfume.rating.toString()).toFixed(1)}
+                        </span>
+                        <span className="text-body text-gray-400">|</span>
+                        {/* <FaCheckCircle className="w-3 h-3 text-blue-500" /> */}
+                        <svg
+                          viewBox="0 0 18 18"
+                          className="w-3 h-3 text-blue-500"
+                          height="14"
+                          width="14"
+                          preserveAspectRatio="xMidYMid meet"
+                          version="1.1"
+                          x="0px"
+                          y="0px"
+                          enableBackground="new 0 0 18 18"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <polygon
+                            id="Star-2"
+                            fill="#005eff"
+                            points="9,16 7.1,16.9 5.8,15.2 3.7,15.1 3.4,13 1.5,12 2.2,9.9 1.1,8.2 2.6,6.7 2.4,4.6 4.5,4 5.3,2 7.4,2.4 9,1.1 10.7,2.4 12.7,2 13.6,4 15.6,4.6 15.5,6.7 17,8.2 15.9,9.9 16.5,12 14.7,13 14.3,15.1 12.2,15.2 10.9,16.9 "
+                          ></polygon>
+                          <polygon
+                            id="Check-Icon"
+                            fill="#FFFFFF"
+                            points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
+                          ></polygon>
+                        </svg>
+                        <span className="text-body text-gray-600">
+                          (
+                          {perfume.rating_count >= 1000
+                            ? `${(perfume.rating_count / 1000).toFixed(1)}K`
+                            : perfume.rating_count}{" "}
+                          Reviews)
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-body text-gray-700 leading-relaxed max-w-2xl">
+                        {perfume.description.slice(0, 160)}...
                       </p>
-                    </div>
 
-                    {/* Rating */}
-                    <div className="flex items-center gap-1">
-                      <FaStar className="w-3.5 h-3.5 text-yellow-400" />
-                      <span className="text-body font-semibold text-gray-900">
-                        {parseFloat(perfume.rating.toString()).toFixed(1)}
-                      </span>
-                      <span className="text-body text-gray-400">|</span>
-                      {/* <FaCheckCircle className="w-3 h-3 text-blue-500" /> */}
-                      <svg
-                        viewBox="0 0 18 18"
-                        className="w-3 h-3 text-blue-500"
-                        height="14"
-                        width="14"
-                        preserveAspectRatio="xMidYMid meet"
-                        version="1.1"
-                        x="0px"
-                        y="0px"
-                        enableBackground="new 0 0 18 18"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <polygon
-                          id="Star-2"
-                          fill="#005eff"
-                          points="9,16 7.1,16.9 5.8,15.2 3.7,15.1 3.4,13 1.5,12 2.2,9.9 1.1,8.2 2.6,6.7 2.4,4.6 4.5,4 5.3,2 7.4,2.4 9,1.1 10.7,2.4 12.7,2 13.6,4 15.6,4.6 15.5,6.7 17,8.2 15.9,9.9 16.5,12 14.7,13 14.3,15.1 12.2,15.2 10.9,16.9 "
-                        ></polygon>
-                        <polygon
-                          id="Check-Icon"
-                          fill="#FFFFFF"
-                          points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
-                        ></polygon>
-                      </svg>
-                      <span className="text-body text-gray-600">
-                        (
-                        {perfume.rating_count >= 1000
-                          ? `${(perfume.rating_count / 1000).toFixed(1)}K`
-                          : perfume.rating_count}{" "}
-                        Reviews)
-                      </span>
-                    </div>
-
-                    {/* Description */}
-                    <p className="text-body text-gray-700 leading-relaxed max-w-2xl">
-                      {perfume.description.slice(0, 160)}...
-                    </p>
-
-                    {/* Fragrance Notes */}
-                    <div className="hidden sm:grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                      <div>
-                        <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
-                          Fragrance Family:
-                        </h4>
-                        <p className="text-meta text-gray-600">
-                          {perfume.fragrance || "N/A"}
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
-                          Concentration:
-                        </h4>
-                        <p className="text-meta text-gray-600">
-                          {perfume.concentration || "N/A"}
-                        </p>
-                      </div>
-                      <div>
-                        <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
-                          Base Notes:
-                        </h4>
-                        <p className="text-meta text-gray-600">
-                          {perfume.base_notes?.replace(/\([^)]*\)/g, '').trim() || "N/A"}
-                        </p>
+                      {/* Fragrance Notes */}
+                      <div className="hidden sm:grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
+                        <div>
+                          <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
+                            Fragrance Family:
+                          </h4>
+                          <p className="text-meta text-gray-600">
+                            {perfume.fragrance || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
+                            Concentration:
+                          </h4>
+                          <p className="text-meta text-gray-600">
+                            {perfume.concentration || "N/A"}
+                          </p>
+                        </div>
+                        <div>
+                          <h4 className="text-meta font-medium text-gray-900 uppercase mb-1">
+                            Base Notes:
+                          </h4>
+                          <p className="text-meta text-gray-600">
+                            {perfume.base_notes?.replace(/\([^)]*\)/g, '').trim() || "N/A"}
+                          </p>
+                        </div>
                       </div>
                     </div>
 
-                    {/* Add to Cart Button */}
-                    <div className="pt-2 mt-auto">
+                    {/* Add to Cart Button - Pinned to Bottom */}
+                    <div className="pt-2">
                       <Link
                         href={`/perfume/${perfume.slug}`}
                         className="w-full flex items-center justify-between bg-black text-white px-6 py-3 text-body font-bold uppercase tracking-wider hover:bg-gray-800 transition-all duration-300"

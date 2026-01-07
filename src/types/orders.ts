@@ -19,6 +19,7 @@ export type SimpleOrderItem = {
   name: string;
   variant: string;
   thumbnail_url: string;
+  product_type?: "clothing" | "perfume";
 };
 
 export type Order = {
@@ -202,4 +203,5 @@ export type BuyAgainItems = {
   name: string;
   slug: string;
   thumbnail_url: string;
+  product_type: "clothing" | "perfume";
 }

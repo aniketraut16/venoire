@@ -222,7 +222,7 @@ function OrderPageContent() {
 
   const getStatusIcon = (status: string, size: number = 20) => {
     const icons: Record<string, React.ReactNode> = {
-      placed: <Package size={size} />,
+      placed: <Clock size={size} />,
       processing: <RefreshCw size={size} />,
       shipped: <Truck size={size} />,
       delivered: <CheckCircle size={size} />,
@@ -895,7 +895,7 @@ function OrderPageContent() {
           {canReturnOrder(order) && (
             <button
               onClick={() => setShowReturnModal(true)}
-              className="flex-1 border border-green-600 text-green-600 px-4 md:px-6 py-2 md:py-3 hover:bg-green-50 transition-colors duration-200 flex items-center justify-center space-x-2"
+              className="flex-1 border border-orange-600 text-orange-600 px-4 md:px-6 py-2 md:py-3 hover:bg-orange-50 transition-colors duration-200 flex items-center justify-center space-x-2"
             >
               <XCircle size={16} />
               <span className="text-sm uppercase tracking-wider">

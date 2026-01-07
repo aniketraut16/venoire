@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { User, Camera, Edit2, Save, X, ShoppingBag, MapPin, Heart, Star, LogOut } from "lucide-react";
+import { User, Camera, Edit2, Save, X, ShoppingBag, MapPin, Heart, Star, LogOut, Clock, RefreshCw, Truck, CheckCircle, XCircle, Package, HelpCircle } from "lucide-react";
 import { getProfile, updateProfile, updateProfileImage, deleteProfileImage, getUserOverview } from "@/utils/profile";
 import { Profile } from "@/types/profile";
 import { useLoading } from "@/contexts/LoadingContext";
@@ -129,24 +129,31 @@ export default function MyProfilePage() {
     { path: "/profile/my-orders", label: "My Orders", icon: <ShoppingBag size={28} /> },
     { path: "/profile/my-addresses", label: "My Addresses", icon: <MapPin size={28} /> },
     { path: "/profile/my-whishlist", label: "My Wishlist", icon: <Heart size={28} /> },
-    { path: "/profile/my-review", label: "My Reviews", icon: <Star size={28} /> },
+    { path: "/profile/help-and-support", label: "Help & Support", icon: <HelpCircle size={28} /> },
   ];
 
   const getStatusColor = (status: Order["status"]) => {
-    switch (status) {
-      case "delivered":
-        return "text-green-700 bg-green-50 border-green-200";
-      case "shipped":
-        return "text-blue-700 bg-blue-50 border-blue-200";
-      case "processing":
-        return "text-yellow-700 bg-yellow-50 border-yellow-200";
-      case "cancelled":
-        return "text-red-700 bg-red-50 border-red-200";
-      case "refunded":
-        return "text-purple-700 bg-purple-50 border-purple-200";
-      default:
-        return "text-gray-700 bg-gray-50 border-gray-200";
-    }
+    const colors: Record<string, string> = {
+      placed: "bg-yellow-100 text-yellow-800 border-yellow-200",
+      processing: "bg-purple-100 text-purple-800 border-purple-200",
+      shipped: "bg-indigo-100 text-indigo-800 border-indigo-200",
+      delivered: "bg-green-100 text-green-800 border-green-200",
+      cancelled: "bg-red-100 text-red-800 border-red-200",
+      refunded: "bg-gray-100 text-gray-800 border-gray-200",
+    };
+    return colors[status] || "bg-gray-100 text-gray-800 border-gray-200";
+  };
+
+  const getStatusIcon = (status: Order["status"]) => {
+    const icons: Record<string, React.ReactNode> = {
+      placed: <Clock size={16} />,
+      processing: <RefreshCw size={16} />,
+      shipped: <Truck size={16} />,
+      delivered: <CheckCircle size={16} />,
+      cancelled: <XCircle size={16} />,
+      refunded: <XCircle size={16} />,
+    };
+    return icons[status] || <Package size={16} />;
   };
 
   const formatDate = (dateString: string) => {
@@ -191,7 +198,7 @@ export default function MyProfilePage() {
                   </div>
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="ml-3 shrink-0 text-xs font-medium text-black border border-black px-3 py-1.5 hover:bg-black hover:text-white transition-colors"
+                    className="ml-3 rounded shrink-0 text-xs font-medium text-black border border-black px-3 py-1.5 hover:bg-black hover:text-white transition-colors"
                   >
                     EDIT
                   </button>
@@ -199,7 +206,7 @@ export default function MyProfilePage() {
                 <div className="px-4 pb-3">
                   <button
                     onClick={handleLogout}
-                    className="w-full text-xs font-medium text-gray-600 border border-gray-300 px-3 py-2 hover:bg-gray-50 transition-colors"
+                    className="w-full rounded text-xs font-medium text-red-600 border border-red-600 px-3 py-2 hover:bg-red-600 hover:text-white transition-colors"
                   >
                     LOGOUT
                   </button>
@@ -212,7 +219,7 @@ export default function MyProfilePage() {
                   <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">Recent Orders</h3>
                   <button
                     onClick={() => router.push("/profile/my-orders")}
-                    className="text-xs text-gray-600 hover:text-black"
+                    className="text-xs text-blue-600 hover:text-blue-800"
                   >
                     View All
                   </button>
@@ -222,7 +229,9 @@ export default function MyProfilePage() {
                 ) : (
                   <div className="space-y-3">
                     {recentOrders.slice(0, 3).map((order) => (
-                      <div key={order.id} className="border border-gray-200 bg-white">
+                      <div key={order.id} className="border border-gray-200 bg-white rounded"
+                      
+                      onClick={() => router.push(`/profile/order?orderId=${order.id}`)}>
                         <div className="p-3 space-y-2">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
@@ -230,21 +239,22 @@ export default function MyProfilePage() {
                               <p className="text-xs text-gray-500 mt-0.5">{formatDate(order.created_at)}</p>
                             </div>
                             <span
-                              className={`text-xs font-semibold px-2 py-1 border uppercase ${getStatusColor(
+                              className={`text-xs rounded font-semibold px-2 py-1 border uppercase flex items-center space-x-1 ${getStatusColor(
                                 order.status
                               )}`}
                             >
-                              {order.status}
+                              {getStatusIcon(order.status)}
+                              <span>{order.status}</span>
                             </span>
                           </div>
                           
                           <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
                             {order.items.slice(0, 2).map((item, idx) => (
-                              <div key={idx} className="w-10 h-10 border border-gray-200 bg-gray-50 shrink-0">
+                              <div key={idx} className="w-10 h-10 border border-gray-200 bg-gray-50 shrink-0 rounded">
                                 <img
                                   src={item.thumbnail_url}
                                   alt={item.name}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-cover rounded"
                                 />
                               </div>
                             ))}
@@ -256,7 +266,6 @@ export default function MyProfilePage() {
                           <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                             <span className="text-sm font-semibold text-gray-900">₹{order.total_amount}</span>
                             <button
-                              onClick={() => router.push(`/profile/order?orderId=${order.id}`)}
                               className="text-xs font-medium text-black hover:underline"
                             >
                               View Details
@@ -272,19 +281,27 @@ export default function MyProfilePage() {
               {/* Buy Again Section */}
               {buyNowItems.length > 0 && (
                 <div className="p-4 border-b-8 border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider mb-3">Buy Again</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-xs font-semibold text-gray-900 uppercase tracking-wider">Buy Again</h3>
+                    <button
+                      onClick={() => router.push("/profile/buy-again")}
+                      className="text-xs text-blue-600 hover:text-blue-800"
+                    >
+                      View All
+                    </button>
+                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     {buyNowItems.slice(0, 4).map((item) => (
                       <button
                         key={item.id}
-                        onClick={() => router.push(`/product/${item.slug}`)}
-                        className="border border-gray-200 bg-white hover:border-black transition-colors text-left"
+                        onClick={() => router.push(`/${item.product_type === "clothing" ? "product" : "perfume"}/${item.slug}`)}
+                        className="border border-gray-200 bg-white hover:border-black transition-colors text-left rounded"
                       >
-                        <div className="aspect-square bg-gray-50">
+                        <div className="aspect-square rounded bg-gray-50">
                           <img
                             src={item.thumbnail_url}
                             alt={item.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover rounded"
                           />
                         </div>
                         <div className="p-2">
@@ -304,7 +321,7 @@ export default function MyProfilePage() {
                     <button
                       key={item.path}
                       onClick={() => router.push(item.path)}
-                      className="flex flex-col items-center justify-center p-4 border border-gray-300 bg-white hover:border-black transition-colors"
+                      className="flex flex-col items-center justify-center p-4 border border-gray-300 bg-white hover:border-black transition-colors rounded"
                     >
                       <div className="mb-2 text-black">{item.icon}</div>
                       <span className="text-xs font-medium text-black uppercase tracking-wide text-center">
@@ -508,11 +525,12 @@ export default function MyProfilePage() {
                             </div>
                             <div className="flex items-center gap-3">
                               <span
-                                className={`text-xs font-bold px-3 py-1.5 border uppercase tracking-wide ${getStatusColor(
+                                className={`text-xs font-bold px-3 py-1.5 border uppercase tracking-wide flex items-center space-x-2 ${getStatusColor(
                                   order.status
                                 )}`}
                               >
-                                {order.status}
+                                {getStatusIcon(order.status)}
+                                <span>{order.status}</span>
                               </span>
                               <button
                                 onClick={() => router.push(`/profile/order?orderId=${order.id}`)}
@@ -552,7 +570,7 @@ export default function MyProfilePage() {
                     {buyNowItems.slice(0, 4).map((item) => (
                       <button
                         key={item.id}
-                        onClick={() => router.push(`/product/${item.slug}`)}
+                        onClick={() => router.push(`/${item.product_type}/${item.slug}`)}
                         className="border border-gray-200 bg-white hover:border-black transition-colors text-left"
                       >
                         <div className="aspect-square bg-gray-50">

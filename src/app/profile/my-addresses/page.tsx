@@ -161,19 +161,21 @@ export default function MyAddresses() {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => openEditAddress(addr)}
-                      className="flex-1 sm:flex-none p-2 border border-gray-300 hover:bg-gray-100 hover:border-black transition-colors duration-200"
+                      className="flex-1 sm:flex-none p-2 border border-gray-300 hover:bg-gray-100 hover:border-black transition-colors duration-200 flex items-center gap-2 justify-center"
                       aria-label="Edit address"
                       title="Edit address"
                     >
                       <Pencil size={16} className="text-gray-700" />
+                      <span className="md:hidden block text-sm font-medium tracking-wider uppercase">Edit</span>
                     </button>
                     <button
                       onClick={() => handleDeleteAddress(addr.id)}
-                      className="flex-1 sm:flex-none p-2 border border-gray-300 hover:bg-red-50 hover:border-red-500 transition-colors duration-200"
+                      className="flex-1 sm:flex-none p-2 border border-gray-300 hover:bg-red-50 hover:border-red-500 transition-colors duration-200 flex items-center gap-2 justify-center"
                       aria-label="Delete address"
                       title="Delete address"
                     >
                       <Trash2 size={16} className="text-gray-700 hover:text-red-600" />
+                      <span className="md:hidden block text-sm font-medium tracking-wider uppercase">Delete</span>
                     </button>
                   </div>
                 </div>
