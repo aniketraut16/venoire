@@ -76,6 +76,8 @@ export default function OneProductPage() {
 
   // Scroll handler for sticky bar
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleScroll = () => {
       if (ctaButtonsRef.current) {
         const ctaRect = ctaButtonsRef.current.getBoundingClientRect();

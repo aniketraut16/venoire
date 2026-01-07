@@ -64,7 +64,9 @@ export default function AllProductsPage(props: {
 
   
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, []);
   
   // Fetch products and attributes on component mount and when filters change

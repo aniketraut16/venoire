@@ -256,21 +256,13 @@ export default function HelpAndSupportPage() {
   return (
     <div className="bg-white lg:border lg:border-gray-200">
       {/* Mobile Header */}
-      <div className="flex md:hidden items-center gap-3 bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full"
-        style={{
-          transform: window.innerWidth < 768 ? "translateY(-30px)" : "translateY(0%)",
-        }}
-      >
+      <div className="flex md:hidden items-center gap-3 bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full -translate-y-[30px] md:translate-y-0">
         <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
           Help & Support
         </h2>
       </div>
 
-      <div className="max-w-6xl mx-auto pt-0 md:p-8"
-        style={{
-          transform: window.innerWidth < 768 ? "translateY(-30px)" : "translateY(0%)",
-        }}
-      >
+      <div className="max-w-6xl mx-auto pt-0 md:p-8 -translate-y-[30px] md:translate-y-0">
   
 
         {/* Search Bar */}

@@ -22,7 +22,9 @@ const CollectionPageContent = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   }, []);
 
   useEffect(() => {
@@ -247,7 +249,11 @@ const CollectionPageContent = () => {
       {/* Back to Top Button */}
       <div className="fixed bottom-8 right-8 z-50">
         <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
           className="bg-red-500 hover:bg-red-600 text-white p-4 rounded-full shadow-lg transition-all hover:scale-110"
           aria-label="Back to top"
         >

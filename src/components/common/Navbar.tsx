@@ -1,7 +1,19 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, User, ShoppingBag, Menu, X, ListOrdered, Package, ArrowLeft, ArrowRight, ChevronRight, ChevronLeft } from "lucide-react";
+import {
+  Search,
+  User,
+  ShoppingBag,
+  Menu,
+  X,
+  ListOrdered,
+  Package,
+  ArrowLeft,
+  ArrowRight,
+  ChevronRight,
+  ChevronLeft,
+} from "lucide-react";
 import { usePathname } from "next/navigation";
 import SearchPopup from "./SearchPopup";
 import { MenuItem } from "@/types/homepage";
@@ -22,22 +34,25 @@ export default function Navbar() {
   const { user, needsCompleteSetup } = useAuth();
   const { count } = useCart();
   const [promoidx, setpromoidx] = useState<number>(0);
-  const promoItems = ["Flat 10% Off On All Orders", "Free Shipping On All Orders", "100% Money Back Guarantee", "24/7 Customer Support"];
+  const promoItems = [
+    "Flat 10% Off On All Orders",
+    "Free Shipping On All Orders",
+    "100% Money Back Guarantee",
+    "24/7 Customer Support",
+  ];
   const { navbarContent } = useHomepage();
 
   const increasepromoidx = () => {
-    
     if (promoidx === promoItems.length - 1) {
       setpromoidx(0);
-    }else{
+    } else {
       setpromoidx(promoidx + 1);
     }
   };
   const decreasepromoidx = () => {
-    
     if (promoidx <= 0) {
       setpromoidx(promoItems.length - 1);
-    }else{
+    } else {
       setpromoidx(promoidx - 1);
     }
   };
@@ -62,7 +77,9 @@ export default function Navbar() {
   }, []);
 
   const isHomePage = pathname === "/";
-  const isPerfumePage = pathname?.startsWith("/perfume") && window.innerWidth > 768;
+  const isPerfumePage =
+    pathname?.startsWith("/perfume") &&
+    (typeof window !== "undefined" ? window.innerWidth > 768 : false);
   const shouldUseScrollEffect = isHomePage || isPerfumePage;
 
   const viewportHeight =
@@ -79,18 +96,26 @@ export default function Navbar() {
     : 1;
 
   // Determine if navbar should be in white theme (hovered or scrolled)
-  const isWhiteTheme = isHovered || (shouldUseScrollEffect && bgOpacity >= 0.5) || (!shouldUseScrollEffect && bgOpacity >= 1);
-  const isTransparent = !isWhiteTheme && shouldUseScrollEffect && bgOpacity < 0.5;
-  
+  const isWhiteTheme =
+    isHovered ||
+    (shouldUseScrollEffect && bgOpacity >= 0.5) ||
+    (!shouldUseScrollEffect && bgOpacity >= 1);
+  const isTransparent =
+    !isWhiteTheme && shouldUseScrollEffect && bgOpacity < 0.5;
+
   // Background color: black/20 by default, white when hovered or scrolled
-  const backgroundColor = isWhiteTheme 
+  const backgroundColor = isWhiteTheme
     ? `rgba(255, 255, 255, 1)`
     : shouldUseScrollEffect && bgOpacity < 0.5
     ? `rgba(255, 255, 255, ${bgOpacity})`
     : `rgba(0, 0, 0, 0.2)`; // bg-black/20
-  
+
   const textColor = isWhiteTheme ? "text-black" : "text-white";
-  const borderColor = isWhiteTheme ? "border-gray-200" : (isTransparent ? "border-white/20" : "border-white/20");
+  const borderColor = isWhiteTheme
+    ? "border-gray-200"
+    : isTransparent
+    ? "border-white/20"
+    : "border-white/20";
 
   const hrefGenerator = (type: string, slug: string) => {
     switch (type) {
@@ -109,17 +134,27 @@ export default function Navbar() {
 
   return (
     <>
-    <div className={`fixed ${ scrollPosition > 758 ? "-top-9" : "top-0" } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out`}>
-      <button>
-        <ChevronLeft size={16} onClick={decreasepromoidx} />
-      </button>
-      <span className="text-white text-xs font-medium tracking-widest">{promoItems[promoidx]}</span>
-      <button>
-        <ChevronRight size={16} onClick={increasepromoidx} />
-      </button>
-    </div>
+      <div
+        className={`fixed ${
+          scrollPosition > 758 ? "-top-9" : "top-0"
+        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out`}
+      >
+        <button>
+          <ChevronLeft size={16} onClick={decreasepromoidx} />
+        </button>
+        <span className="text-white text-xs font-medium tracking-widest">
+          {promoItems[promoidx]}
+        </span>
+        <button>
+          <ChevronRight size={16} onClick={increasepromoidx} />
+        </button>
+      </div>
       <nav
-        className={`fixed ${ scrollPosition > 758 ? "top-0" : "top-9" } left-0 right-0 ${isWhiteTheme ? "border-b" : ""} ${borderColor} z-50 transition-all duration-300 ease-in-out`}
+        className={`fixed ${
+          scrollPosition > 758 ? "top-0" : "top-9"
+        } left-0 right-0 ${
+          isWhiteTheme ? "border-b" : ""
+        } ${borderColor} z-50 transition-all duration-300 ease-in-out`}
         style={{ backgroundColor }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -611,8 +646,6 @@ export default function Navbar() {
                 CONTACT US
               </span>
             </Link>
-
-            
           </div>
         </div>
       </div>

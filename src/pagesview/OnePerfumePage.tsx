@@ -60,6 +60,7 @@ export default function OnePerfumePage() {
 
   // Scroll handler for sticky bar
   useEffect(() => {
+    
     const handleScroll = () => {
       if (ctaButtonsRef.current) {
         const ctaRect = ctaButtonsRef.current.getBoundingClientRect();
