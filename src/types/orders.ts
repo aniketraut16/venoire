@@ -50,6 +50,7 @@ export type OrderItem = SimpleOrderItem & {
   quantity: number;
   unit_price: number;
   total_price: number;
+  status?: "active" | "cancelled" | "returned";
 };
 export type Address = {
   id: string;
@@ -73,6 +74,13 @@ export type Payment = {
   amount: string;
   transaction_id: string;
   paid_at: string | null;
+  refund_status?: "not_applicable" | "pending_refund" | "refund_initiated" | "refunded" | "refund_failed";
+  refund_amount?: string;
+  refund_transaction_id?: string;
+  refund_initiated_at?: string;
+  refund_completed_at?: string | null;
+  refund_reason?: string;
+  refund_notes?: string;
 };
 
 export type Coupon = {
@@ -123,6 +131,7 @@ export type Refund = {
 export type CancelOrderArgs = {
   reason: string;
   comments: string;
+  itemIds?: string[];
 };
 export type CancelOrderResponse = {
   success: boolean;
@@ -205,3 +214,10 @@ export type BuyAgainItems = {
   thumbnail_url: string;
   product_type: "clothing" | "perfume";
 }
+
+export type ReviewableItem = {
+  id: string;
+  product_id: string;
+  product_name: string;
+  product_thumbnail: string;
+};

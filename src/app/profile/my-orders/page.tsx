@@ -57,6 +57,11 @@ function MyOrders() {
   const { startLoading, stopLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"created_at" | "updated_at" | "total_amount" | "order_number">("created_at");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+  const [showFilterModal, setShowFilterModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -87,6 +92,14 @@ function MyOrders() {
   const modalType = searchParams.get("modal");
   const orderId = searchParams.get("id");
 
+  // Calculate active filters count
+  const activeFiltersCount = [
+    statusFilter !== "all",
+    dateFrom !== "",
+    dateTo !== "",
+    sortBy !== "created_at" || sortOrder !== "desc"
+  ].filter(Boolean).length;
+
   // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
@@ -106,7 +119,7 @@ function MyOrders() {
       setCurrentPage(1);
       fetchOrders(1);
     }
-  }, [token, statusFilter, isMobile]);
+  }, [token, statusFilter, sortBy, sortOrder, dateFrom, dateTo, isMobile]);
 
   useEffect(() => {
     // Skip pagination on mobile - all orders are fetched at once
@@ -165,12 +178,18 @@ function MyOrders() {
     const params: any = {
       page: isMobile ? 1 : page, // Always use page 1 on mobile
       limit: isMobile ? 1000 : 5, // Fetch all orders on mobile (using large limit)
-      sort: "created_at",
-      order: "desc",
+      sort: sortBy,
+      order: sortOrder,
       search: searchQuery,
     };
     if (statusFilter !== "all") {
       params.status = statusFilter;
+    }
+    if (dateFrom) {
+      params.date_from = dateFrom;
+    }
+    if (dateTo) {
+      params.date_to = dateTo;
     }
     const response = await getOrders(token, params);
     if (response.success) {
@@ -263,17 +282,23 @@ function MyOrders() {
     openModal("tracking", orderId);
   };
 
-  const handleCancelOrder = async (reason: string, comments: string) => {
+  const handleCancelOrder = async (reason: string, comments: string, selectedItemIds: string[]) => {
     if (!token || !selectedOrder) return;
     startLoading();
     const response = await cancelOrder(selectedOrder.id, token, {
       reason,
       comments,
+      itemIds: selectedItemIds,
     });
     stopLoading();
 
     if (response.success) {
-      toast.success("Order cancelled successfully", { duration: 3000 });
+      const itemCount = selectedItemIds.length;
+      const totalItems = selectedOrder.items.length;
+      const message = itemCount === totalItems 
+        ? "Order cancelled successfully" 
+        : `${itemCount} item${itemCount !== 1 ? 's' : ''} cancelled successfully`;
+      toast.success(message, { duration: 3000 });
       setShowCancelModal(false);
       setSelectedOrder(null);
       fetchOrders();
@@ -471,6 +496,21 @@ function MyOrders() {
     return status === "delivered";
   };
 
+  const handleResetFilters = () => {
+    setStatusFilter("all");
+    setSortBy("created_at");
+    setSortOrder("desc");
+    setDateFrom("");
+    setDateTo("");
+    setSearchQuery("");
+  };
+
+  const handleApplyFilters = () => {
+    setShowFilterModal(false);
+    setCurrentPage(1);
+    fetchOrders(1);
+  };
+
   const filteredOrders = orders.filter((order) =>
     order.order_number.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -487,9 +527,17 @@ function MyOrders() {
         <div className="items-center gap-3 hidden md:flex">
             <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Orders</h2>
           </div>
-          <button className="p-2 hover:bg-gray-100 transition-colors rounded-xs   hidden md:flex items-center gap-2">
+          <button 
+            onClick={() => setShowFilterModal(true)}
+            className="p-2 hover:bg-gray-100 transition-colors rounded-xl hidden md:flex items-center gap-2 relative"
+          >
             <FilterIcon size={20} strokeWidth={1} className="text-gray-600" />
             <span className="text-sm uppercase tracking-wider">Filters</span>
+            {activeFiltersCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">
+                {activeFiltersCount}
+              </span>
+            )}
           </button>
         </div>
         <div className="md:hidden border-b border-gray-200">
@@ -514,12 +562,76 @@ function MyOrders() {
             <div className="w-px h-6 bg-gray-200"></div>
 
             {/* Filter Button */}
-            <button className="px-4 py-3 flex items-center gap-2 hover:bg-gray-50 transition-colors">
+            <button 
+              onClick={() => setShowFilterModal(true)}
+              className="px-4 py-3 flex items-center gap-2 hover:bg-gray-50 transition-colors relative"
+            >
               <span className="text-sm font-medium text-gray-900">Filter</span>
+              {activeFiltersCount > 0 && (
+                <span className="bg-black text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-semibold">
+                  {activeFiltersCount}
+                </span>
+              )}
               <ChevronRight size={16} strokeWidth={2} className="text-gray-900" />
             </button>
           </div>
         </div>
+
+        {/* Active Filters Display */}
+        {activeFiltersCount > 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 mx-4 md:mx-0">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-semibold text-blue-900">Active Filters:</span>
+                {statusFilter !== "all" && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-900">
+                    Status: {statusFilter}
+                    <button
+                      onClick={() => setStatusFilter("all")}
+                      className="hover:bg-blue-100 rounded-full p-0.5"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {dateFrom && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-900">
+                    From: {new Date(dateFrom).toLocaleDateString()}
+                    <button
+                      onClick={() => setDateFrom("")}
+                      className="hover:bg-blue-100 rounded-full p-0.5"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {dateTo && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-900">
+                    To: {new Date(dateTo).toLocaleDateString()}
+                    <button
+                      onClick={() => setDateTo("")}
+                      className="hover:bg-blue-100 rounded-full p-0.5"
+                    >
+                      <X size={12} />
+                    </button>
+                  </span>
+                )}
+                {(sortBy !== "created_at" || sortOrder !== "desc") && (
+                  <span className="inline-flex items-center gap-1 px-3 py-1 bg-white border border-blue-300 rounded-full text-xs font-medium text-blue-900">
+                    Sort: {sortBy.replace("_", " ")} ({sortOrder})
+                  </span>
+                )}
+              </div>
+              <button
+                onClick={handleResetFilters}
+                className="text-xs font-semibold text-blue-900 hover:text-blue-700 underline"
+              >
+                Clear All
+              </button>
+            </div>
+          </div>
+        )}
+
         {filteredOrders.length === 0 ? (
           <div className="text-center py-12">
             <Package size={48} className="mx-auto text-gray-300 mb-4" />
@@ -854,7 +966,7 @@ function MyOrders() {
       )}
 
       {/* Review Modal */}
-      {selectedOrder && (
+      {selectedOrder && token && (
         <ReviewModal
           isOpen={showReviewModal}
           onClose={() => {
@@ -862,9 +974,10 @@ function MyOrders() {
             setSelectedOrder(null);
             setReviewsMap({});
           }}
-          order={selectedOrder}
+          orderId={selectedOrder.id}
+          orderNumber={selectedOrder.order_number}
+          token={token}
           onConfirm={handleSubmitReviews}
-          existingReviews={existingReviews}
         />
       )}
 
@@ -880,7 +993,265 @@ function MyOrders() {
           onConfirm={handleReturnRefund}
         />
       )}
+
+      {/* Filter Modal */}
+      <FilterModal
+        isOpen={showFilterModal}
+        onClose={() => setShowFilterModal(false)}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
+        sortOrder={sortOrder}
+        setSortOrder={setSortOrder}
+        dateFrom={dateFrom}
+        setDateFrom={setDateFrom}
+        dateTo={dateTo}
+        setDateTo={setDateTo}
+        onReset={handleResetFilters}
+        onApply={handleApplyFilters}
+        activeFiltersCount={activeFiltersCount}
+      />
     </div>
+  );
+}
+
+interface FilterModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  statusFilter: string;
+  setStatusFilter: (value: string) => void;
+  sortBy: "created_at" | "updated_at" | "total_amount" | "order_number";
+  setSortBy: (value: "created_at" | "updated_at" | "total_amount" | "order_number") => void;
+  sortOrder: "asc" | "desc";
+  setSortOrder: (value: "asc" | "desc") => void;
+  dateFrom: string;
+  setDateFrom: (value: string) => void;
+  dateTo: string;
+  setDateTo: (value: string) => void;
+  onReset: () => void;
+  onApply: () => void;
+  activeFiltersCount: number;
+}
+
+function FilterModal({
+  isOpen,
+  onClose,
+  statusFilter,
+  setStatusFilter,
+  sortBy,
+  setSortBy,
+  sortOrder,
+  setSortOrder,
+  dateFrom,
+  setDateFrom,
+  dateTo,
+  setDateTo,
+  onReset,
+  onApply,
+  activeFiltersCount,
+}: FilterModalProps) {
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setIsMounted(true);
+    } else {
+      const timer = setTimeout(() => setIsMounted(false), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  if (!isMounted) return null;
+
+  const statusOptions = [
+    { value: "all", label: "All Orders", icon: <Package size={16} /> },
+    { value: "placed", label: "Placed", icon: <Clock size={16} /> },
+    { value: "processing", label: "Processing", icon: <RefreshCw size={16} /> },
+    { value: "shipped", label: "Shipped", icon: <Truck size={16} /> },
+    { value: "delivered", label: "Delivered", icon: <CheckCircle size={16} /> },
+    { value: "cancelled", label: "Cancelled", icon: <XCircle size={16} /> },
+    { value: "refunded", label: "Refunded", icon: <XCircle size={16} /> },
+  ];
+
+  const sortOptions = [
+    { value: "created_at", label: "Order Date" },
+    { value: "updated_at", label: "Last Updated" },
+    { value: "total_amount", label: "Order Amount" },
+    { value: "order_number", label: "Order Number" },
+  ];
+
+  return (
+    <>
+      {/* Overlay */}
+      <div
+        data-lenis-prevent="true"
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-[9999] transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
+        onClick={onClose}
+      />
+
+      {/* Filter Modal - Desktop centered, Mobile bottom sheet */}
+      <div className="fixed inset-0 z-[10000] flex md:items-center items-end justify-center md:p-4 p-0 pointer-events-none">
+        <div
+          className={`bg-white w-full md:max-w-2xl overflow-hidden transition-all duration-300 ease-out pointer-events-auto
+            md:rounded-xl md:max-h-[90vh] shadow-2xl
+            rounded-t-3xl max-h-[92vh]
+            ${isOpen ? 'md:translate-y-0 md:opacity-100 translate-y-0 opacity-100' : 'md:translate-y-4 md:opacity-0 translate-y-full opacity-0'}
+          `}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Drag Handle for Mobile */}
+          <div className="md:hidden flex justify-center pt-3 pb-2">
+            <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+          </div>
+
+          {/* Header */}
+          <div className="sticky top-0 bg-white border-b border-gray-100 px-5 py-4 md:px-6 md:py-5 flex justify-between items-center z-10">
+            <div className="flex items-center gap-3">
+              <h3 className="text-lg md:text-xl font-bold text-gray-900">
+                Filter Orders
+              </h3>
+              {activeFiltersCount > 0 && (
+                <span className="bg-black text-white text-xs px-2 py-1 rounded-full font-semibold">
+                  {activeFiltersCount} active
+                </span>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors shrink-0"
+              aria-label="Close"
+            >
+              <X size={20} className="text-gray-600" />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div
+            data-lenis-prevent="true"
+            className="overflow-y-auto overscroll-contain md:max-h-[calc(90vh-160px)] max-h-[calc(92vh-170px)] px-5 py-5 md:px-6 md:py-6"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            {/* Order Status Filter */}
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-gray-900 mb-3">
+                Order Status
+              </label>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                {statusOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setStatusFilter(option.value)}
+                    className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all ${
+                      statusFilter === option.value
+                        ? 'border-black bg-black text-white'
+                        : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                    }`}
+                  >
+                    {option.icon}
+                    <span className="text-sm font-medium">{option.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sort By */}
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-gray-900 mb-3">
+                Sort By
+              </label>
+              <div className="grid grid-cols-2 gap-2.5 mb-3">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setSortBy(option.value as any)}
+                    className={`px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                      sortBy === option.value
+                        ? 'border-black bg-black text-white'
+                        : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Sort Order */}
+              <div className="flex gap-2.5">
+                <button
+                  onClick={() => setSortOrder("desc")}
+                  className={`flex-1 px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                    sortOrder === "desc"
+                      ? 'border-black bg-black text-white'
+                      : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                  }`}
+                >
+                  Newest First
+                </button>
+                <button
+                  onClick={() => setSortOrder("asc")}
+                  className={`flex-1 px-4 py-3 rounded-xl border-2 transition-all text-sm font-medium ${
+                    sortOrder === "asc"
+                      ? 'border-black bg-black text-white'
+                      : 'border-gray-200 hover:border-gray-300 bg-white text-gray-700'
+                  }`}
+                >
+                  Oldest First
+                </button>
+              </div>
+            </div>
+
+            {/* Date Range */}
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-gray-900 mb-3">
+                Date Range
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-gray-600 mb-2">From Date</label>
+                  <input
+                    type="date"
+                    value={dateFrom}
+                    onChange={(e) => setDateFrom(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition-all text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-gray-600 mb-2">To Date</label>
+                  <input
+                    type="date"
+                    value={dateTo}
+                    onChange={(e) => setDateTo(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:border-black focus:outline-none focus:ring-2 focus:ring-black/10 transition-all text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Footer Actions */}
+          <div className="sticky bottom-0 bg-white border-t border-gray-100 px-5 py-4 md:px-6 md:py-5">
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={onReset}
+                disabled={activeFiltersCount === 0}
+                className="flex-1 border-2 border-gray-300 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-50 transition-all duration-200 font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Reset All
+              </button>
+              <button
+                onClick={onApply}
+                className="flex-1 bg-black text-white px-6 py-3 rounded-xl hover:bg-gray-900 transition-all duration-200 font-semibold text-sm"
+              >
+                Apply Filters
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 

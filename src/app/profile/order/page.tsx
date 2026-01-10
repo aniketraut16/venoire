@@ -78,17 +78,23 @@ function OrderPageContent() {
     stopLoading();
   };
 
-  const handleCancelOrder = async (reason: string, comments: string) => {
-    if (!token || !orderId) return;
+  const handleCancelOrder = async (reason: string, comments: string, selectedItemIds: string[]) => {
+    if (!token || !orderId || !order) return;
     startLoading();
     const response = await cancelOrder(orderId, token, {
       reason,
       comments,
+      itemIds: selectedItemIds,
     });
     stopLoading();
 
     if (response.success) {
-      toast.success("Order cancelled successfully", { duration: 3000 });
+      const itemCount = selectedItemIds.length;
+      const totalItems = order.items.length;
+      const message = itemCount === totalItems 
+        ? "Order cancelled successfully" 
+        : `${itemCount} item${itemCount !== 1 ? 's' : ''} cancelled successfully`;
+      toast.success(message, { duration: 3000 });
       setShowCancelModal(false);
       fetchOrderDetails();
     } else {
@@ -530,37 +536,80 @@ function OrderPageContent() {
             Order Items
           </h2>
           <div className="space-y-3">
-            {order.items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center space-x-4 p-4 border border-gray-200"
-              >
-                <div className="w-20 h-20 shrink-0 bg-gray-100 border border-gray-200">
-                  <img
-                    src={item.thumbnail_url}
-                    alt={item.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-gray-900">{item.name}</p>
-                  <p className="text-sm text-gray-600">{item.variant}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Quantity: {item.quantity}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-medium">
-                    ₹{Number(item.total_price).toFixed(2)}
-                  </p>
-                  {item.quantity > 1 && (
-                    <p className="text-xs text-gray-500">
-                      ₹{Number(item.unit_price).toFixed(2)} each
-                    </p>
+            {order.items.map((item) => {
+              const isCancelled = item.status === 'cancelled';
+              const isReturned = item.status === 'returned';
+              
+              return (
+                <div
+                  key={item.id}
+                  className={`flex items-center space-x-4 p-4 border relative ${
+                    isCancelled 
+                      ? 'border-red-200 bg-red-50/30' 
+                      : isReturned
+                      ? 'border-orange-200 bg-orange-50/30'
+                      : 'border-gray-200'
+                  }`}
+                >
+                  {/* Status Badge */}
+                  {(isCancelled || isReturned) && (
+                    <div className="absolute top-2 right-2">
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                        isCancelled 
+                          ? 'bg-red-100 text-red-700' 
+                          : 'bg-orange-100 text-orange-700'
+                      }`}>
+                        {isCancelled ? 'Cancelled' : 'Returned'}
+                      </span>
+                    </div>
                   )}
+
+                  <div className={`w-20 h-20 shrink-0 bg-gray-100 border border-gray-200 relative ${
+                    (isCancelled || isReturned) ? 'opacity-60' : ''
+                  }`}>
+                    <img
+                      src={item.thumbnail_url}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {(isCancelled || isReturned) && (
+                      <div className="absolute inset-0 bg-black/10"></div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <p className={`font-medium ${
+                      (isCancelled || isReturned) ? 'text-gray-500 line-through' : 'text-gray-900'
+                    }`}>
+                      {item.name}
+                    </p>
+                    <p className={`text-sm ${
+                      (isCancelled || isReturned) ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      {item.variant}
+                    </p>
+                    <p className={`text-xs mt-1 ${
+                      (isCancelled || isReturned) ? 'text-gray-400' : 'text-gray-500'
+                    }`}>
+                      Quantity: {item.quantity}
+                    </p>
+                  </div>
+                  <div className="text-right">
+                    <p className={`font-medium ${
+                      (isCancelled || isReturned) ? 'text-gray-500 line-through' : 'text-gray-900'
+                    }`}>
+                      ₹{Number(item.total_price).toFixed(2)}
+                    </p>
+                    {item.quantity > 1 && (
+                      <p className={`text-xs ${
+                        (isCancelled || isReturned) ? 'text-gray-400' : 'text-gray-500'
+                      }`}>
+                        ₹{Number(item.unit_price).toFixed(2)} each
+                      </p>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
@@ -786,19 +835,19 @@ function OrderPageContent() {
         </div>
 
         {/* Refund Information */}
-        {order.status === "cancelled" && order.refund && (
+        {(order.refund || (order.payment.refund_status && order.payment.refund_status !== "not_applicable")) && (
           <div>
             <h2 className="text-sm font-medium uppercase tracking-wider mb-3">
               Refund Information
             </h2>
-            <div className="bg-red-50 p-4 border-l-2 border-red-600 space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="bg-amber-50 p-4 border-l-2 border-amber-600 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                     Refund Status
                   </p>
                   <p className="text-sm text-gray-900 capitalize">
-                    {order.refund.refund_status.replace(/_/g, " ")}
+                    {(order.refund?.refund_status || order.payment.refund_status || "").replace(/_/g, " ")}
                   </p>
                 </div>
                 <div>
@@ -806,43 +855,45 @@ function OrderPageContent() {
                     Refund Amount
                   </p>
                   <p className="text-sm text-gray-900 font-medium">
-                    ₹{parseFloat(order.refund.refund_amount).toFixed(2)}
+                    ₹{parseFloat(order.refund?.refund_amount || order.payment.refund_amount || "0").toFixed(2)}
                   </p>
                 </div>
-                {order.refund.refund_transaction_id && (
-                  <div>
+                {(order.refund?.refund_transaction_id || order.payment.refund_transaction_id) && (
+                  <div className="sm:col-span-2">
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                       Refund Transaction ID
                     </p>
-                    <p className="text-sm text-gray-900 font-mono">
-                      {order.refund.refund_transaction_id}
+                    <p className="text-sm text-gray-900 font-mono break-all">
+                      {order.refund?.refund_transaction_id || order.payment.refund_transaction_id}
                     </p>
                   </div>
                 )}
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                    Refund Initiated At
-                  </p>
-                  <p className="text-sm text-gray-900">
-                    {new Date(
-                      order.refund.refund_initiated_at
-                    ).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-                {order.refund.refund_completed_at && (
+                {(order.refund?.refund_initiated_at || order.payment.refund_initiated_at) && (
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                      Refund Initiated At
+                    </p>
+                    <p className="text-sm text-gray-900">
+                      {new Date(
+                        order.refund?.refund_initiated_at || order.payment.refund_initiated_at || ""
+                      ).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                )}
+                {(order.refund?.refund_completed_at || order.payment.refund_completed_at) && (
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                       Refund Completed At
                     </p>
                     <p className="text-sm text-gray-900">
                       {new Date(
-                        order.refund.refund_completed_at
+                        order.refund?.refund_completed_at || order.payment.refund_completed_at || ""
                       ).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
@@ -854,23 +905,23 @@ function OrderPageContent() {
                   </div>
                 )}
               </div>
-              {order.refund.refund_reason && (
+              {(order.refund?.refund_reason || order.payment.refund_reason) && (
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                     Refund Reason
                   </p>
-                  <p className="text-sm text-gray-900">
-                    {order.refund.refund_reason}
+                  <p className="text-sm text-gray-900 capitalize">
+                    {(order.refund?.refund_reason || order.payment.refund_reason || "").replace(/_/g, " ")}
                   </p>
                 </div>
               )}
-              {order.refund.refund_notes && (
+              {(order.refund?.refund_notes || order.payment.refund_notes) && (
                 <div>
                   <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
                     Refund Notes
                   </p>
                   <p className="text-sm text-gray-900">
-                    {order.refund.refund_notes}
+                    {order.refund?.refund_notes || order.payment.refund_notes}
                   </p>
                 </div>
               )}
@@ -939,16 +990,17 @@ function OrderPageContent() {
       )}
 
       {/* Review Modal */}
-      {order && (
+      {order && token && (
         <ReviewModal
           isOpen={showReviewModal}
           onClose={() => {
             setShowReviewModal(false);
             setReviewsMap({});
           }}
-          order={order}
+          orderId={order.id}
+          orderNumber={order.order_number}
+          token={token}
           onConfirm={handleSubmitReviews}
-          existingReviews={existingReviews}
         />
       )}
 

@@ -9,6 +9,7 @@ import {
   GetUserReviewsResponse,
   CreateReviewArgs,
   CreateReviewResponse,
+  ReviewableItem,
 } from "@/types/orders";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -222,5 +223,20 @@ export const requestReturnRefund = async (
       success: false,
       message: error?.response?.data?.error?.message || "Failed to submit return request",
     };
+  }
+};
+
+export const getReviewableItemsfromOrder = async (
+  orderId: string,
+  token: string
+): Promise<{ success: boolean; data: ReviewableItem[] }> => {
+  try {
+    const response = await axios.get(`${baseUrl}/user/orders/${orderId}/reviewable-items`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data as { success: boolean; data: ReviewableItem[] };
+  } catch (error) {
+    console.error("Error getting reviewable items from order:", error);
+    return { success: false, data: [] };
   }
 };

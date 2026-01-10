@@ -50,3 +50,4 @@ export const getPerfumeCollections = async (): Promise<PerfumeCollection[]> => {
         return [];
     }
 }
+
