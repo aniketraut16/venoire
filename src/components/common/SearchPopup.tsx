@@ -14,6 +14,7 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<SearchResponse['data'] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
@@ -28,6 +29,16 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     'Formal Dress Shirt',
     'Jasmine Nights'
   ]
+
+  // Handle mount animation
+  useEffect(() => {
+    if (isOpen) {
+      setIsMounted(true)
+    } else {
+      const timer = setTimeout(() => setIsMounted(false), 300)
+      return () => clearTimeout(timer)
+    }
+  }, [isOpen])
 
   // Handle search with debouncing
   useEffect(() => {
@@ -93,27 +104,38 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
     searchResults.collections.length > 0
   )
 
-  if (!isOpen) return null
+  if (!isMounted) return null
 
   return (
     <>
       {/* Overlay */}
       <div 
         data-lenis-prevent="true"
-        className="fixed inset-0 bg-black/50 z-[9998] transition-opacity duration-300"
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-9998 transition-opacity duration-300 ${
+          isOpen ? 'opacity-100' : 'opacity-0'
+        }`}
         onClick={onClose}
       />
       
-      {/* Search Modal */}
-      <div className="fixed inset-0 z-9999 flex items-start justify-center pt-16 sm:pt-20 md:pt-24 px-4">
+      {/* Search Modal - Desktop centered, Mobile bottom sheet */}
+      <div className="fixed inset-0 z-9999 flex md:items-start md:justify-center items-end justify-center md:pt-20 px-0 md:px-4">
         <div 
-          className="bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[80vh] overflow-hidden animate-in slide-in-from-top-4 duration-300"
+          className={`bg-white shadow-2xl w-full md:max-w-3xl overflow-hidden transition-all duration-300 ease-out
+            md:rounded-xl md:max-h-[85vh]
+            rounded-t-3xl max-h-[90vh]
+            ${isOpen ? 'md:translate-y-0 md:opacity-100 translate-y-0 opacity-100' : 'md:translate-y-4 md:opacity-0 translate-y-full opacity-0'}
+          `}
           onClick={(e) => e.stopPropagation()}
         >
+          {/* Drag Handle for Mobile */}
+          <div className="md:hidden flex justify-center pt-3 pb-2">
+            <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+          </div>
+
           {/* Search Header */}
-          <div className="flex items-center gap-3 p-4 sm:p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3 px-4 py-4 md:px-6 md:py-5 border-b border-gray-100">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -121,34 +143,40 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full pl-10 pr-4 py-3 text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3.5 text-base bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-black/10 focus:bg-white transition-all"
                 autoFocus
               />
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2.5 hover:bg-gray-100 rounded-xl transition-colors shrink-0"
+              aria-label="Close search"
             >
-              <X size={20} className="text-gray-500" />
+              <X size={20} className="text-gray-600" />
+
             </button>
           </div>
 
           {/* Search Content */}
-          <div className="max-h-[60vh] overflow-y-auto overscroll-contain" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div
+            data-lenis-prevent="true"
+            className="overflow-y-auto overscroll-contain md:max-h-[calc(85vh-80px)] max-h-[calc(90vh-100px)]" 
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
             {searchQuery.trim() === '' ? (
               /* Top Searches */
-              <div className="p-4 sm:p-6">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900">Top Searches</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="p-5 md:p-6">
+                <h3 className="text-lg font-bold mb-4 text-gray-900">Top Searches</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {topSearches.map((search, index) => (
                     <button
                       key={index}
                       onClick={() => handleTopSearchClick(search)}
-                      className="text-left p-3 hover:bg-gray-50 rounded-lg transition-colors text-gray-700 hover:text-black"
+                      className="text-left px-4 py-3 hover:bg-gray-50 rounded-xl transition-all text-gray-700 hover:text-black border border-transparent hover:border-gray-200"
                     >
                       <div className="flex items-center gap-3">
-                        <Search size={16} className="text-gray-400" />
-                        <span className="text-sm">{search}</span>
+                        <Search size={16} className="text-gray-400 shrink-0" />
+                        <span className="text-sm font-medium">{search}</span>
                       </div>
                     </button>
                   ))}
@@ -156,35 +184,46 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
               </div>
             ) : (
               /* Search Results */
-              <div className="p-4 sm:p-6">
+              <div className="p-5 md:p-6">
                 {isLoading ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-10 w-10 border-2 border-gray-200 border-t-black"></div>
                   </div>
                 ) : hasResults ? (
-                  <div className="space-y-6">
+                  <div className="space-y-8">
                     {/* Products Section */}
                     {searchResults.products.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-3 text-gray-900">
-                          Products ({searchResults.products.length})
+                        <h3 className="text-base font-bold mb-4 text-gray-900 flex items-center gap-2">
+                          Products 
+                          <span className="text-xs font-semibold px-2.5 py-1 bg-blue-100 text-blue-700 rounded-full">
+                            {searchResults.products.length}
+                          </span>
                         </h3>
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                           {searchResults.products.map((product) => (
                             <Link
                               key={product.id}
                               href={`/product/${product.slug}`}
                               onClick={onClose}
-                              className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                              className="flex items-start gap-4 p-3.5 hover:bg-gray-50 rounded-xl transition-all group border border-transparent hover:border-gray-200"
                             >
+                              <img 
+                                src={product.thumbnail_url || '/dummy.jpg'} 
+                                alt={product.name} 
+                                className="h-20 w-20 object-cover rounded-lg shrink-0 shadow-sm"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/dummy.jpg'
+                                }}
+                              />
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
+                                <h4 className="font-semibold text-gray-900 group-hover:text-black transition-colors line-clamp-1 mb-1">
                                   {product.name}
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
                                   {product.description}
                                 </p>
-                                <span className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full mt-2">
+                                <span className="inline-block px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full mt-2.5">
                                   Product
                                 </span>
                               </div>
@@ -197,25 +236,36 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
                     {/* Categories Section */}
                     {searchResults.categories.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-3 text-gray-900">
-                          Categories ({searchResults.categories.length})
+                        <h3 className="text-base font-bold mb-4 text-gray-900 flex items-center gap-2">
+                          Categories 
+                          <span className="text-xs font-semibold px-2.5 py-1 bg-green-100 text-green-700 rounded-full">
+                            {searchResults.categories.length}
+                          </span>
                         </h3>
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                           {searchResults.categories.map((category) => (
                             <Link
                               key={category.id}
                               href={`/c/${category.slug}`}
                               onClick={onClose}
-                              className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                              className="flex items-start gap-4 p-3.5 hover:bg-gray-50 rounded-xl transition-all group border border-transparent hover:border-gray-200"
                             >
+                              <img 
+                                src={category.thumbnail_url || '/dummy.jpg'} 
+                                alt={category.name} 
+                                className="h-20 w-20 object-cover rounded-lg shrink-0 shadow-sm"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/dummy.jpg'
+                                }}
+                              />
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
+                                <h4 className="font-semibold text-gray-900 group-hover:text-black transition-colors line-clamp-1 mb-1">
                                   {category.name}
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
                                   {category.description}
                                 </p>
-                                <span className="inline-block px-2 py-1 text-xs bg-green-100 text-green-700 rounded-full mt-2">
+                                <span className="inline-block px-2.5 py-1 text-xs font-medium bg-green-50 text-green-700 rounded-full mt-2.5">
                                   Category
                                 </span>
                               </div>
@@ -228,25 +278,36 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
                     {/* Collections Section */}
                     {searchResults.collections.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold mb-3 text-gray-900">
-                          Collections ({searchResults.collections.length})
+                        <h3 className="text-base font-bold mb-4 text-gray-900 flex items-center gap-2">
+                          Collections 
+                          <span className="text-xs font-semibold px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full">
+                            {searchResults.collections.length}
+                          </span>
                         </h3>
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                           {searchResults.collections.map((collection) => (
                             <Link
                               key={collection.id}
                               href={getCollectionLink(collection)}
                               onClick={onClose}
-                              className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                              className="flex items-start gap-4 p-3.5 hover:bg-gray-50 rounded-xl transition-all group border border-transparent hover:border-gray-200"
                             >
+                              <img 
+                                src={collection.thumbnail_url || '/dummy.jpg'} 
+                                alt={collection.name} 
+                                className="h-20 w-20 object-cover rounded-lg shrink-0 shadow-sm"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/dummy.jpg'
+                                }}
+                              />
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-medium text-gray-900 group-hover:text-black transition-colors line-clamp-1">
+                                <h4 className="font-semibold text-gray-900 group-hover:text-black transition-colors line-clamp-1 mb-1">
                                   {collection.name}
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                                <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
                                   {collection.description}
                                 </p>
-                                <span className="inline-block px-2 py-1 text-xs bg-purple-100 text-purple-700 rounded-full mt-2 capitalize">
+                                <span className="inline-block px-2.5 py-1 text-xs font-medium bg-purple-50 text-purple-700 rounded-full mt-2.5 capitalize">
                                   {collection.collection_type} Collection
                                 </span>
                               </div>
@@ -257,10 +318,12 @@ export default function SearchPopup({ isOpen, onClose }: SearchPopupProps) {
                     )}
                   </div>
                 ) : (
-                  <div className="text-center py-8">
-                    <Search size={48} className="text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No results found</h3>
-                    <p className="text-gray-500">
+                  <div className="text-center py-16">
+                    <div className="bg-gray-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Search size={40} className="text-gray-400" />
+                    </div>
+                    <h3 className="text-lg font-bold text-gray-900 mb-2">No results found</h3>
+                    <p className="text-gray-600 text-sm max-w-sm mx-auto">
                       Try searching with different keywords or check your spelling.
                     </p>
                   </div>

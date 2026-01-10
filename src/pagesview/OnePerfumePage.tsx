@@ -60,7 +60,6 @@ export default function OnePerfumePage() {
 
   // Scroll handler for sticky bar
   useEffect(() => {
-    
     const handleScroll = () => {
       if (ctaButtonsRef.current) {
         const ctaRect = ctaButtonsRef.current.getBoundingClientRect();
@@ -227,7 +226,7 @@ export default function OnePerfumePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0 overflow-x-hidden">
+    <div className="min-h-screen bg-white pb-20 md:pb-0">
       {/* Hero Section with Product Image as Background */}
 
       <div className="space-y-1 grow flex md:hidden flex-col mt-30 px-4">
@@ -812,11 +811,9 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
-          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 -mx-4"
+          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 "
           style={{
             transform:"scale(1.2)",
-            transformOrigin: "center center",
-            width: "calc(100% + 2rem)"
           }}
           >
             <div className="flex items-center h-full">

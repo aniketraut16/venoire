@@ -30,6 +30,7 @@ export interface SearchResponse {
             id: string;
             name: string;
             slug: string;
+            thumbnail_url: string;
             description: string;
         }[];
         categories: {
@@ -37,6 +38,7 @@ export interface SearchResponse {
             name: string;
             slug: string;
             description: string;
+            thumbnail_url: string;
         }[];
         collections: {
             id: string;
@@ -44,6 +46,7 @@ export interface SearchResponse {
             slug: string;
             description: string;
             collection_type: string;
+            thumbnail_url: string;
         }[];
     }
 }
