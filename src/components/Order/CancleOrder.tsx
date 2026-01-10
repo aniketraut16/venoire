@@ -232,7 +232,7 @@ export default function CancleOrderModal({
                               Qty: {item.quantity}
                             </span>
                             <span className="text-sm font-semibold text-gray-900">
-                              ₹{parseFloat(item.total_price).toFixed(2)}
+                              ₹{item.total_price.toFixed(2)}
                             </span>
                           </div>
                         </div>
