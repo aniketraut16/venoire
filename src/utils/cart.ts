@@ -68,7 +68,8 @@ export const getCartCount = async (
 };
 
 export const getCart = async (
-  token: string | null = null
+  token: string | null = null,
+  pinCode: string | null = null
 ): Promise<CartApiResponse> => {
   try {
     let sessionId = null;
@@ -83,7 +84,7 @@ export const getCart = async (
       : sessionId
         ? { headers: { "x-session-id": sessionId } }
         : {};
-    const response = await axios.get(`${baseUrl}/cart`, headers);
+    const response = await axios.get(`${baseUrl}/cart?pincode=${pinCode}`, headers);
     const data = response.data || {};
 
     // Support both old and new response shapes if backend differs

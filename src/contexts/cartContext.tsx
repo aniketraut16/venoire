@@ -34,7 +34,7 @@ type CartContextType = {
   cartItems: CartItem[];
   pricing: Pricing | null;
   isCartLoading: boolean;
-  fetchCart: () => Promise<void>;
+  fetchCart: (pinCode?: string | null) => Promise<void>;
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
   removeFromCart: (itemId: string) => Promise<boolean>;
   updateCartItem: (itemId: string, args: AddToCartArgs) => Promise<boolean>;
@@ -90,10 +90,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setPreSelectedVariantId(undefined);
   }, []);
 
-  const fetchCart = useCallback(async () => {
+  const fetchCart = useCallback(async (pinCode?: string | null) => {
     setIsCartLoading(true);
     try {
-      const fetched: CartApiResponse = await getCart(token ?? null);
+      const fetched: CartApiResponse = await getCart(token ?? null, pinCode ?? null);
       if (fetched.success) {
         setCartItems(fetched.cartItems);
         setPricing(fetched.pricing);

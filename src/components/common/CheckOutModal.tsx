@@ -5,9 +5,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AddressType, CreateAddressArgs } from "@/types/address";
 import { deleteAddress, getAddresses } from "@/utils/address";
 import toast from "react-hot-toast";
-import { Shield, Trash2, Pencil, Plus, X } from "lucide-react";
+import { Shield, Trash2, Pencil, Plus, X, AlertCircle } from "lucide-react";
 import { intiateOrder } from "@/utils/orders";
 import AddressForm from "../Address/AddressForm";
+import { getCart } from "@/utils/cart";
 
 interface CheckOutModalProps {
   open: boolean;
@@ -20,7 +21,7 @@ interface CheckOutModalProps {
 export default function CheckoutPageModal({
   open,
   onClose,
-  pricing,
+  pricing: initialPricing,
   cartId,
   appliedCoupon = null,
 }: CheckOutModalProps) {
@@ -37,6 +38,12 @@ export default function CheckoutPageModal({
   }>(null);
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
   const [showAllAddresses, setShowAllAddresses] = useState(false);
+  const [pricing, setPricing] = useState<Pricing | null>(initialPricing);
+  const [isRecalculatingShipping, setIsRecalculatingShipping] = useState(false);
+
+  useEffect(() => {
+    setPricing(initialPricing);
+  }, [initialPricing]);
 
   useEffect(() => {
     const loadAddresses = async () => {
@@ -54,13 +61,43 @@ export default function CheckoutPageModal({
   useEffect(() => {
     if (addresses.length > 0) {
       const def = addresses.find((a) => a.is_default);
-      setSelectedAddressId(
-        (prev) => prev ?? (def ? def.id : addresses[0]?.id ?? null)
-      );
+      const addressId = def ? def.id : addresses[0]?.id ?? null;
+      setSelectedAddressId(addressId);
+      
+      if (addressId && token) {
+        const selectedAddr = addresses.find((a) => a.id === addressId);
+        if (selectedAddr) {
+          recalculateShipping(selectedAddr.postal_code);
+        }
+      }
     } else {
       setSelectedAddressId(null);
     }
   }, [addresses]);
+
+  const recalculateShipping = async (pinCode: string) => {
+    if (!token) return;
+    
+    setIsRecalculatingShipping(true);
+    try {
+      const cartResponse = await getCart(token, pinCode);
+      if (cartResponse.success && cartResponse.pricing) {
+        setPricing(cartResponse.pricing);
+      }
+    } catch (error) {
+      console.error("Error recalculating shipping:", error);
+    } finally {
+      setIsRecalculatingShipping(false);
+    }
+  };
+
+  const handleAddressChange = async (addressId: string) => {
+    setSelectedAddressId(addressId);
+    const selectedAddress = addresses.find((addr) => addr.id === addressId);
+    if (selectedAddress && token) {
+      await recalculateShipping(selectedAddress.postal_code);
+    }
+  };
 
   const bagTotal = pricing?.subtotal || 0;
   const discount = pricing?.discount || 0;
@@ -143,6 +180,10 @@ export default function CheckoutPageModal({
     }
     if (!selectedAddressId) {
       toast.error("Select a delivery address");
+      return;
+    }
+    if (pricing && pricing.shipping === -1) {
+      toast.error("No courier service available for the selected address. Please choose a different address.");
       return;
     }
     if (!token) {
@@ -264,7 +305,7 @@ export default function CheckoutPageModal({
                             ? "border-black bg-gray-50 ring-1 ring-black/5"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
-                        onClick={() => setSelectedAddressId(addr.id)}
+                        onClick={() => handleAddressChange(addr.id)}
                       >
                         <div className="flex items-start gap-3">
                           <div className="pt-0.5">
@@ -329,6 +370,24 @@ export default function CheckoutPageModal({
                       {showAllAddresses ? "Show Less" : `View All (${addresses.length})`}
                     </button>
                   )}
+                  
+                  {/* Shipping Status Messages */}
+                  {pricing && pricing.shipping === -1 && selectedAddressId && (
+                    <div className="mt-3 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+                      <p className="text-sm text-red-700">
+                        No courier service available for this address. Please select a different address.
+                      </p>
+                    </div>
+                  )}
+                  {pricing && pricing.shipping === -1 && !selectedAddressId && (
+                    <div className="mt-3 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" />
+                      <p className="text-sm text-yellow-700">
+                        Please select a delivery address to calculate shipping charges.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -360,8 +419,14 @@ export default function CheckoutPageModal({
                   )}
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span className={shipping === 0 ? "text-green-600" : ""}>
-                      {shipping === 0 ? "FREE" : `₹${shipping.toFixed(2)}`}
+                    <span className={shipping === -1 ? "text-gray-500" : shipping === 0 ? "text-green-600" : ""}>
+                      {isRecalculatingShipping 
+                        ? "Calculating..." 
+                        : shipping === -1 
+                        ? "Not Available" 
+                        : shipping === 0 
+                        ? "FREE" 
+                        : `₹${shipping.toFixed(2)}`}
                     </span>
                   </div>
                </div>
@@ -389,9 +454,9 @@ export default function CheckoutPageModal({
           </button>
           <button
             onClick={handlePay}
-            disabled={isProcessingPayment || !selectedAddressId}
-            className={`flex-[2] py-3.5 px-6 font-bold text-sm tracking-widest text-white transition-all rounded-lg shadow-md uppercase ${
-              isProcessingPayment || !selectedAddressId
+            disabled={isProcessingPayment || !selectedAddressId || (pricing && pricing.shipping === -1)}
+            className={`flex-2 py-3.5 px-6 font-bold text-sm tracking-widest text-white transition-all rounded-lg shadow-md uppercase ${
+              isProcessingPayment || !selectedAddressId || (pricing && pricing.shipping === -1)
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-black hover:bg-gray-800 active:scale-[0.99] shadow-lg hover:shadow-xl"
             }`}
@@ -419,6 +484,8 @@ export default function CheckoutPageModal({
                 </svg>
                 PROCESSING...
               </span>
+            ) : pricing && pricing.shipping === -1 ? (
+              "SHIPPING NOT AVAILABLE"
             ) : (
               `PAY ₹${payableAmount.toFixed(2)}`
             )}

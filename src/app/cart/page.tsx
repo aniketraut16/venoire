@@ -9,6 +9,8 @@ import {
   Truck,
   Minus,
   Plus,
+  MapPin,
+  AlertCircle,
 } from "lucide-react";
 import { useCart } from "@/contexts/cartContext";
 import { CartItem } from "@/types/cart";
@@ -16,6 +18,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import CheckoutPageModal from "@/components/common/CheckOutModal";
+import { getAddresses } from "@/utils/address";
+import { AddressType } from "@/types/address";
 
 function ShoppingCartPage() {
   const {
@@ -26,6 +30,7 @@ function ShoppingCartPage() {
     pricing,
     isCartLoading,
     cartId,
+    fetchCart,
   } = useCart();
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>(
     {}
@@ -37,17 +42,48 @@ function ShoppingCartPage() {
     [key: string]: number;
   }>({});
   const [showCheckoutModal, setShowCheckoutModal] = useState(false);
-  const { user, needsCompleteSetup } = useAuth();
+  const { user, needsCompleteSetup, token } = useAuth();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || null;
   const checkoutmodal = searchParams.get("checkoutmodal") || "false";
   const { moveToWishlist } = useCart();
   const router = useRouter();
+  const [addresses, setAddresses] = useState<AddressType[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
 
   const getCurrentQuantity = (item: CartItem): number => {
     const q = selectedQuantities[item.id] ?? item.quantity ?? 1;
     const asNum = Number(q);
     return Number.isFinite(asNum) && asNum > 0 ? asNum : 1;
+  };
+
+  useEffect(() => {
+    if (user && token) {
+      setIsLoadingAddresses(true);
+      getAddresses(token)
+        .then((response) => {
+          if (response.success) {
+            setAddresses(response.data);
+            const defaultAddress = response.data.find((addr) => addr.is_default);
+            if (defaultAddress) {
+              setSelectedAddressId(defaultAddress.id);
+              fetchCart(defaultAddress.postal_code);
+            }
+          }
+        })
+        .finally(() => {
+          setIsLoadingAddresses(false);
+        });
+    }
+  }, [user, token]);
+
+  const handleAddressChange = async (addressId: string) => {
+    setSelectedAddressId(addressId);
+    const selectedAddress = addresses.find((addr) => addr.id === addressId);
+    if (selectedAddress) {
+      await fetchCart(selectedAddress.postal_code);
+    }
   };
 
   useEffect(() => {
@@ -168,6 +204,10 @@ function ShoppingCartPage() {
       );
     } else if (!cartId || cartId.trim() === "") {
       toast.error("Cart information is not available. Please try again.");
+    } else if (shipping === -1 && !selectedAddressId) {
+      toast.error("Please select a delivery address to proceed.");
+    } else if (shipping === -1 && selectedAddressId) {
+      toast.error("No courier service available for the selected address. Please choose a different address.");
     } else {
       setShowCheckoutModal(true);
     }
@@ -382,6 +422,49 @@ function ShoppingCartPage() {
               </div>
             ))}
 
+            {/* Mobile: Address Selection */}
+            {user && addresses.length > 0 && (
+              <div className="bg-white rounded-lg p-4 mt-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin className="w-5 h-5 text-gray-700" />
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
+                    Delivery Address
+                  </h3>
+                </div>
+                <div className="relative">
+                  <select
+                    className="w-full px-3 py-2 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
+                    value={selectedAddressId}
+                    onChange={(e) => handleAddressChange(e.target.value)}
+                  >
+                    <option value="">Select delivery address</option>
+                    {addresses.map((addr) => (
+                      <option key={addr.id} value={addr.id}>
+                        {addr.address_line1}, {addr.city} - {addr.postal_code}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                </div>
+                {shipping === -1 && selectedAddressId && (
+                  <div className="mt-3 flex items-start gap-2 p-2 bg-red-50 border border-red-200 rounded">
+                    <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                    <p className="text-xs text-red-700">
+                      No courier service available for this address. Please select a different address.
+                    </p>
+                  </div>
+                )}
+                {shipping === -1 && !selectedAddressId && (
+                  <div className="mt-3 flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                    <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+                    <p className="text-xs text-yellow-700">
+                      Please select a delivery address to calculate shipping charges.
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Mobile: Order Summary */}
             <div className="bg-gray-100 rounded-lg p-4 mt-6">
               <div className="flex items-center gap-2 mb-4">
@@ -423,9 +506,11 @@ function ShoppingCartPage() {
                     Shipping Charges
                     <span className="text-xs text-gray-500">(i)</span>
                   </span>
-                  <span className="font-medium text-green-600">
+                  <span className={`font-medium ${shipping === -1 ? 'text-gray-500' : 'text-green-600'}`}>
                     {isCartLoading
                       ? "..."
+                      : shipping === -1
+                      ? "Not Available"
                       : shipping === 0
                       ? "Free"
                       : `₹ ${shipping.toLocaleString()}`}
@@ -722,6 +807,49 @@ function ShoppingCartPage() {
             {/* Right Side - Order Summary */}
             <div className="w-full lg:w-96">
               <div className="sticky top-25">
+                {/* Address Selection */}
+                {user && addresses.length > 0 && (
+                  <div className="bg-white shadow-sm mb-6">
+                    <div className="flex items-center gap-3 p-6 border-b">
+                      <MapPin className="w-5 h-5" />
+                      <h2 className="text-lg font-semibold">DELIVERY ADDRESS</h2>
+                    </div>
+                    <div className="p-6">
+                      <div className="relative">
+                        <select
+                          className="w-full px-3 py-2 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
+                          value={selectedAddressId}
+                          onChange={(e) => handleAddressChange(e.target.value)}
+                        >
+                          <option value="">Select delivery address</option>
+                          {addresses.map((addr) => (
+                            <option key={addr.id} value={addr.id}>
+                              {addr.address_line1}, {addr.city} - {addr.postal_code}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
+                      </div>
+                      {shipping === -1 && selectedAddressId && (
+                        <div className="mt-3 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded">
+                          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+                          <p className="text-sm text-red-700">
+                            No courier service available for this address. Please select a different address.
+                          </p>
+                        </div>
+                      )}
+                      {shipping === -1 && !selectedAddressId && (
+                        <div className="mt-3 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                          <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" />
+                          <p className="text-sm text-yellow-700">
+                            Please select a delivery address to calculate shipping charges.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-white shadow-sm ">
                   {/* Header */}
                   <div className="flex items-center gap-3 p-6 border-b">
@@ -765,9 +893,11 @@ function ShoppingCartPage() {
 
                       <div className="flex justify-between items-center text-sm gap-4">
                         <span className="text-gray-700">Shipping Charges</span>
-                        <span className="font-medium text-green-600 whitespace-nowrap">
+                        <span className={`font-medium whitespace-nowrap ${shipping === -1 ? 'text-gray-500' : 'text-green-600'}`}>
                           {isCartLoading
                             ? "Loading..."
+                            : shipping === -1
+                            ? "Not Available"
                             : shipping === 0
                             ? "Free"
                             : `₹ ${shipping.toLocaleString()}`}
@@ -796,9 +926,14 @@ function ShoppingCartPage() {
                     {/* Checkout Button */}
                     <button
                       onClick={handleCheckout}
-                      className="w-full bg-black text-white py-3 font-medium text-sm hover:bg-gray-800 transition-colors mb-4"
+                      disabled={shipping === -1}
+                      className={`w-full py-3 font-medium text-sm transition-colors mb-4 ${
+                        shipping === -1
+                          ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                          : 'bg-black text-white hover:bg-gray-800'
+                      }`}
                     >
-                      CHECK OUT
+                      {shipping === -1 ? 'SHIPPING NOT AVAILABLE' : 'CHECK OUT'}
                     </button>
 
                     {/* Coupon Link */}
@@ -849,9 +984,14 @@ function ShoppingCartPage() {
             </div>
             <button
               onClick={handleCheckout}
-              className="bg-black text-white px-12 py-3 rounded font-semibold text-sm hover:bg-gray-800 transition-colors"
+              disabled={shipping === -1}
+              className={`px-12 py-3 rounded font-semibold text-sm transition-colors ${
+                shipping === -1
+                  ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
+                  : 'bg-black text-white hover:bg-gray-800'
+              }`}
             >
-              CHECK OUT
+              {shipping === -1 ? 'SHIPPING NOT AVAILABLE' : 'CHECK OUT'}
             </button>
           </div>
         </div>
