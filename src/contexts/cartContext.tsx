@@ -67,6 +67,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     string | undefined
   >(undefined);
   const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
+  const [lastPinCode, setLastPinCode] = useState<string | null>(null);
   const { startLoading, stopLoading } = useLoading();
 
   const openAddToCartModal = useCallback(
@@ -93,7 +94,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const fetchCart = useCallback(async (pinCode?: string | null) => {
     setIsCartLoading(true);
     try {
-      const fetched: CartApiResponse = await getCart(token ?? null, pinCode ?? null);
+      const pinCodeToUse = pinCode !== undefined ? pinCode : lastPinCode;
+      const fetched: CartApiResponse = await getCart(token ?? null, pinCodeToUse);
       if (fetched.success) {
         setCartItems(fetched.cartItems);
         setPricing(fetched.pricing);
@@ -103,6 +105,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
           0
         );
         setCount(newCount);
+        if (pinCode !== undefined) {
+          setLastPinCode(pinCode);
+        }
       } else {
         setCartItems([]);
         setPricing(null);
@@ -112,7 +117,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsCartLoading(false);
     }
-  }, [token]);
+  }, [token, lastPinCode]);
 
   const addToCart = useCallback(
     async (args: AddToCartArgs): Promise<boolean> => {
