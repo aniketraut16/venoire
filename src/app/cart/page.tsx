@@ -11,6 +11,8 @@ import {
   Plus,
   MapPin,
   AlertCircle,
+  Pencil,
+  Trash,
 } from "lucide-react";
 import { useCart } from "@/contexts/cartContext";
 import { CartItem } from "@/types/cart";
@@ -18,8 +20,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import CheckoutPageModal from "@/components/common/CheckOutModal";
-import { getAddresses } from "@/utils/address";
-import { AddressType } from "@/types/address";
+import { getAddresses, deleteAddress } from "@/utils/address";
+import { AddressType, CreateAddressArgs } from "@/types/address";
+import AddressForm from "@/components/Address/AddressForm";
 
 function ShoppingCartPage() {
   const {
@@ -51,6 +54,12 @@ function ShoppingCartPage() {
   const [addresses, setAddresses] = useState<AddressType[]>([]);
   const [selectedAddressId, setSelectedAddressId] = useState<string>("");
   const [isLoadingAddresses, setIsLoadingAddresses] = useState(false);
+  const [showAddressForm, setShowAddressForm] = useState<null | {
+    method: "create" | "update";
+    addressId?: string;
+    defaultValues?: CreateAddressArgs;
+  }>(null);
+  const [showAllAddresses, setShowAllAddresses] = useState(false);
 
   const getCurrentQuantity = (item: CartItem): number => {
     const q = selectedQuantities[item.id] ?? item.quantity ?? 1;
@@ -60,23 +69,28 @@ function ShoppingCartPage() {
 
   useEffect(() => {
     if (user && token) {
-      setIsLoadingAddresses(true);
-      getAddresses(token)
-        .then((response) => {
-          if (response.success) {
-            setAddresses(response.data);
-            const defaultAddress = response.data.find((addr) => addr.is_default);
-            if (defaultAddress) {
-              setSelectedAddressId(defaultAddress.id);
-              fetchCart(defaultAddress.postal_code);
-            }
-          }
-        })
-        .finally(() => {
-          setIsLoadingAddresses(false);
-        });
+      loadAddresses();
     }
-  }, [user, token]);
+  }, [user, token, showAddressForm]);
+
+  const loadAddresses = async () => {
+    if (!token) return;
+    setIsLoadingAddresses(true);
+    const response = await getAddresses(token);
+    if (response.success && response.data.length > 0) {
+      setAddresses(response.data);
+      const defaultAddress = response.data.find((addr) => addr.is_default);
+      const firstAddress = defaultAddress || response.data[0];
+      
+      if (firstAddress) {
+        setSelectedAddressId(firstAddress.id);
+        await fetchCart(firstAddress.postal_code);
+      }
+    } else if (response.success) {
+      setAddresses([]);
+    }
+    setIsLoadingAddresses(false);
+  };
 
   const handleAddressChange = async (addressId: string) => {
     setSelectedAddressId(addressId);
@@ -84,6 +98,53 @@ function ShoppingCartPage() {
     if (selectedAddress) {
       await fetchCart(selectedAddress.postal_code);
     }
+  };
+
+  const handleDeleteAddress = async (addressId: string) => {
+    if (!token) return;
+    
+    const confirmed = window.confirm("Delete this address?");
+    if (!confirmed) return;
+    
+    const res = await deleteAddress(addressId, token);
+    if (res.success) {
+      toast.success("Address deleted");
+      const updatedAddresses = addresses.filter((a) => a.id !== addressId);
+      setAddresses(updatedAddresses);
+      
+      if (selectedAddressId === addressId) {
+        const newSelected = updatedAddresses.find(a => a.is_default) || updatedAddresses[0];
+        if (newSelected) {
+          setSelectedAddressId(newSelected.id);
+          await fetchCart(newSelected.postal_code);
+        } else {
+          setSelectedAddressId("");
+        }
+      }
+    } else {
+      toast.error(res.message || "Failed to delete address");
+    }
+  };
+
+  const openCreateAddress = () => {
+    setShowAddressForm({ method: "create" });
+  };
+
+  const openEditAddress = (addr: AddressType) => {
+    const defaults: CreateAddressArgs = {
+      address_line1: addr.address_line1,
+      address_line2: addr.address_line2 || "",
+      city: addr.city,
+      postal_code: addr.postal_code,
+      country: addr.country,
+      state: addr.state || "",
+      is_default: addr.is_default,
+    };
+    setShowAddressForm({
+      method: "update",
+      addressId: addr.id,
+      defaultValues: defaults,
+    });
   };
 
   useEffect(() => {
@@ -97,9 +158,19 @@ function ShoppingCartPage() {
         return;
       }
 
-      setShowCheckoutModal(true);
+      if (!selectedAddressId && !isLoadingAddresses) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete('checkoutmodal');
+        const newUrl = params.toString() ? `?${params.toString()}` : window.location.pathname;
+        router.push(newUrl);
+        return;
+      }
+
+      if (selectedAddressId) {
+        setShowCheckoutModal(true);
+      }
     }
-  }, [checkoutmodal, showCheckoutModal]);
+  }, [checkoutmodal, showCheckoutModal, selectedAddressId, isLoadingAddresses]);
 
   const getCurrentVariantId = (item: CartItem): string | null => {
     if (item.productType === "clothing") {
@@ -191,26 +262,35 @@ function ShoppingCartPage() {
 
   const handleCheckout = () => {
     if (!user) {
-      toast.error("Please login to checkout");
       router.push("/auth?redirect=/cart?checkoutmodal=true");
-    } else if (needsCompleteSetup) {
-      toast.error("Please complete your profile to checkout");
-      router.push("/complete-profile?redirect=/cart?checkoutmodal=true");
-    } else if (isCartLoading) {
-      toast.error("Please wait while we load your cart...");
-    } else if (!pricing) {
-      toast.error(
-        "Cart pricing information is not available. Please try again."
-      );
-    } else if (!cartId || cartId.trim() === "") {
-      toast.error("Cart information is not available. Please try again.");
-    } else if (shipping === -1 && !selectedAddressId) {
-      toast.error("Please select a delivery address to proceed.");
-    } else if (shipping === -1 && selectedAddressId) {
-      toast.error("No courier service available for the selected address. Please choose a different address.");
-    } else {
-      setShowCheckoutModal(true);
+      return;
     }
+    
+    if (needsCompleteSetup) {
+      router.push("/complete-profile?redirect=/cart?checkoutmodal=true");
+      return;
+    }
+    
+    if (isCartLoading || isLoadingAddresses) {
+      return;
+    }
+    
+    if (!selectedAddressId) {
+      toast.error("Please select a delivery address");
+      return;
+    }
+    
+    if (shipping === -1) {
+      toast.error("Delivery not available for this address. Please select a different one.");
+      return;
+    }
+    
+    if (!pricing || !cartId || cartId.trim() === "") {
+      toast.error("Unable to proceed. Please refresh and try again.");
+      return;
+    }
+    
+    setShowCheckoutModal(true);
   };
 
   return (
@@ -423,43 +503,128 @@ function ShoppingCartPage() {
             ))}
 
             {/* Mobile: Address Selection */}
-            {user && addresses.length > 0 && (
+            {user && (
               <div className="bg-white rounded-lg p-4 mt-6 shadow-sm">
-                <div className="flex items-center gap-2 mb-3">
-                  <MapPin className="w-5 h-5 text-gray-700" />
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
-                    Delivery Address
-                  </h3>
-                </div>
-                <div className="relative">
-                  <select
-                    className="w-full px-3 py-2 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
-                    value={selectedAddressId}
-                    onChange={(e) => handleAddressChange(e.target.value)}
-                  >
-                    <option value="">Select delivery address</option>
-                    {addresses.map((addr) => (
-                      <option key={addr.id} value={addr.id}>
-                        {addr.address_line1}, {addr.city} - {addr.postal_code}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                </div>
-                {shipping === -1 && selectedAddressId && (
-                  <div className="mt-3 flex items-start gap-2 p-2 bg-red-50 border border-red-200 rounded">
-                    <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
-                    <p className="text-xs text-red-700">
-                      No courier service available for this address. Please select a different address.
-                    </p>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-5 h-5 text-gray-700" />
+                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wide">
+                      Delivery Address
+                    </h3>
                   </div>
-                )}
-                {shipping === -1 && !selectedAddressId && (
-                  <div className="mt-3 flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
-                    <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
-                    <p className="text-xs text-yellow-700">
-                      Please select a delivery address to calculate shipping charges.
+                  <button
+                    onClick={openCreateAddress}
+                    className="text-xs px-2 py-1 bg-black text-white hover:bg-gray-800 transition-colors rounded"
+                  >
+                    + Add
+                  </button>
+                </div>
+
+                {isLoadingAddresses ? (
+                  <p className="text-xs text-gray-500 italic">Loading addresses...</p>
+                ) : addresses.length === 0 ? (
+                  <div className="text-center py-4 bg-gray-50 rounded border border-dashed border-gray-300">
+                    <p className="text-xs text-gray-600 mb-2">
+                      No addresses found.
                     </p>
+                    <button
+                      onClick={openCreateAddress}
+                      className="text-xs font-medium text-black hover:underline"
+                    >
+                      Add an address
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className={`space-y-2 overflow-y-auto ${showAllAddresses ? 'max-h-none' : 'max-h-[250px]'}`}>
+                      {(showAllAddresses ? addresses : addresses.slice(0, 2)).map((addr) => (
+                        <div
+                          key={addr.id}
+                          className={`relative border rounded-lg p-2 transition-all cursor-pointer ${
+                            selectedAddressId === addr.id
+                              ? "border-black bg-gray-50 ring-1 ring-black/5"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                          onClick={() => handleAddressChange(addr.id)}
+                        >
+                          <div className="flex items-start gap-2">
+                            <div className="pt-0.5">
+                              <div
+                                className={`w-3 h-3 rounded-full border flex items-center justify-center ${
+                                  selectedAddressId === addr.id
+                                    ? "border-black"
+                                    : "border-gray-300"
+                                }`}
+                              >
+                                {selectedAddressId === addr.id && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex-1 text-xs overflow-hidden pr-12">
+                              <div className="flex items-center gap-1 mb-0.5">
+                                <span className="font-semibold text-gray-900 truncate">
+                                  {addr.address_line1.slice(0, 25)}{addr.address_line1.length > 25 && "..."}
+                                </span>
+                                {addr.is_default && (
+                                  <span className="text-[9px] font-bold px-1 py-0.5 bg-gray-200 text-gray-700 rounded-sm shrink-0">
+                                    DEFAULT
+                                  </span>
+                                )}
+                              </div>
+                              {addr.address_line2 && (
+                                <p className="text-gray-600 text-[10px] truncate">
+                                  {addr.address_line2}
+                                </p>
+                              )}
+                              <p className="text-gray-600 text-[10px]">
+                                {addr.city}, {addr.state} {addr.postal_code}
+                              </p>
+                            </div>
+                            
+                            <div className="absolute top-1 right-1 flex items-center gap-0.5">
+                              <button
+                                onClick={(e) => { e.stopPropagation(); openEditAddress(addr); }}
+                                className="p-1 text-gray-400 hover:text-black transition-colors bg-white rounded"
+                              >
+                                <Pencil className="w-3 h-3" />
+                              </button>
+                              <button
+                                onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr.id); }}
+                                className="p-1 text-gray-400 hover:text-red-600 transition-colors bg-white rounded"
+                              >
+                                <Trash className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {addresses.length > 2 && (
+                      <button
+                        onClick={() => setShowAllAddresses(!showAllAddresses)}
+                        className="text-[10px] font-semibold text-gray-600 hover:text-black underline transition-colors"
+                      >
+                        {showAllAddresses ? "Show Less" : `View All (${addresses.length})`}
+                      </button>
+                    )}
+                    
+                    {shipping === -1 && selectedAddressId && (
+                      <div className="mt-2 flex items-start gap-2 p-2 bg-red-50 border border-red-200 rounded">
+                        <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 shrink-0" />
+                        <p className="text-xs text-red-700">
+                          No courier service available for this address. Please select a different address.
+                        </p>
+                      </div>
+                    )}
+                    {shipping === -1 && !selectedAddressId && (
+                      <div className="mt-2 flex items-start gap-2 p-2 bg-yellow-50 border border-yellow-200 rounded">
+                        <AlertCircle className="w-4 h-4 text-yellow-600 mt-0.5 shrink-0" />
+                        <p className="text-xs text-yellow-700">
+                          Please select a delivery address to calculate shipping charges.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -504,7 +669,7 @@ function ShoppingCartPage() {
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-700 flex items-center gap-1">
                     Shipping Charges
-                    <span className="text-xs text-gray-500">(i)</span>
+                    {/* <span className="text-xs text-gray-500">(i)</span> */}
                   </span>
                   <span className={`font-medium ${shipping === -1 ? 'text-gray-500' : 'text-green-600'}`}>
                     {isCartLoading
@@ -808,42 +973,127 @@ function ShoppingCartPage() {
             <div className="w-full lg:w-96">
               <div className="sticky top-25">
                 {/* Address Selection */}
-                {user && addresses.length > 0 && (
+                {user && (
                   <div className="bg-white shadow-sm mb-6">
-                    <div className="flex items-center gap-3 p-6 border-b">
-                      <MapPin className="w-5 h-5" />
-                      <h2 className="text-lg font-semibold">DELIVERY ADDRESS</h2>
+                    <div className="flex items-center justify-between p-6 border-b">
+                      <div className="flex items-center gap-3">
+                        <MapPin className="w-5 h-5" />
+                        <h2 className="text-lg font-semibold">DELIVERY ADDRESS</h2>
+                      </div>
+                      <button
+                        onClick={openCreateAddress}
+                        className="text-xs px-3 py-1.5 bg-black text-white hover:bg-gray-800 transition-colors rounded"
+                      >
+                        + Add New
+                      </button>
                     </div>
                     <div className="p-6">
-                      <div className="relative">
-                        <select
-                          className="w-full px-3 py-2 pr-8 border border-gray-300 rounded bg-white text-sm appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-black"
-                          value={selectedAddressId}
-                          onChange={(e) => handleAddressChange(e.target.value)}
-                        >
-                          <option value="">Select delivery address</option>
-                          {addresses.map((addr) => (
-                            <option key={addr.id} value={addr.id}>
-                              {addr.address_line1}, {addr.city} - {addr.postal_code}
-                            </option>
-                          ))}
-                        </select>
-                        <ChevronDown className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
-                      </div>
-                      {shipping === -1 && selectedAddressId && (
-                        <div className="mt-3 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded">
-                          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
-                          <p className="text-sm text-red-700">
-                            No courier service available for this address. Please select a different address.
+                      {isLoadingAddresses ? (
+                        <p className="text-sm text-gray-500 italic">Loading addresses...</p>
+                      ) : addresses.length === 0 ? (
+                        <div className="text-center py-6 bg-gray-50 rounded border border-dashed border-gray-300">
+                          <p className="text-sm text-gray-600 mb-2">
+                            No addresses found.
                           </p>
+                          <button
+                            onClick={openCreateAddress}
+                            className="text-sm font-medium text-black hover:underline"
+                          >
+                            Add an address
+                          </button>
                         </div>
-                      )}
-                      {shipping === -1 && !selectedAddressId && (
-                        <div className="mt-3 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded">
-                          <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" />
-                          <p className="text-sm text-yellow-700">
-                            Please select a delivery address to calculate shipping charges.
-                          </p>
+                      ) : (
+                        <div className="space-y-3">
+                          <div className={`space-y-3 overflow-y-auto pr-1 ${showAllAddresses ? 'max-h-none' : 'max-h-[300px]'}`}>
+                            {(showAllAddresses ? addresses : addresses.slice(0, 2)).map((addr) => (
+                              <div
+                                key={addr.id}
+                                className={`relative border rounded-lg p-3 transition-all cursor-pointer ${
+                                  selectedAddressId === addr.id
+                                    ? "border-black bg-gray-50 ring-1 ring-black/5"
+                                    : "border-gray-200 hover:border-gray-300"
+                                }`}
+                                onClick={() => handleAddressChange(addr.id)}
+                              >
+                                <div className="flex items-start gap-3">
+                                  <div className="pt-0.5">
+                                    <div
+                                      className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                                        selectedAddressId === addr.id
+                                          ? "border-black"
+                                          : "border-gray-300"
+                                      }`}
+                                    >
+                                      {selectedAddressId === addr.id && (
+                                        <div className="w-2 h-2 rounded-full bg-black" />
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex-1 text-sm overflow-hidden pr-16">
+                                    <div className="flex items-center gap-2 mb-0.5">
+                                      <span className="font-semibold text-gray-900 truncate">
+                                        {addr.address_line1.slice(0, 30)}{addr.address_line1.length > 30 && "..."}
+                                      </span>
+                                      {addr.is_default && (
+                                        <span className="text-[10px] font-bold px-1.5 py-0.5 bg-gray-200 text-gray-700 rounded-sm shrink-0">
+                                          DEFAULT
+                                        </span>
+                                      )}
+                                    </div>
+                                    {addr.address_line2 && (
+                                      <p className="text-gray-600 text-xs truncate">
+                                        {addr.address_line2}
+                                      </p>
+                                    )}
+                                    <p className="text-gray-600 text-xs">
+                                      {addr.city}, {addr.state} {addr.postal_code}
+                                    </p>
+                                    <p className="text-gray-600 text-xs">{addr.country}</p>
+                                  </div>
+                                  
+                                  <div className="absolute top-2 right-2 flex items-center gap-1">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); openEditAddress(addr); }}
+                                      className="p-1.5 text-gray-400 hover:text-black transition-colors bg-white"
+                                    >
+                                      <Pencil className="w-3.5 h-3.5" />
+                                    </button>
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); handleDeleteAddress(addr.id); }}
+                                      className="p-1.5 text-gray-400 hover:text-red-600 transition-colors bg-white"
+                                    >
+                                      <Trash className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          {addresses.length > 2 && (
+                            <button
+                              onClick={() => setShowAllAddresses(!showAllAddresses)}
+                              className="text-xs font-semibold text-gray-600 hover:text-black underline transition-colors"
+                            >
+                              {showAllAddresses ? "Show Less" : `View All (${addresses.length})`}
+                            </button>
+                          )}
+                          
+                          {shipping === -1 && selectedAddressId && (
+                            <div className="mt-3 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                              <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 shrink-0" />
+                              <p className="text-sm text-red-700">
+                                No courier service available for this address. Please select a different address.
+                              </p>
+                            </div>
+                          )}
+                          {shipping === -1 && !selectedAddressId && (
+                            <div className="mt-3 flex items-start gap-2 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                              <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 shrink-0" />
+                              <p className="text-sm text-yellow-700">
+                                Please select a delivery address to calculate shipping charges.
+                              </p>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -996,6 +1246,16 @@ function ShoppingCartPage() {
           </div>
         </div>
       </div>
+      
+      {showAddressForm && (
+        <AddressForm
+          method={showAddressForm.method}
+          addressId={showAddressForm.addressId}
+          defaultValues={showAddressForm.defaultValues}
+          onCancel={() => setShowAddressForm(null)}
+        />
+      )}
+      
       {showCheckoutModal && (
         <CheckoutPageModal
           open={showCheckoutModal}
@@ -1010,6 +1270,7 @@ function ShoppingCartPage() {
           pricing={pricing}
           cartId={cartId}
           appliedCoupon={null}
+          selectedAddress={addresses.find(addr => addr.id === selectedAddressId) || null}
         />
       )}
     </>
