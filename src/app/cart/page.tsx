@@ -256,6 +256,7 @@ function ShoppingCartPage() {
 
   const bagTotal = pricing?.subtotal || 0;
   const shipping = pricing?.shipping || 0;
+  const isFreeShipping = pricing?.isFreeShipping || false;
   const payableAmount = pricing?.total || 0;
   const discount = pricing?.discount || 0;
   const tax = pricing?.gst || 0;
@@ -671,13 +672,13 @@ function ShoppingCartPage() {
                     Shipping Charges
                     {/* <span className="text-xs text-gray-500">(i)</span> */}
                   </span>
-                  <span className={`font-medium ${shipping === -1 ? 'text-gray-500' : 'text-green-600'}`}>
+                  <span className={`font-medium ${shipping === -1 ? 'text-gray-500' : isFreeShipping ? 'text-green-600' : 'text-gray-900'}`}>
                     {isCartLoading
                       ? "..."
                       : shipping === -1
                       ? "Not Available"
-                      : shipping === 0
-                      ? "Free"
+                      : isFreeShipping
+                      ? `Free (₹${shipping.toLocaleString()} saved)`
                       : `₹ ${shipping.toLocaleString()}`}
                   </span>
                 </div>
@@ -1143,13 +1144,13 @@ function ShoppingCartPage() {
 
                       <div className="flex justify-between items-center text-sm gap-4">
                         <span className="text-gray-700">Shipping Charges</span>
-                        <span className={`font-medium whitespace-nowrap ${shipping === -1 ? 'text-gray-500' : 'text-green-600'}`}>
+                        <span className={`font-medium whitespace-nowrap ${shipping === -1 ? 'text-gray-500' : isFreeShipping ? 'text-green-600' : 'text-gray-900'}`}>
                           {isCartLoading
                             ? "Loading..."
                             : shipping === -1
                             ? "Not Available"
-                            : shipping === 0
-                            ? "Free"
+                            : isFreeShipping
+                            ? `Free (₹${shipping.toLocaleString()} saved)`
                             : `₹ ${shipping.toLocaleString()}`}
                         </span>
                       </div>

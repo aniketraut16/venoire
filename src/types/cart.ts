@@ -42,7 +42,8 @@ export type CartItem = {
 export type Pricing = {
   subtotal: number; // total after item-level discounts
   gst: number; // tax amount
-  shipping: number; // shipping cost
+  shipping: number; // actual shipping cost (always calculated)
+  isFreeShipping: boolean; // whether shipping is free (by offer or threshold)
   discount: number; // cart-level discount
   total: number; // final amount to pay
   appliedOffer: string | null;

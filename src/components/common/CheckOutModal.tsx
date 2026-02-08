@@ -33,6 +33,7 @@ export default function CheckoutPageModal({
   const bagTotal = pricing?.subtotal || 0;
   const discount = pricing?.discount || 0;
   const shipping = pricing?.shipping || 0;
+  const isFreeShipping = pricing?.isFreeShipping || false;
   const payableAmount = pricing?.total || 0;
 
   if (!pricing || !cartId || cartId.trim() === '' || !selectedAddress) {
@@ -214,11 +215,11 @@ export default function CheckoutPageModal({
                   )}
                   <div className="flex justify-between">
                     <span>Shipping</span>
-                    <span className={shipping === -1 ? "text-gray-500" : shipping === 0 ? "text-green-600" : ""}>
+                    <span className={shipping === -1 ? "text-gray-500" : isFreeShipping ? "text-green-600" : ""}>
                       {shipping === -1 
                         ? "Not Available" 
-                        : shipping === 0 
-                        ? "FREE" 
+                        : isFreeShipping 
+                        ? `FREE (₹${shipping.toFixed(2)} saved)` 
                         : `₹${shipping.toFixed(2)}`}
                     </span>
                   </div>
