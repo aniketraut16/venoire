@@ -8,7 +8,7 @@ import { UserSignInArgs } from "@/types/user";
 import { useLoading } from "@/contexts/LoadingContext";
 
 function CompleteProfile() {
-    const { user, token, needsCompleteSetup } = useAuth();
+    const { user, token, needsCompleteSetup, isCheckingUser } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = searchParams.get('redirect') || null;
@@ -37,6 +37,8 @@ function CompleteProfile() {
     ];
 
     useEffect(() => {
+        if (isCheckingUser) return;
+        
         if (user && !needsCompleteSetup) {
             if(redirect){
                 router.push(redirect);
@@ -51,7 +53,7 @@ function CompleteProfile() {
                 router.push("/auth");
             }
         }
-    }, [user, needsCompleteSetup, redirect, router]);
+    }, [user, needsCompleteSetup, isCheckingUser, redirect, router]);
 
     const validateForm = (): string | null => {
         if (!firstName.trim()) {

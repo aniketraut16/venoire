@@ -73,6 +73,12 @@ function ShoppingCartPage() {
     }
   }, [user, token, showAddressForm]);
 
+  useEffect(() => {
+    if (!user && !isCartLoading) {
+      router.push("/auth?redirect=/cart");
+    }
+  }, [user, isCartLoading, router]);
+
   const loadAddresses = async () => {
     if (!token) return;
     setIsLoadingAddresses(true);
@@ -293,6 +299,14 @@ function ShoppingCartPage() {
     
     setShowCheckoutModal(true);
   };
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">Redirecting to login...</p>
+      </div>
+    );
+  }
 
   return (
     <>

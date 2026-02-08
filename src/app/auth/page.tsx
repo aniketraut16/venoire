@@ -29,7 +29,7 @@ function Login() {
     const [otpTimer, setOtpTimer] = useState(0);
 
     const authContext = useAuth();
-    const { user, login, register, loginWithGoogle, loginWithOTP, resetPassword, needsCompleteSetup } = authContext;
+    const { user, login, register, loginWithGoogle, loginWithOTP, resetPassword, needsCompleteSetup, isCheckingUser } = authContext;
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirectUrl = searchParams.get('redirect');
@@ -200,6 +200,7 @@ function Login() {
 
     useEffect(() => {
         if (!user) return;
+        if (isCheckingUser) return;
 
         if(needsCompleteSetup){
             router.push("/complete-profile" + (redirectUrl ? `?redirect=${redirectUrl}` : ""));
@@ -210,7 +211,7 @@ function Login() {
         } else {
             router.push("/");
         }
-    }, [user, needsCompleteSetup, redirectUrl, router]);
+    }, [user, needsCompleteSetup, isCheckingUser, redirectUrl, router]);
 
     return (
         <div className="min-h-screen relative flex items-center justify-center px-4 pt-45 pb-15 bg-gray-100">

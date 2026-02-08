@@ -22,6 +22,7 @@ type AuthContextType = {
     user: User | null;
     dbUser: DBUser | null;
     needsCompleteSetup: boolean;
+    isCheckingUser: boolean;
     token: string | null;
     login: (email: string, password: string) => Promise<void>;
     loginWithGoogle: () => Promise<void>;
@@ -37,10 +38,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [dbUser, setDbUser] = useState<DBUser | null>(null);
     const [needsCompleteSetup, setNeedsCompleteSetup] = useState(false);
+    const [isCheckingUser, setIsCheckingUser] = useState(true);
     const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+            setIsCheckingUser(true);
             setUser(currentUser);
 
             if (currentUser) {
@@ -57,9 +60,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                     setNeedsCompleteSetup(true);
                 }
             } else {
+                setToken(null);
                 setDbUser(null);
                 setNeedsCompleteSetup(false);
             }
+            
+            setIsCheckingUser(false);
         });
 
         return () => unsubscribe();
@@ -141,6 +147,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 user,
                 dbUser,
                 needsCompleteSetup,
+                isCheckingUser,
                 token,
                 login,
                 loginWithGoogle,
