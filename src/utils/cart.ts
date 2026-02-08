@@ -76,7 +76,7 @@ export const getCart = async (
     if (!token) {
       sessionId = getCookie("sessionId");
       if (!sessionId) {
-        return { success: false, message: "Session ID is required", cartId: "", cartItems: [], pricing: { subtotal: 0, gst: 0, shipping: 0, discount: 0, total: 0, appliedOffer: null } };
+        return { success: false, message: "Session ID is required", cartId: "", cartItems: [], pricing: { subtotal: 0, gst: 0, shipping: 0, discount: 0, total: 0, appliedOffer: null, isFreeShipping: false } };
       }
     }
     const headers = token
@@ -102,7 +102,7 @@ export const getCart = async (
     console.error("Error getting cart:", error);
     const errorMessage =
       error?.response?.data?.message || error?.message || "Failed to fetch cart";
-    return { success: false, message: errorMessage, cartId: "", cartItems: [], pricing: { subtotal: 0, gst: 0, shipping: 0, discount: 0, total: 0, appliedOffer: null } };
+    return { success: false, message: errorMessage, cartId: "", cartItems: [], pricing: { subtotal: 0, gst: 0, shipping: 0, discount: 0, total: 0, appliedOffer: null, isFreeShipping: false } };
   }
 };
 
