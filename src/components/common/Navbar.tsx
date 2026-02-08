@@ -34,6 +34,9 @@ export default function Navbar() {
   const { user, needsCompleteSetup } = useAuth();
   const { count } = useCart();
   const [promoidx, setpromoidx] = useState<number>(0);
+  const [prevPromoidx, setPrevPromoidx] = useState<number>(0);
+  const [promoDirection, setPromoDirection] = useState<'left' | 'right' | null>(null);
+  const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const promoItems = [
     "Flat 10% Off On All Orders",
     "Free Shipping On All Orders",
@@ -43,24 +46,39 @@ export default function Navbar() {
   const { navbarContent } = useHomepage();
 
   const increasepromoidx = () => {
-    if (promoidx === promoItems.length - 1) {
-      setpromoidx(0);
-    } else {
-      setpromoidx(promoidx + 1);
-    }
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setPrevPromoidx(promoidx);
+    setPromoDirection('left');
+    setTimeout(() => {
+      if (promoidx === promoItems.length - 1) {
+        setpromoidx(0);
+      } else {
+        setpromoidx(promoidx + 1);
+      }
+      setTimeout(() => setIsAnimating(false), 400);
+    }, 0);
   };
+  
   const decreasepromoidx = () => {
-    if (promoidx <= 0) {
-      setpromoidx(promoItems.length - 1);
-    } else {
-      setpromoidx(promoidx - 1);
-    }
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setPrevPromoidx(promoidx);
+    setPromoDirection('right');
+    setTimeout(() => {
+      if (promoidx <= 0) {
+        setpromoidx(promoItems.length - 1);
+      } else {
+        setpromoidx(promoidx - 1);
+      }
+      setTimeout(() => setIsAnimating(false), 400);
+    }, 0);
   };
 
   useEffect(() => {
     const interval = setInterval(() => {
       increasepromoidx();
-    }, 1500);
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [promoidx]);
@@ -137,16 +155,41 @@ export default function Navbar() {
       <div
         className={`fixed ${
           scrollPosition > 758 ? "-top-9" : "top-0"
-        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out`}
+        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out px-[10%] overflow-hidden`}
       >
-        <button>
-          <ChevronLeft size={16} onClick={decreasepromoidx} />
+        <button onClick={decreasepromoidx} className="z-10" disabled={isAnimating}>
+          <ChevronLeft size={16} />
         </button>
-        <span className="text-white text-xs font-medium tracking-widest">
-          {promoItems[promoidx]}
-        </span>
-        <button>
-          <ChevronRight size={16} onClick={increasepromoidx} />
+        <div className="relative flex-1 h-full flex items-center justify-center overflow-hidden">
+          {/* Previous/Outgoing Item */}
+          {isAnimating && (
+            <span 
+              className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center"
+              style={{
+                animation: promoDirection === 'left' 
+                  ? 'slideOutLeft 0.4s ease-out forwards'
+                  : 'slideOutRight 0.4s ease-out forwards'
+              }}
+            >
+              {promoItems[prevPromoidx]}
+            </span>
+          )}
+          
+          {/* Current/Incoming Item */}
+          <span 
+            key={promoidx}
+            className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center"
+            style={{
+              animation: promoDirection && isAnimating
+                ? `${promoDirection === 'left' ? 'slideInLeft' : 'slideInRight'} 0.4s ease-out`
+                : 'none'
+            }}
+          >
+            {promoItems[promoidx]}
+          </span>
+        </div>
+        <button onClick={increasepromoidx} className="z-10" disabled={isAnimating}>
+          <ChevronRight size={16} />
         </button>
       </div>
       <nav

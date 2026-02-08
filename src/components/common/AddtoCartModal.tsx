@@ -114,6 +114,7 @@ export default function AddtoCartModal({
         onClick={onClose}
       >
         <div
+        
           className="bg-white w-full md:max-w-2xl md:rounded-xl shadow-2xl overflow-hidden flex flex-col absolute bottom-0 md:relative md:bottom-auto animate-[slideUp_0.3s_ease-out] md:animate-none rounded-t-2xl md:rounded-b-xl"
           onClick={(e) => e.stopPropagation()}
           style={{
@@ -141,7 +142,7 @@ export default function AddtoCartModal({
           {/* Success Content */}
           <div className="p-4 md:p-6 overflow-y-auto flex-1">
             {/* Success Animation */}
-            <div className="flex flex-col items-center justify-center py-6">
+            <div className="flex flex-col items-center justify-center py-4">
               <div className="relative">
                 {/* Checkmark Animation */}
                 <div className="w-20 h-20 md:w-24 md:h-24 rounded-full bg-green-50 flex items-center justify-center animate-[scaleIn_0.5s_ease-out]">
@@ -161,19 +162,34 @@ export default function AddtoCartModal({
                 {/* Ripple Effect */}
                 <div className="absolute inset-0 rounded-full bg-green-400 animate-[ripple_1s_ease-out]" style={{ zIndex: -1 }} />
               </div>
+            </div>
 
-              <h3 className="text-lg md:text-xl font-bold text-gray-900 mt-4 animate-[fadeInUp_0.5s_ease-out_0.4s_both]">
-                {modalParams.productName}
-              </h3>
-              <p className="text-sm md:text-base text-gray-600 mt-1 animate-[fadeInUp_0.5s_ease-out_0.5s_both]">
-                {getVariantInfo()} • Qty: {quantity}
-              </p>
+            {/* Product Info with Image */}
+            <div className="flex gap-4 items-center justify-center w-full mb-6 animate-[fadeInUp_0.5s_ease-out_0.3s_both]">
+              {/* Product Image */}
+              <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-lg overflow-hidden border-2 border-gray-200">
+                <img
+                  src={modalParams.productImage}
+                  alt={modalParams.productName}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+
+              {/* Product Details */}
+              <div className="min-w-0">
+                <h3 className="text-base md:text-lg font-bold text-gray-900 line-clamp-2">
+                  {modalParams.productName}
+                </h3>
+                <p className="text-sm md:text-base text-gray-600 mt-1">
+                  {getVariantInfo()} • Qty: {quantity}
+                </p>
+              </div>
             </div>
 
             {/* Similar Products */}
             <div className="mt-6 animate-[fadeInUp_0.5s_ease-out_0.6s_both]">
               <h4 className="text-sm md:text-base font-semibold text-gray-900 mb-3">
-                You might also like
+                You May Also Like
               </h4>
 
               {loadingSimilar ? (
@@ -231,14 +247,14 @@ export default function AddtoCartModal({
           <div className="border-t bg-gray-50 p-3 md:p-4 flex gap-2 md:gap-3">
             <button
               onClick={onClose}
-              className="flex-1 py-2.5 rounded-lg border text-xs md:text-sm font-semibold hover:bg-gray-100 transition"
+              className="flex-1 py-2.5 rounded-lg border-2 border-blue-900 text-blue-900 text-xs md:text-sm font-semibold hover:bg-blue-50 transition"
             >
               Continue Shopping
             </button>
 
             <button
               onClick={handleCheckout}
-              className="flex-1 py-2.5 rounded-lg bg-black text-white text-xs md:text-sm font-semibold hover:bg-gray-800 transition"
+              className="flex-1 py-2.5 rounded-lg bg-yellow-400 text-gray-900 text-xs md:text-sm font-semibold hover:bg-yellow-500 transition"
             >
               Checkout
             </button>
