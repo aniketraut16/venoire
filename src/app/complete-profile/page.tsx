@@ -119,7 +119,11 @@ function CompleteProfile() {
             
             if (success) {
                 stopLoading();
-                window.location.href = "/";
+                if(redirect){
+                    window.location.href = redirect;
+                } else {
+                    window.location.href = "/";
+                }
             } else {
                 setError("Failed to complete profile. Please try again.");
                 stopLoading();

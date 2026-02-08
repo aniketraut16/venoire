@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   ReactNode,
 } from "react";
@@ -68,6 +69,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   >(undefined);
   const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
   const [lastPinCode, setLastPinCode] = useState<string | null>(null);
+  const prevTokenRef = useRef<string | null>(null);
+  const hasMergedRef = useRef<boolean>(false);
   const { startLoading, stopLoading } = useLoading();
 
   const openAddToCartModal = useCallback(
@@ -219,23 +222,35 @@ export function CartProvider({ children }: { children: ReactNode }) {
   );
 
   useEffect(() => {
-    startLoading();
-    fetchCart().finally(() => {
-      stopLoading();
-    });
-  }, [fetchCart]);
+    const initializeCart = async () => {
+      const userJustBecameAvailable = token && dbUser && !hasMergedRef.current;
+      
+      if (!token) {
+        hasMergedRef.current = false;
+        prevTokenRef.current = null;
+      }
+      
+      if (token !== prevTokenRef.current) {
+        prevTokenRef.current = token;
+      }
 
-  useEffect(() => {
-    if (!token || !dbUser) return;
-    startLoading();
-    mergeCartAfterLoginApi(token)
-      .then(() => {
-        return fetchCart();
-      })
-      .finally(() => {
+      startLoading();
+      try {
+        if (userJustBecameAvailable) {
+          await mergeCartAfterLoginApi(token);
+          hasMergedRef.current = true;
+        }
+        await fetchCart();
+      } catch (error) {
+        console.error("Error initializing cart:", error);
+      } finally {
         stopLoading();
-      });
-  }, [token, dbUser, fetchCart]);
+      }
+    };
+
+    initializeCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, dbUser]);
 
   const value = useMemo<CartContextType>(
     () => ({

@@ -177,6 +177,7 @@ export const mergeCartAfterLogin = async (token: string): Promise<void> => {
         "x-session-id": sessionId,
       },
     });
+    Cookies.remove("sessionId");
     return;
   } catch (error) {
     console.error("Error merging cart after login:", error);
