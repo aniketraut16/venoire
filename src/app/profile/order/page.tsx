@@ -32,11 +32,11 @@ import ReviewModal from "@/components/Order/ReviewModal";
 import ReturnRefundModal from "@/components/Order/ReturnRefundModal";
 
 function OrderPageContent() {
-    const urlParams = useSearchParams();
+  const urlParams = useSearchParams();
   const router = useRouter();
   const { token } = useAuth();
   const { startLoading, stopLoading } = useLoading();
-    const orderId = urlParams.get("orderId");
+  const orderId = urlParams.get("orderId");
   const [order, setOrder] = useState<DetailedOrder | null>(null);
   const [trackingData, setTrackingData] = useState<TrackOrderResponse | null>(
     null
@@ -78,22 +78,65 @@ function OrderPageContent() {
     stopLoading();
   };
 
-  const handleCancelOrder = async (reason: string, comments: string, selectedItemIds: string[]) => {
+  const handleCancelOrder = async (
+    reason: string,
+    comments: string,
+    itemsToCancel: { id: string; cancelled_quantity: number }[]
+  ) => {
     if (!token || !orderId || !order) return;
+
+    // Build payload items with safe cancelled_quantity based on available quantity
+    const items = itemsToCancel
+      .map((item) => {
+        const orderItem = order.items.find((oi) => oi.id === item.id);
+        if (!orderItem) return null;
+
+        const alreadyCancelled = orderItem.cancelled_quantity || 0;
+        const availableQuantity = orderItem.quantity - alreadyCancelled;
+
+        if (availableQuantity <= 0) {
+          return null;
+        }
+
+        const requested = item.cancelled_quantity;
+        const safeQuantity = Math.max(1, Math.min(requested, availableQuantity));
+
+        if (safeQuantity <= 0) return null;
+
+        return {
+          id: orderItem.id,
+          cancelled_quantity: safeQuantity,
+        };
+      })
+      .filter((item): item is { id: string; cancelled_quantity: number } => item !== null);
+
+    if (items.length === 0) {
+      toast.error("No items are available to cancel for this order.");
+      return;
+    }
+
     startLoading();
     const response = await cancelOrder(orderId, token, {
       reason,
       comments,
-      itemIds: selectedItemIds,
+      items,
     });
     stopLoading();
 
     if (response.success) {
-      const itemCount = selectedItemIds.length;
-      const totalItems = order.items.length;
-      const message = itemCount === totalItems 
-        ? "Order cancelled successfully" 
-        : `${itemCount} item${itemCount !== 1 ? 's' : ''} cancelled successfully`;
+      const itemCount = items.length;
+      const totalItems = order.items.filter((item) => {
+        const alreadyCancelled = item.cancelled_quantity || 0;
+        const availableQuantity = item.quantity - alreadyCancelled;
+        const isCancelled = item.status === "cancelled" || item.status === "returned";
+        return !isCancelled && availableQuantity > 0;
+      }).length;
+      const message =
+        itemCount === totalItems
+          ? "Order cancelled successfully"
+          : `${itemCount} item${
+              itemCount !== 1 ? "s" : ""
+            } cancelled successfully`;
       toast.success(message, { duration: 3000 });
       setShowCancelModal(false);
       fetchOrderDetails();
@@ -194,9 +237,6 @@ function OrderPageContent() {
     }
   };
 
-  const canCancelOrder = (status: string) => {
-    return status === "placed";
-  };
 
   const canReturnOrder = (order: DetailedOrder) => {
     if (order.status !== "delivered") return false;
@@ -466,8 +506,8 @@ function OrderPageContent() {
                           currentStatusIndex !== -1 &&
                           index <= currentStatusIndex;
                         const stepDate = getStepDate(step);
-    
-  return (
+
+                        return (
                           <div
                             key={step}
                             className="relative flex items-start pb-8 last:pb-0"
@@ -537,36 +577,40 @@ function OrderPageContent() {
           </h2>
           <div className="space-y-3">
             {order.items.map((item) => {
-              const isCancelled = item.status === 'cancelled';
-              const isReturned = item.status === 'returned';
-              
+              const isCancelled = item.status === "cancelled";
+              const isReturned = item.status === "returned";
+
               return (
                 <div
                   key={item.id}
                   className={`flex items-center space-x-4 p-4 border relative ${
-                    isCancelled 
-                      ? 'border-red-200 bg-red-50/30' 
+                    isCancelled
+                      ? "border-red-200 bg-red-50/30"
                       : isReturned
-                      ? 'border-orange-200 bg-orange-50/30'
-                      : 'border-gray-200'
+                      ? "border-orange-200 bg-orange-50/30"
+                      : "border-gray-200"
                   }`}
                 >
                   {/* Status Badge */}
                   {(isCancelled || isReturned) && (
                     <div className="absolute top-2 right-2">
-                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                        isCancelled 
-                          ? 'bg-red-100 text-red-700' 
-                          : 'bg-orange-100 text-orange-700'
-                      }`}>
-                        {isCancelled ? 'Cancelled' : 'Returned'}
+                      <span
+                        className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          isCancelled
+                            ? "bg-red-100 text-red-700"
+                            : "bg-orange-100 text-orange-700"
+                        }`}
+                      >
+                        {isCancelled ? "Cancelled" : "Returned"}
                       </span>
                     </div>
                   )}
 
-                  <div className={`w-20 h-20 shrink-0 bg-gray-100 border border-gray-200 relative ${
-                    (isCancelled || isReturned) ? 'opacity-60' : ''
-                  }`}>
+                  <div
+                    className={`w-20 h-20 shrink-0 bg-gray-100 border border-gray-200 relative ${
+                      isCancelled || isReturned ? "opacity-60" : ""
+                    }`}
+                  >
                     <img
                       src={item.thumbnail_url}
                       alt={item.name}
@@ -577,32 +621,64 @@ function OrderPageContent() {
                     )}
                   </div>
                   <div className="flex-1">
-                    <p className={`font-medium ${
-                      (isCancelled || isReturned) ? 'text-gray-500 line-through' : 'text-gray-900'
-                    }`}>
+                    <p
+                      className={`font-medium ${
+                        isCancelled || isReturned
+                          ? "text-gray-500 line-through"
+                          : "text-gray-900"
+                      }`}
+                    >
                       {item.name}
                     </p>
-                    <p className={`text-sm ${
-                      (isCancelled || isReturned) ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
+                    <p
+                      className={`text-sm ${
+                        isCancelled || isReturned
+                          ? "text-gray-400"
+                          : "text-gray-600"
+                      }`}
+                    >
                       {item.variant}
                     </p>
-                    <p className={`text-xs mt-1 ${
-                      (isCancelled || isReturned) ? 'text-gray-400' : 'text-gray-500'
-                    }`}>
-                      Quantity: {item.quantity}
+                    <p
+                      className={`text-xs mt-1 ${
+                        isCancelled || isReturned
+                          ? "text-gray-400"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      Quantity:{" "}
+                      {item.cancelled_quantity && item.cancelled_quantity > 0 ? (
+                        <>
+                          <span className="text-gray-900 font-semibold">
+                            {item.quantity - item.cancelled_quantity}
+                          </span>
+                          <span className="ml-2 text-xs text-red-500 font-medium">
+                            ({item.cancelled_quantity} cancelled)
+                          </span>
+                        </>
+                      ) : (
+                        <span className="font-medium">{item.quantity}</span>
+                      )}
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className={`font-medium ${
-                      (isCancelled || isReturned) ? 'text-gray-500 line-through' : 'text-gray-900'
-                    }`}>
-                      ₹{Number(item.total_price).toFixed(2)}
+                    <p
+                      className={`font-medium ${
+                        isCancelled || isReturned
+                          ? "text-gray-500 line-through"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      ₹{ item.cancelled_quantity ? Number(item.total_price) - Number(item.unit_price) * item.cancelled_quantity : Number(item.total_price).toFixed(2)}
                     </p>
                     {item.quantity > 1 && (
-                      <p className={`text-xs ${
-                        (isCancelled || isReturned) ? 'text-gray-400' : 'text-gray-500'
-                      }`}>
+                      <p
+                        className={`text-xs ${
+                          isCancelled || isReturned
+                            ? "text-gray-400"
+                            : "text-gray-500"
+                        }`}
+                      >
                         ₹{Number(item.unit_price).toFixed(2)} each
                       </p>
                     )}
@@ -646,7 +722,7 @@ function OrderPageContent() {
               )}
 
               {/* Cancel Order Action */}
-              {canCancelOrder(order.status) && (
+              {order.can_cancel && (
                 <button
                   onClick={() => setShowCancelModal(true)}
                   className="w-full py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
@@ -676,8 +752,7 @@ function OrderPageContent() {
               )}
 
               {/* Message for processing/shipped orders */}
-              {(order.status === "processing" ||
-                order.status === "shipped") && (
+              { !order.can_cancel && (
                 <p className="text-xs text-gray-600">
                   The order cancellation window is over. You can't cancel the
                   order. You may return it after you receive the delivery.
@@ -835,99 +910,187 @@ function OrderPageContent() {
         </div>
 
         {/* Refund Information */}
-        {(order.refund || (order.payment.refund_status && order.payment.refund_status !== "not_applicable")) && (
+        {(Array.isArray(order.refund) && order.refund.length > 0) ||
+          (order.payment.refund_status &&
+            order.payment.refund_status !== "not_applicable") ? (
           <div>
             <h2 className="text-sm font-medium uppercase tracking-wider mb-3">
               Refund Information
             </h2>
-            <div className="bg-amber-50 p-4 border-l-2 border-amber-600 space-y-3">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                    Refund Status
-                  </p>
-                  <p className="text-sm text-gray-900 capitalize">
-                    {(order.refund?.refund_status || order.payment.refund_status || "").replace(/_/g, " ")}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                    Refund Amount
-                  </p>
-                  <p className="text-sm text-gray-900 font-medium">
-                    ₹{parseFloat(order.refund?.refund_amount || order.payment.refund_amount || "0").toFixed(2)}
-                  </p>
-                </div>
-                {(order.refund?.refund_transaction_id || order.payment.refund_transaction_id) && (
-                  <div className="sm:col-span-2">
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                      Refund Transaction ID
-                    </p>
-                    <p className="text-sm text-gray-900 font-mono break-all">
-                      {order.refund?.refund_transaction_id || order.payment.refund_transaction_id}
-                    </p>
-                  </div>
-                )}
-                {(order.refund?.refund_initiated_at || order.payment.refund_initiated_at) && (
+            <div className="bg-amber-50 p-4 border-l-2 border-amber-600 space-y-6">
+              {/* Display all refund records */}
+              {Array.isArray(order.refund) && order.refund.length > 0 ? (
+                order.refund.map((refund, idx) =>
+                  refund ? (
+                    <div key={refund.id || idx} className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-b border-amber-200 pb-4 last:border-0 last:pb-0">
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                          Refund Status
+                        </p>
+                        <p className="text-sm text-gray-900 capitalize">
+                          {(refund.refund_status || "")
+                            .replace(/_/g, " ")}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                          Refund Amount
+                        </p>
+                        <p className="text-sm text-gray-900 font-medium">
+                          ₹{parseFloat(refund.refund_amount || "0").toFixed(2)}
+                        </p>
+                      </div>
+                      {refund.refund_transaction_id && (
+                        <div className="sm:col-span-2">
+                          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                            Refund Transaction ID
+                          </p>
+                          <p className="text-sm text-gray-900 font-mono break-all">
+                            {refund.refund_transaction_id}
+                          </p>
+                        </div>
+                      )}
+                      {refund.refund_initiated_at && (
+                        <div>
+                          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                            Refund Initiated At
+                          </p>
+                          <p className="text-sm text-gray-900">
+                            {new Date(refund.refund_initiated_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      )}
+                      {refund.refund_completed_at && refund.refund_status === "refunded" && (
+                        <div>
+                          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                            Refund Completed At
+                          </p>
+                          <p className="text-sm text-gray-900">
+                            {new Date(refund.refund_completed_at).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      )}
+                      {refund.refund_reason && (
+                        <div className="sm:col-span-2">
+                          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                            Refund Reason
+                          </p>
+                          <p className="text-sm text-gray-900 capitalize">
+                            {(refund.refund_reason || "").replace(/_/g, " ")}
+                          </p>
+                        </div>
+                      )}
+                      {refund.refund_notes && (
+                        <div className="sm:col-span-2">
+                          <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                            Refund Notes
+                          </p>
+                          <p className="text-sm text-gray-900">
+                            {refund.refund_notes}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : null
+                )
+              ) : (
+                // Fallback (display payment refund if present)
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                      Refund Initiated At
+                      Refund Status
                     </p>
-                    <p className="text-sm text-gray-900">
-                      {new Date(
-                        order.refund?.refund_initiated_at || order.payment.refund_initiated_at || ""
-                      ).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                    <p className="text-sm text-gray-900 capitalize">
+                      {(order.payment.refund_status || "").replace(/_/g, " ")}
                     </p>
                   </div>
-                )}
-                {(order.refund?.refund_completed_at || order.payment.refund_completed_at) && (
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                      Refund Completed At
+                      Refund Amount
                     </p>
-                    <p className="text-sm text-gray-900">
-                      {new Date(
-                        order.refund?.refund_completed_at || order.payment.refund_completed_at || ""
-                      ).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                    <p className="text-sm text-gray-900 font-medium">
+                      ₹{parseFloat(order.payment.refund_amount || "0").toFixed(2)}
                     </p>
                   </div>
-                )}
-              </div>
-              {(order.refund?.refund_reason || order.payment.refund_reason) && (
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                    Refund Reason
-                  </p>
-                  <p className="text-sm text-gray-900 capitalize">
-                    {(order.refund?.refund_reason || order.payment.refund_reason || "").replace(/_/g, " ")}
-                  </p>
-                </div>
-              )}
-              {(order.refund?.refund_notes || order.payment.refund_notes) && (
-                <div>
-                  <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
-                    Refund Notes
-                  </p>
-                  <p className="text-sm text-gray-900">
-                    {order.refund?.refund_notes || order.payment.refund_notes}
-                  </p>
+                  {order.payment.refund_transaction_id && (
+                    <div className="sm:col-span-2">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                        Refund Transaction ID
+                      </p>
+                      <p className="text-sm text-gray-900 font-mono break-all">
+                        {order.payment.refund_transaction_id}
+                      </p>
+                    </div>
+                  )}
+                  {order.payment.refund_initiated_at && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                        Refund Initiated At
+                      </p>
+                      <p className="text-sm text-gray-900">
+                        {new Date(order.payment.refund_initiated_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  )}
+                  {order.payment.refund_completed_at && (
+                    <div>
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                        Refund Completed At
+                      </p>
+                      <p className="text-sm text-gray-900">
+                        {new Date(order.payment.refund_completed_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    </div>
+                  )}
+                  {order.payment.refund_reason && (
+                    <div className="sm:col-span-2">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                        Refund Reason
+                      </p>
+                      <p className="text-sm text-gray-900 capitalize">
+                        {(order.payment.refund_reason || "").replace(/_/g, " ")}
+                      </p>
+                    </div>
+                  )}
+                  {order.payment.refund_notes && (
+                    <div className="sm:col-span-2">
+                      <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                        Refund Notes
+                      </p>
+                      <p className="text-sm text-gray-900">
+                        {order.payment.refund_notes}
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           </div>
-        )}
+        ) : null}
 
         {/* Order Notes */}
         {order.notes && (
@@ -965,7 +1128,7 @@ function OrderPageContent() {
               </span>
             </button>
           )}
-          {canCancelOrder(order.status) && (
+          {order.can_cancel && (
             <button
               onClick={() => setShowCancelModal(true)}
               className="flex-1 border border-red-600 text-red-600 px-4 md:px-6 py-2 md:py-3 hover:bg-red-50 transition-colors duration-200 flex items-center justify-center space-x-2"
@@ -1019,7 +1182,7 @@ function OrderPageContent() {
 
 function OrderPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}> 
+    <Suspense fallback={<div>Loading...</div>}>
       <OrderPageContent />
     </Suspense>
   );

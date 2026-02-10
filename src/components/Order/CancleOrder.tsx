@@ -7,7 +7,11 @@ interface CancleOrderModalProps {
   isOpen: boolean;
   onClose: () => void;
   order: DetailedOrder;
-  onConfirm: (reason: string, comments: string, selectedItemIds: string[]) => Promise<void>;
+  onConfirm: (
+    reason: string,
+    comments: string,
+    items: { id: string; cancelled_quantity: number }[]
+  ) => Promise<void>;
 }
 
 export default function CancleOrderModal({
@@ -17,6 +21,7 @@ export default function CancleOrderModal({
   onConfirm,
 }: CancleOrderModalProps) {
   const [selectedItems, setSelectedItems] = useState<Set<string>>(new Set());
+  const [cancelQuantities, setCancelQuantities] = useState<Record<string, number>>({});
   const [reason, setReason] = useState("");
   const [comments, setComments] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,7 +33,29 @@ export default function CancleOrderModal({
       setIsMounted(true);
       // Select all items by default
       if (order?.items) {
-        setSelectedItems(new Set(order.items.map(item => item.id)));
+        const selectableItems = order.items
+          .filter((item) => {
+            const alreadyCancelled = item.cancelled_quantity || 0;
+            const availableQuantity = item.quantity - alreadyCancelled;
+            const isCancelled = item.status === "cancelled" || item.status === "returned";
+            return !isCancelled && availableQuantity > 0;
+          })
+          .map((item) => ({
+            id: item.id,
+            availableQuantity: item.quantity - (item.cancelled_quantity || 0),
+          }));
+
+        const initialSelected = new Set<string>();
+        const initialQuantities: Record<string, number> = {};
+
+        selectableItems.forEach(({ id, availableQuantity }) => {
+          initialSelected.add(id);
+          // Default to cancelling full available quantity, but user can adjust
+          initialQuantities[id] = availableQuantity;
+        });
+
+        setSelectedItems(initialSelected);
+        setCancelQuantities(initialQuantities);
       }
     } else {
       const timer = setTimeout(() => setIsMounted(false), 300);
@@ -51,10 +78,32 @@ export default function CancleOrderModal({
   };
 
   const toggleSelectAll = () => {
-    if (selectedItems.size === order.items.length) {
+    const cancellableItems = order.items.filter((item) => {
+      const alreadyCancelled = item.cancelled_quantity || 0;
+      const availableQuantity = item.quantity - alreadyCancelled;
+      const isCancelled = item.status === "cancelled" || item.status === "returned";
+      return !isCancelled && availableQuantity > 0;
+    });
+
+    if (selectedItems.size === cancellableItems.length && cancellableItems.length > 0) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(order.items.map(item => item.id)));
+      const newSelected = new Set<string>();
+      const newQuantities: Record<string, number> = { ...cancelQuantities };
+
+      cancellableItems.forEach((item) => {
+        const alreadyCancelled = item.cancelled_quantity || 0;
+        const availableQuantity = item.quantity - alreadyCancelled;
+        if (availableQuantity > 0) {
+          newSelected.add(item.id);
+          if (!newQuantities[item.id]) {
+            newQuantities[item.id] = availableQuantity;
+          }
+        }
+      });
+
+      setSelectedItems(newSelected);
+      setCancelQuantities(newQuantities);
     }
   };
 
@@ -62,10 +111,38 @@ export default function CancleOrderModal({
     if (!reason || selectedItems.size === 0) return;
     setIsSubmitting(true);
     try {
-      await onConfirm(reason, comments, Array.from(selectedItems));
+      const itemsToCancel = Array.from(selectedItems)
+        .map((id) => {
+          const orderItem = order.items.find((item) => item.id === id);
+          if (!orderItem) return null;
+
+          const alreadyCancelled = orderItem.cancelled_quantity || 0;
+          const availableQuantity = orderItem.quantity - alreadyCancelled;
+
+          if (availableQuantity <= 0) return null;
+
+          const requested = cancelQuantities[id] ?? availableQuantity;
+          const safeQuantity = Math.max(1, Math.min(requested, availableQuantity));
+
+          if (safeQuantity <= 0) return null;
+
+          return {
+            id,
+            cancelled_quantity: safeQuantity,
+          };
+        })
+        .filter((item): item is { id: string; cancelled_quantity: number } => item !== null);
+
+      if (itemsToCancel.length === 0) {
+        setIsSubmitting(false);
+        return;
+      }
+
+      await onConfirm(reason, comments, itemsToCancel);
       setReason("");
       setComments("");
       setSelectedItems(new Set());
+      setCancelQuantities({});
     } catch (error) {
       console.error("Error cancelling order:", error);
     } finally {
@@ -77,12 +154,20 @@ export default function CancleOrderModal({
     setReason("");
     setComments("");
     setSelectedItems(new Set());
+    setCancelQuantities({});
     onClose();
   };
 
-  const allSelected = selectedItems.size === order.items.length;
+  const cancellableItems = order.items.filter((item) => {
+    const alreadyCancelled = item.cancelled_quantity || 0;
+    const availableQuantity = item.quantity - alreadyCancelled;
+    const isCancelled = item.status === "cancelled" || item.status === "returned";
+    return !isCancelled && availableQuantity > 0;
+  });
+
+  const allSelected = selectedItems.size === cancellableItems.length && cancellableItems.length > 0;
   const selectedCount = selectedItems.size;
-  const totalItems = order.items.length;
+  const totalItems = cancellableItems.length;
 
   return (
     <>
@@ -167,8 +252,11 @@ export default function CancleOrderModal({
               )}
 
               <div className="space-y-3">
-                {order.items.map((item) => {
+                {cancellableItems.map((item) => {
                   const isSelected = selectedItems.has(item.id);
+                  const alreadyCancelled = item.cancelled_quantity || 0;
+                  const availableQuantity = item.quantity - alreadyCancelled;
+                  const currentQuantity = cancelQuantities[item.id] ?? availableQuantity;
                   return (
                     <div
                       key={item.id}
@@ -230,10 +318,38 @@ export default function CancleOrderModal({
                           <div className="flex items-center justify-between">
                             <span className="text-sm text-gray-600">
                               Qty: {item.quantity}
+                              {alreadyCancelled > 0 && (
+                                <span className="ml-2 text-xs text-red-500">
+                                  ({alreadyCancelled} cancelled, {availableQuantity} available)
+                                </span>
+                              )}
                             </span>
-                            <span className="text-sm font-semibold text-gray-900">
-                              ₹{item.total_price.toFixed(2)}
-                            </span>
+                            <div className="flex items-center gap-2"
+                            onClick={(e) => e.stopPropagation()}
+                            
+                            >
+                              <label className="text-xs text-gray-500">
+                                Cancel qty:
+                              </label>
+                              <input
+                                type="number"
+                                min={1}
+                                max={availableQuantity}
+                                value={currentQuantity}
+                                disabled={!isSelected}
+                                onChange={(e) => {
+                                  const raw = parseInt(e.target.value, 10);
+                                  const clamped = isNaN(raw)
+                                    ? 1
+                                    : Math.max(1, Math.min(raw, availableQuantity));
+                                  setCancelQuantities((prev) => ({
+                                    ...prev,
+                                    [item.id]: clamped,
+                                  }));
+                                }}
+                                className="w-16 border border-gray-300 rounded-lg px-2 py-1 text-sm text-right disabled:bg-gray-100"
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
