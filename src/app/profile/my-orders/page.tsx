@@ -282,22 +282,65 @@ function MyOrders() {
     openModal("tracking", orderId);
   };
 
-  const handleCancelOrder = async (reason: string, comments: string, selectedItemIds: string[]) => {
+  const handleCancelOrder = async (
+    reason: string,
+    comments: string,
+    itemsToCancel: { id: string; cancelled_quantity: number }[]
+  ) => {
     if (!token || !selectedOrder) return;
+
+    const items = itemsToCancel
+      .map((item) => {
+        const orderItem = selectedOrder.items.find((oi) => oi.id === item.id);
+        if (!orderItem) return null;
+
+        const alreadyCancelled = orderItem.cancelled_quantity || 0;
+        const availableQuantity = orderItem.quantity - alreadyCancelled;
+
+        if (availableQuantity <= 0) {
+          return null;
+        }
+
+        const requested = item.cancelled_quantity;
+        const safeQuantity = Math.max(1, Math.min(requested, availableQuantity));
+
+        if (safeQuantity <= 0) return null;
+
+        return {
+          id: orderItem.id,
+          cancelled_quantity: safeQuantity,
+        };
+      })
+      .filter(
+        (item): item is { id: string; cancelled_quantity: number } =>
+          item !== null
+      );
+
+    if (items.length === 0) {
+      toast.error("No items are available to cancel for this order.");
+      return;
+    }
+
     startLoading();
     const response = await cancelOrder(selectedOrder.id, token, {
       reason,
       comments,
-      itemIds: selectedItemIds,
+      items,
     });
     stopLoading();
 
     if (response.success) {
-      const itemCount = selectedItemIds.length;
-      const totalItems = selectedOrder.items.length;
-      const message = itemCount === totalItems 
-        ? "Order cancelled successfully" 
-        : `${itemCount} item${itemCount !== 1 ? 's' : ''} cancelled successfully`;
+      const itemCount = items.length;
+      const totalItems = selectedOrder.items.filter((item) => {
+        const alreadyCancelled = item.cancelled_quantity || 0;
+        const availableQuantity = item.quantity - alreadyCancelled;
+        const isCancelled = item.status === "cancelled" || item.status === "returned";
+        return !isCancelled && availableQuantity > 0;
+      }).length;
+      const message =
+        itemCount === totalItems
+          ? "Order cancelled successfully"
+          : `${itemCount} item${itemCount !== 1 ? "s" : ""} cancelled successfully`;
       toast.success(message, { duration: 3000 });
       setShowCancelModal(false);
       setSelectedOrder(null);
