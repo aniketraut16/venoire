@@ -342,7 +342,7 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Icons (Right Side) */}
-            <div className="flex items-center gap-3 sm:gap-4 md:hidden">
+            <div className="flex items-center  gap-1 md:hidden">
               <button
                 onClick={() => setIsSearchOpen(true)}
                 className={`${textColor} transition-opacity hover:opacity-70 p-1`}
