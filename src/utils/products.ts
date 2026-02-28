@@ -1,4 +1,4 @@
-import { AttributesResponse,  DetailProductResponse, ProductFilters, ProductsResponse , SimilarProductsResponse } from "@/types/product";
+import { AttributesResponse,  DetailProductResponse, ProductFilters, ProductReviewsResponse, ProductsResponse , SimilarProductsResponse } from "@/types/product";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -42,3 +42,13 @@ export const getSimilarProducts = async (id: string): Promise<SimilarProductsRes
     return { success: false, data: [] };
   }
 };
+
+export const getProductReviews = async (slugOrId: string, page: number, limit: number): Promise<ProductReviewsResponse> => {
+  try {
+    const response = await axios.get(`${baseUrl}/product/product-reviews/${slugOrId}`, { params: { page, limit } });
+    return response.data as ProductReviewsResponse;
+  } catch (error) {
+    console.error("Error fetching product reviews:", error);
+    return { success: false, data: [], ratingBreakdown: { averageRating: 0, totalReviews: 0, oneStar: 0, twoStar: 0, threeStar: 0, fourStar: 0, fiveStar: 0 }, totalReviews: 0, totalPages: 0, currentPage: 1 };
+  }
+}

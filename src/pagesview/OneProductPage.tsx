@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { useParams } from "next/navigation";
-import { getDetailProduct, getSimilarProducts } from "@/utils/products";
-import type { DetailProduct, ProductPricing, Product } from "@/types/product";
+import { getDetailProduct, getSimilarProducts, getProductReviews } from "@/utils/products";
+import type { DetailProduct, ProductPricing, Product, ProductReviewsResponse } from "@/types/product";
 import {
   Heart,
   ShoppingCart,
@@ -52,6 +52,8 @@ export default function OneProductPage() {
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
   const [currentReviewPage, setCurrentReviewPage] = useState(1);
   const [reviewSortBy, setReviewSortBy] = useState("most_recent");
+  const [reviewsData, setReviewsData] = useState<ProductReviewsResponse | null>(null);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
 
   useEffect(() => {
     if (!slug) return;
@@ -73,6 +75,17 @@ export default function OneProductPage() {
     };
     fetchProduct();
   }, [slug]);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      if (!slug) return;
+      setReviewsLoading(true);
+      const reviewsResponse = await getProductReviews(slug, currentReviewPage, 5);
+      setReviewsData(reviewsResponse);
+      setReviewsLoading(false);
+    };
+    fetchReviews();
+  }, [slug, currentReviewPage]);
 
   // Scroll handler for sticky bar
   useEffect(() => {
@@ -637,8 +650,8 @@ export default function OneProductPage() {
                 Customer Reviews
               </h2>
 
-              {/* Header Section - 3 Column Layout */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 items-center">
+              {/* Header Section - 2 Column Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 items-center">
                 {/* Left: Overall Rating */}
                 <div className="flex flex-col items-center">
                   {/* Stars above rating */}
@@ -691,25 +704,31 @@ export default function OneProductPage() {
                   <div className="flex items-center gap-1.5">
                     <span className="text-title text-gray-600">
                       Based on{" "}
-                      {product.rating_count >= 1000
-                        ? `${(product.rating_count / 1000).toFixed(1)}K`
-                        : product.rating_count}{" "}
+                      {reviewsData && reviewsData.ratingBreakdown.totalReviews >= 1000
+                        ? `${(reviewsData.ratingBreakdown.totalReviews / 1000).toFixed(1)}K`
+                        : reviewsData?.ratingBreakdown.totalReviews || product.rating_count}{" "}
                       reviews
                     </span>
                     <CheckCircle2 size={14} className="text-green-600" />
                   </div>
                 </div>
 
-                {/* Middle: Star Rating Breakdown */}
-                <div className="space-y-2 border-l-0 border-r-0 md:border-l-2 md:border-r-2 border-gray-200 pl-6 pr-6">
+                {/* Right: Star Rating Breakdown */}
+                <div className="space-y-2 border-l-0 md:border-l-2 border-gray-200 pl-6">
                   {[5, 4, 3, 2, 1].map((star) => {
-                    const count = Math.floor(
-                      (product.rating_count * (6 - star)) / 15
-                    );
-                    const percentage =
-                      product.rating_count > 0
-                        ? (count / product.rating_count) * 100
-                        : 0;
+                    const ratingBreakdown = reviewsData?.ratingBreakdown;
+                    let count = 0;
+                    if (ratingBreakdown) {
+                      if (star === 5) count = ratingBreakdown.fiveStar;
+                      else if (star === 4) count = ratingBreakdown.fourStar;
+                      else if (star === 3) count = ratingBreakdown.threeStar;
+                      else if (star === 2) count = ratingBreakdown.twoStar;
+                      else if (star === 1) count = ratingBreakdown.oneStar;
+                    } else {
+                      count = Math.floor((product.rating_count * (6 - star)) / 15);
+                    }
+                    const totalReviews = ratingBreakdown?.totalReviews || product.rating_count;
+                    const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
                     return (
                       <div key={star} className="flex items-center gap-2">
                         {/* Visual Stars */}
@@ -743,50 +762,46 @@ export default function OneProductPage() {
                     );
                   })}
                 </div>
-
-                {/* Right: Write Review Button */}
-                <div className="flex items-start justify-center">
-                  <button className="bg-black text-white px-6 py-2.5 text-sm font-normal hover:bg-gray-800 transition-colors">
-                    Write a review
-                  </button>
-                </div>
               </div>
 
               {/* Customer Photos & Videos Section */}
-              <div className="mb-10 pt-6 border-t border-gray-200">
-                <h3 className="text-sm font-medium text-gray-900 mb-4">
-                  Customer photos & videos
-                </h3>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-2 flex-1  pb-2 scrollbar-hide">
-                    {[...Array(8)].map((_, i) => (
-                      <div
-                        key={i}
-                        className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
+              {reviewsData && reviewsData.data.some(review => review.review_images && review.review_images.length > 0) && (
+                <div className="mb-10 pt-6 border-t border-gray-200">
+                  <h3 className="text-sm font-medium text-gray-900 mb-4">
+                    Customer photos & videos
+                  </h3>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-2 flex-1 pb-2 scrollbar-hide">
+                      {reviewsData.data
+                        .flatMap(review => review.review_images || [])
+                        .filter(img => img)
+                        .map((img, i) => (
+                          <div
+                            key={i}
+                            className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
+                          >
+                            <img
+                              src={img}
+                              alt={`Customer photo ${i + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ))}
+                    </div>
+                    {reviewsData.data.flatMap(review => review.review_images || []).filter(img => img).length > 8 && (
+                      <a
+                        href="#"
+                        className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
                       >
-                        <img
-                          src={
-                            product.images[i % product.images.length] ||
-                            product.thumbnail ||
-                            ""
-                          }
-                          alt={`Customer photo ${i + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
+                        See more
+                      </a>
+                    )}
                   </div>
-                  <a
-                    href="#"
-                    className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
-                  >
-                    See more
-                  </a>
                 </div>
-              </div>
+              )}
 
               {/* Sort Dropdown */}
-              <div className="flex items-center justify-between mb-6">
+              {/* <div className="flex items-center justify-between mb-6">
                 <h3 className="text-md font-medium text-gray-900">Reviews</h3>
                 <select
                   value={reviewSortBy}
@@ -798,152 +813,85 @@ export default function OneProductPage() {
                   <option value="lowest_rating">Lowest Rating</option>
                   <option value="oldest">Oldest First</option>
                 </select>
+              </div> */}
+              <div className="mb-6">
+                <h3 className="text-md font-medium text-gray-900">Reviews</h3>
               </div>
 
               {/* Individual Reviews */}
               <div className="space-y-6 mb-8">
-                {/* Review 1 */}
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-gray-900">
-                          Ritika Chopra
-                        </span>
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <span key={i} className="text-yellow-400 text-sm">
-                              ★
+                {reviewsLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
+                  </div>
+                ) : reviewsData && reviewsData.success && reviewsData.data.length > 0 ? (
+                  reviewsData.data.map((review) => (
+                    <div key={review.id} className="border-b border-gray-100 pb-6">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="font-medium text-gray-900">
+                              {review.reviewer_name}
                             </span>
-                          ))}
+                            <div className="flex items-center gap-1">
+                              {[...Array(5)].map((_, i) => (
+                                <span
+                                  key={i}
+                                  className={`text-sm ${
+                                    i < review.rating
+                                      ? "text-yellow-400"
+                                      : "text-gray-300"
+                                  }`}
+                                >
+                                  ★
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-500 mb-2">
+                            {new Date(review.created_at).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </p>
+                          {review.review_images && review.review_images.length > 0 && (
+                            <div className="flex gap-2 mb-2">
+                              {review.review_images.map((img, idx) => (
+                                <div
+                                  key={idx}
+                                  className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0"
+                                >
+                                  <img
+                                    src={img}
+                                    alt={`Review image ${idx + 1}`}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <p className="text-gray-800 font-normal leading-relaxed my-2">
+                            {review.comment}
+                          </p>
                         </div>
                       </div>
-                      <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
-                      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
-                        <img
-                          src={product.thumbnail || ""}
-                          alt="Review image"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <p className="text-gray-800 font-normal leading-relaxed my-2">
-                        CEO naam jaisa hi hai, pehno toh sab notice karte hain.
-                      </p>
                     </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12">
+                    <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
                   </div>
-                </div>
-
-                {/* Review 2 */}
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="font-medium text-gray-900">
-                          Vikrant Joshi
-                        </span>
-                        <div className="flex items-center gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <span key={i} className="text-yellow-400 text-sm">
-                              ★
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
-                      <div className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0">
-                        <img
-                          src={product.thumbnail || ""}
-                          alt="Review image"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <p className="text-gray-800 font-normal leading-relaxed my-2">
-                        Perfect balance of strength and smoothness in the
-                        fragrance.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Review 3 */}
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium text-gray-900">
-                        Rajeev Khurana
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-sm">
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-2">3 weeks ago</p>
-
-                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
-                      Has that rich, bossy vibe. Great for formal wear.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Review 4 */}
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium text-gray-900">
-                        NIMISH GOEL
-                      </span>
-
-                      <div className="flex items-center gap-1">
-                        {[...Array(5)].map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-sm">
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-2">5 months ago</p>
-
-                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
-                      Awsome fregnance
-                    </p>
-                  </div>
-                </div>
-
-                {/* Review 5 */}
-                <div className="border-b border-gray-100 pb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-medium text-gray-900">
-                        Varun Pratap
-                      </span>
-                      <div className="flex items-center gap-1">
-                        {[...Array(4)].map((_, i) => (
-                          <span key={i} className="text-yellow-400 text-sm">
-                            ★
-                          </span>
-                        ))}
-                        <span className="text-gray-300 text-sm">★</span>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 mb-2">5 months ago</p>
-
-                    <p className="text-gray-800 font-normal leading-relaxed mb-2">
-                      Lasts decently, but not all day. Still very classy.
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Pagination */}
               <div className="flex items-center justify-center gap-2">
                 <button
                   onClick={() =>
-                    setCurrentReviewPage(Math.max(1, currentReviewPage - 1))
+                    setCurrentReviewPage(1)
                   }
-                  disabled={currentReviewPage === 1}
+                  disabled={currentReviewPage === 1 || reviewsLoading}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &lt;&lt;
@@ -952,38 +900,42 @@ export default function OneProductPage() {
                   onClick={() =>
                     setCurrentReviewPage(Math.max(1, currentReviewPage - 1))
                   }
-                  disabled={currentReviewPage === 1}
+                  disabled={currentReviewPage === 1 || reviewsLoading}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &lt;
                 </button>
-                {[1, 2, 3].map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentReviewPage(page)}
-                    className={`px-3 py-1 text-sm ${
-                      currentReviewPage === page
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-600 hover:text-gray-900"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
+                {reviewsData && Array.from({ length: Math.min(5, reviewsData.totalPages) }, (_, i) => {
+                  const page = i + 1;
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentReviewPage(page)}
+                      disabled={reviewsLoading}
+                      className={`px-3 py-1 text-sm ${
+                        currentReviewPage === page
+                          ? "bg-gray-900 text-white"
+                          : "text-gray-600 hover:text-gray-900"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
                 <button
                   onClick={() =>
-                    setCurrentReviewPage(Math.min(3, currentReviewPage + 1))
+                    setCurrentReviewPage(Math.min(reviewsData?.totalPages || 1, currentReviewPage + 1))
                   }
-                  disabled={currentReviewPage === 3}
+                  disabled={currentReviewPage === (reviewsData?.totalPages || 1) || reviewsLoading}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &gt;
                 </button>
                 <button
                   onClick={() =>
-                    setCurrentReviewPage(Math.min(3, currentReviewPage + 1))
+                    setCurrentReviewPage(reviewsData?.totalPages || 1)
                   }
-                  disabled={currentReviewPage === 3}
+                  disabled={currentReviewPage === (reviewsData?.totalPages || 1) || reviewsLoading}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &gt;&gt;

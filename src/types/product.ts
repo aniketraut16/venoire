@@ -156,3 +156,31 @@ export interface SimilarProductsResponse {
   message?: string;
   error?: string;
 }
+
+export interface OneProductReview{
+  id: string;
+  reviewer_name: string;
+  review_images: string[];
+  rating: number;
+  comment: string;
+  created_at: string;
+}
+
+
+export interface RatingBreakdown{
+  averageRating: number;
+  totalReviews: number;
+  oneStar: number;
+  twoStar: number;
+  threeStar: number;
+  fourStar: number;
+  fiveStar: number;
+}
+export interface ProductReviewsResponse {
+  success: boolean;
+  data: OneProductReview[];
+  ratingBreakdown: RatingBreakdown;
+  totalReviews: number;
+  totalPages: number;
+  currentPage: number;
+}
