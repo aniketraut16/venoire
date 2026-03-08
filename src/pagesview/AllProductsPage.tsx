@@ -39,9 +39,6 @@ export default function AllProductsPage(props: {
     hasPrevPage: false,
   });
 
-  // Search functionality
-  const [searchTerm, setSearchTerm] = useState(searchQuery ?? "");
-  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
 
   // Multi-select for sidebar filters
@@ -82,7 +79,6 @@ export default function AllProductsPage(props: {
 
         // Build filter object
         const filterParams: ProductFilters = {
-          search: debouncedSearchTerm || undefined,
           min_price: debouncedMinPrice ? parseFloat(debouncedMinPrice) : undefined,
           max_price: debouncedMaxPrice ? parseFloat(debouncedMaxPrice) : undefined,
           rating: rating ? parseFloat(rating) : undefined,
@@ -127,7 +123,6 @@ export default function AllProductsPage(props: {
 
     fetchData();
   }, [
-    debouncedSearchTerm,
     debouncedMinPrice,
     debouncedMaxPrice,
     slug_type,
@@ -398,25 +393,6 @@ export default function AllProductsPage(props: {
   // Render top bar dropdowns
   const renderTopBar = () => (
     <div className="w-full hidden lg:flex flex-row items-center gap-8 px-8 py-6 bg-white border-b border-gray-200">
-      {/* Search Input */}
-      <div className="flex flex-col min-w-[200px]">
-        <label
-          className="mb-1 text-xs font-semibold text-gray-700"
-          htmlFor="search"
-        >
-          Search
-        </label>
-        <input
-          id="search"
-          type="text"
-          placeholder="Search products..."
-          className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
-          style={{ borderRadius: 0 }}
-          value={searchTerm || ""}
-          onChange={(e) => setSearchTerm(e.target.value || "")}
-        />
-      </div>
-
       {/* Rating Filter */}
       <div className="flex flex-col min-w-[120px]">
         <label
