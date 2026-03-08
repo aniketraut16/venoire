@@ -37,13 +37,15 @@ export default function Navbar() {
   const [prevPromoidx, setPrevPromoidx] = useState<number>(0);
   const [promoDirection, setPromoDirection] = useState<'left' | 'right' | null>(null);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const promoItems = [
-    "Flat 10% Off On All Orders",
-    "Free Shipping On All Orders",
-    "100% Money Back Guarantee",
-    "24/7 Customer Support",
-  ];
-  const { navbarContent } = useHomepage();
+  const { navbarContent, navbarBanners } = useHomepage();
+  
+  const promoItems = navbarBanners.length > 0 
+    ? navbarBanners.map(banner => banner.text)
+    : ["Flat 10% Off On All Orders", "Free Shipping On All Orders", "100% Money Back Guarantee", "24/7 Customer Support"];
+  
+  const promoLinks = navbarBanners.length > 0
+    ? navbarBanners.map(banner => banner.url)
+    : ["#", "#", "#", "#"];
 
   const increasepromoidx = () => {
     if (isAnimating) return;
@@ -163,8 +165,11 @@ export default function Navbar() {
         <div className="relative flex-1 h-full flex items-center justify-center overflow-hidden">
           {/* Previous/Outgoing Item */}
           {isAnimating && (
-            <span 
-              className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center"
+            <a
+              href={promoLinks[prevPromoidx]}
+              target={promoLinks[prevPromoidx].startsWith("http") ? "_blank" : "_self"}
+              rel={promoLinks[prevPromoidx].startsWith("http") ? "noopener noreferrer" : undefined}
+              className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
               style={{
                 animation: promoDirection === 'left' 
                   ? 'slideOutLeft 0.4s ease-out forwards'
@@ -172,13 +177,16 @@ export default function Navbar() {
               }}
             >
               {promoItems[prevPromoidx]}
-            </span>
+            </a>
           )}
           
           {/* Current/Incoming Item */}
-          <span 
+          <a
             key={promoidx}
-            className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center"
+            href={promoLinks[promoidx]}
+            target={promoLinks[promoidx].startsWith("http") ? "_blank" : "_self"}
+            rel={promoLinks[promoidx].startsWith("http") ? "noopener noreferrer" : undefined}
+            className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
             style={{
               animation: promoDirection && isAnimating
                 ? `${promoDirection === 'left' ? 'slideInLeft' : 'slideInRight'} 0.4s ease-out`
@@ -186,7 +194,7 @@ export default function Navbar() {
             }}
           >
             {promoItems[promoidx]}
-          </span>
+          </a>
         </div>
         <button onClick={increasepromoidx} className="z-10" disabled={isAnimating}>
           <ChevronRight size={16} />

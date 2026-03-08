@@ -217,7 +217,7 @@ function OrderPageContent() {
 
     if (successCount > 0) {
       toast.success(
-        `${successCount} review(s) submitted successfully! Pending admin approval.`,
+        `${successCount} review(s) submitted successfully.`,
         {
           duration: 4000,
         }

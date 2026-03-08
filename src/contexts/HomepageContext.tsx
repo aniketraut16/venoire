@@ -6,10 +6,11 @@ import {
   InstagramReel,
   NavbarContentData,
   CollectionsAndCategories,
-  BestSellers
+  BestSellers,
+  BannerItem
 } from "@/types/homepage";
 import { Product } from "@/types/product";
-import { getHomepageContent } from "@/utils/homepage";
+import { getHomepageContent, getAllBannerItems } from "@/utils/homepage";
 import { Perfume } from "@/types/perfume";
 
 interface HomepageContextType {
@@ -20,6 +21,8 @@ interface HomepageContextType {
   instagramReels: InstagramReel[];
   navbarContent: NavbarContentData | null;
   collectionsAndCategories: CollectionsAndCategories | null;
+  navbarBanners: BannerItem[];
+  perfumeBanners: BannerItem[];
   isLoading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
@@ -39,6 +42,8 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
   const [instagramReels, setInstagramReels] = useState<InstagramReel[]>([]);
   const [navbarContent, setNavbarContent] = useState<NavbarContentData | null>(null);
   const [collectionsAndCategories, setCollectionsAndCategories] = useState<CollectionsAndCategories | null>(null);
+  const [navbarBanners, setNavbarBanners] = useState<BannerItem[]>([]);
+  const [perfumeBanners, setPerfumeBanners] = useState<BannerItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -47,18 +52,30 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
       setIsLoading(true);
       setError(null);
 
-      const response = await getHomepageContent();
+      const [homepageResponse, navbarBannersResponse, perfumeBannersResponse] = await Promise.all([
+        getHomepageContent(),
+        getAllBannerItems("navbar"),
+        getAllBannerItems("perfume")
+      ]);
 
-      if (response.success && response.data) {
-        setHeroCarousel(response.data.hero_carousel || []);
-        setFeaturedPerfumes(response.data.featured_perfumes || []);
-        setFeaturedClothing(response.data.featured_clothing || []);
-        setBestSellers(response.data.best_sellers || []);
-        setInstagramReels(response.data.instagram_reels || []);
-        setNavbarContent(response.data.navbar_content || null);
-        setCollectionsAndCategories(response.data.collections_and_categories || null);
+      if (homepageResponse.success && homepageResponse.data) {
+        setHeroCarousel(homepageResponse.data.hero_carousel || []);
+        setFeaturedPerfumes(homepageResponse.data.featured_perfumes || []);
+        setFeaturedClothing(homepageResponse.data.featured_clothing || []);
+        setBestSellers(homepageResponse.data.best_sellers || []);
+        setInstagramReels(homepageResponse.data.instagram_reels || []);
+        setNavbarContent(homepageResponse.data.navbar_content || null);
+        setCollectionsAndCategories(homepageResponse.data.collections_and_categories || null);
       } else {
-        setError(response.message || "Failed to fetch homepage content");
+        setError(homepageResponse.message || "Failed to fetch homepage content");
+      }
+
+      if (navbarBannersResponse.success && navbarBannersResponse.data) {
+        setNavbarBanners(navbarBannersResponse.data);
+      }
+
+      if (perfumeBannersResponse.success && perfumeBannersResponse.data) {
+        setPerfumeBanners(perfumeBannersResponse.data);
       }
     } catch (err) {
       console.error("Error fetching homepage content:", err);
@@ -84,6 +101,8 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
     instagramReels,
     navbarContent,
     collectionsAndCategories,
+    navbarBanners,
+    perfumeBanners,
     isLoading,
     error,
     refetch,

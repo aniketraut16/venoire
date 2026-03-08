@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CategoryorCollection, HomepageContentResponse } from "@/types/homepage";
+import { CategoryorCollection, HomepageContentResponse , BannerItem, BannerGroup } from "@/types/homepage";
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
@@ -24,5 +24,28 @@ export const getCollections = async (): Promise<CategoryorCollection[]> => {
   } catch (error) {
     console.error("Error fetching collections:", error);
     return [];
+  }
+};
+
+
+
+
+export const getAllBannerItems = async (bannerGroup: BannerGroup): Promise<{
+  success: Boolean;
+  message: String;
+  data?: BannerItem[];
+}> => {
+  try {
+      const response = await axios.get(`${baseUrl}/banner?banner_group=${bannerGroup}`);
+      return response.data as {
+          success: Boolean;
+          message: String;
+          data: BannerItem[];
+      };
+  } catch (error) {
+      return {
+          success: false,
+          message: (error as Error).message,
+      };
   }
 };

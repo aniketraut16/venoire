@@ -3,11 +3,13 @@ import RichText from "@/components/Perfume/RichText";
 import BestSellersPerfume from "@/components/Perfume/BestSellersPerfume";
 import SignatureScents from "@/components/Perfume/SignatureScents";
 import WhatMakesOurPerfumesUnique from "@/components/Perfume/WhatMakesOurPerfumesUnique";
+import PerfumeBanner from "@/components/Perfume/PerfumeBanner";
 
 export default function PerfumePage() {
   return (
     <main className="min-h-screen">
       <HeroSlideshow />
+      <PerfumeBanner />
       <RichText
         titleParts={[
           { text: "VENOIRE", color: "#242424" },

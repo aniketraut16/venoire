@@ -73,3 +73,12 @@ export interface HomepageContentResponse {
   message?: string;
   error?: string;
 }
+
+ export type BannerGroup = "navbar" | "perfume";
+
+ export type BannerItem = {
+    id: string;
+    text: string;
+    url: string;
+    banner_group: BannerGroup;
+}

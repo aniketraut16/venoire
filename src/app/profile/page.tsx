@@ -570,7 +570,7 @@ export default function MyProfilePage() {
                     {buyNowItems.slice(0, 4).map((item) => (
                       <button
                         key={item.id}
-                        onClick={() => router.push(`/${item.product_type}/${item.slug}`)}
+                        onClick={() => router.push(`/${item.product_type === "clothing" ? "product" : "perfume"}/${item.slug}`)}
                         className="border border-gray-200 bg-white hover:border-black transition-colors text-left"
                       >
                         <div className="aspect-square bg-gray-50">

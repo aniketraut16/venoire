@@ -518,7 +518,7 @@ export default function OneProductPage() {
                   Delivery Options
                 </h2>
 
-                <div className="flex items-start md:items-center gap-3 mb-4 md:mb-6">
+                {/* <div className="flex items-start md:items-center gap-3 mb-4 md:mb-6">
                   <Truck className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-0.5 md:mt-0 shrink-0" />
                   <div>
                     <span className="text-green-600 lato-bold text-body md:text-body">
@@ -531,17 +531,17 @@ export default function OneProductPage() {
                       or select location to see availability
                     </p>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                   <div className="flex items-start gap-3">
                     <Package className="h-4 md:h-5 w-4 md:w-5 text-gray-400 mt-1 shrink-0" />
                     <div>
                       <h4 className="lato-bold text-gray-900 text-body md:text-body">
-                        Free Delivery
+                        Free Delivery 
                       </h4>
                       <p className="text-meta md:text-body text-gray-600 lato-regular">
-                        Easily exchange items if not the right size
+                        Enjoy free shipping when you shop for ₹1499 or more!
                       </p>
                     </div>
                   </div>
@@ -562,7 +562,7 @@ export default function OneProductPage() {
               </div>
 
               {/* Coupon */}
-              <div className="space-y-3 md:space-y-4 pt-4 md:pt-6 border-t border-gray-200">
+              {/* <div className="space-y-3 md:space-y-4 pt-4 md:pt-6 border-t border-gray-200">
                 <h3 className="text-body md:text-title lato-bold text-gray-900 uppercase tracking-wide flex items-center gap-2">
                   <Tag className="h-4 md:h-5 w-4 md:w-5" />
                   Coupon Code
@@ -579,7 +579,7 @@ export default function OneProductPage() {
                     Apply
                   </button>
                 </div>
-              </div>
+              </div> */}
 
               {/* Available Offers */}
             </div>
