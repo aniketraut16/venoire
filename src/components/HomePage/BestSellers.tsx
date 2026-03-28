@@ -75,7 +75,7 @@ function BestSellerCard({ item }: BestSellerCardProps) {
   // Get category label
   const categoryLabel = isPerfume(item)
     ? "PERFUME"
-    : item.category || "PRODUCT";
+    : item.category || "APPARELS";
 
   // Get link URL
   const linkUrl = isPerfume(item)
@@ -315,7 +315,7 @@ export default function BestSellers() {
               className={`cursor-pointer font-light ${currTab === "products" ? "text-[#0f182c]" : "text-gray-400 animate-pulse"}`}
               onClick={() => setcurrTab("products")}
             >
-              PRODUCTS
+              APPARELS
             </span>
           </h2>
         </div>

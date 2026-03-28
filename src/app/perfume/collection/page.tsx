@@ -1,23 +1,36 @@
 "use client";
 
 import { getPerfumes, getPerfumeCollections } from "@/utils/perfume";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { Suspense, useEffect, useState } from "react";
 import OnePerfumecard from "@/components/Perfume/OnePerfumecard";
 import { PerfumeCollection } from "@/types/perfume";
 import { Perfume } from "@/types/perfume";
-import { FiSearch, FiFilter, FiChevronRight } from "react-icons/fi";
+import { PerfumeGender } from "@/types/product";
+import { FiSearch, FiChevronRight } from "react-icons/fi";
+
+const VALID_GENDERS: PerfumeGender[] = ["Mens", "Womens", "Unisex"];
+
+type GenderFilter = PerfumeGender | "All";
+
+const parseGenderParam = (value: string | null): GenderFilter => {
+  if (value && VALID_GENDERS.includes(value as PerfumeGender)) {
+    return value as PerfumeGender;
+  }
+  return "All";
+};
 
 const CollectionPageContent = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const collectionSlug = searchParams?.get("slug") || "";
-  
+  const genderParam = searchParams?.get("gender") || null;
+
   const [collection, setCollection] = useState<PerfumeCollection | null>(null);
   const [collectionList, setCollectionList] = useState<PerfumeCollection[]>([]);
   const [perfumes, setPerfumes] = useState<Perfume[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("new-arrivals");
-  const [selectedGender, setSelectedGender] = useState<string>("all");
+  const [selectedGender, setSelectedGender] = useState<GenderFilter>(() => parseGenderParam(genderParam));
   const [filteredPerfumes, setFilteredPerfumes] = useState<Perfume[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,11 +41,14 @@ const CollectionPageContent = () => {
   }, []);
 
   useEffect(() => {
+    setSelectedGender(parseGenderParam(genderParam));
+  }, [genderParam]);
+
+  useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       const collections = await getPerfumeCollections();
       
-      // Add "All" collection at the beginning
       const allCollection: PerfumeCollection = {
         id: "",
         name: "All",
@@ -43,17 +59,19 @@ const CollectionPageContent = () => {
       
       setCollectionList([allCollection, ...collections]);
       
-      // If no slug or slug is "all", show all perfumes
+      const genderArg = selectedGender !== "All" ? selectedGender : undefined;
+
       if (!collectionSlug || collectionSlug === "all") {
         setCollection(allCollection);
-        const perfumesData = await getPerfumes({});
+        const perfumesData = await getPerfumes({ gender: genderArg });
         setPerfumes(perfumesData);
       } else {
         const currentCollection = collections.find(c => c.slug === collectionSlug);
         setCollection(currentCollection || allCollection);
         
         const perfumesData = await getPerfumes({ 
-          collection_slug: currentCollection?.slug || collectionSlug 
+          collection_slug: currentCollection?.slug || collectionSlug,
+          gender: genderArg,
         });
         setPerfumes(perfumesData);
       }
@@ -61,7 +79,7 @@ const CollectionPageContent = () => {
       setIsLoading(false);
     };
     fetchData();
-  }, [collectionSlug]);
+  }, [collectionSlug, selectedGender]);
 
   useEffect(() => {
     if (!perfumes || perfumes.length === 0) {
@@ -71,7 +89,6 @@ const CollectionPageContent = () => {
 
     let filtered = [...perfumes];
 
-    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(
         (perfume) =>
@@ -80,40 +97,23 @@ const CollectionPageContent = () => {
       );
     }
 
-    // Apply gender filter
-    if (selectedGender !== "all") {
-      filtered = filtered.filter((perfume) => perfume.gender === selectedGender);
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case "price-low-high":
-        filtered.sort((a, b) => {
-          const priceA = Math.min(...a.price.map((p) => p.price));
-          const priceB = Math.min(...b.price.map((p) => p.price));
-          return priceA - priceB;
-        });
-        break;
-      case "price-high-low":
-        filtered.sort((a, b) => {
-          const priceA = Math.min(...a.price.map((p) => p.price));
-          const priceB = Math.min(...b.price.map((p) => p.price));
-          return priceB - priceA;
-        });
-        break;
-      case "name-a-z":
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case "name-z-a":
-        filtered.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-      default:
-        // new-arrivals - keep original order
-        break;
-    }
-
     setFilteredPerfumes(filtered);
-  }, [perfumes, searchQuery, sortBy, selectedGender]);
+  }, [perfumes, searchQuery]);
+
+  const buildUrl = (slug: string, gender: GenderFilter) => {
+    const params = new URLSearchParams();
+    params.set("slug", slug);
+    if (gender !== "All") params.set("gender", gender);
+    return `/perfume/collection?${params.toString()}`;
+  };
+
+  const handleGenderChange = (gender: GenderFilter) => {
+    const params = new URLSearchParams();
+    if (collectionSlug) params.set("slug", collectionSlug);
+    if (gender !== "All") params.set("gender", gender);
+    const query = params.toString();
+    router.push(`/perfume/collection${query ? `?${query}` : ""}`);
+  };
 
   if (isLoading || !collection) {
     return (
@@ -127,9 +127,9 @@ const CollectionPageContent = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 mt-9">
+    <div className="min-h-screen bg-gray-50 mt-30">
       {/* Hero Banner with Cover Image */}
-      {collection.slug !== "all" ? (
+      {/* {collection.slug !== "all" ? (
         <div className="relative w-full h-[300px] md:h-[400px] lg:h-[450px] bg-linear-to-r from-red-500 to-orange-500 overflow-hidden">
           <img
             src={collection.banner_image_url}
@@ -154,26 +154,36 @@ const CollectionPageContent = () => {
             <p className="text-lg md:text-xl italic">Explore our complete collection</p>
           </div>
         </div>
-      )}
+      )} */}
 
-      {/* Collection Tabs */}
-      <div className=" top-0 z-40 max-w-7xl mx-auto py-5 px-4">
-        <div className="max-w-7xl mx-auto">
+      {/* Gender Title + Collection Tabs */}
+      <div className="top-0 z-40 max-w-352 mx-auto pt-6 pb-2 px-4">
+        <div className="max-w-352 mx-auto">
+          {/* Gender Label */}
+          {selectedGender !== "All" && (
+            <p className="text-sm font-semibold uppercase tracking-widest text-red-500 mb-1">
+              {selectedGender}
+            </p>
+          )}
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            {selectedGender === "All" ? "All Perfumes" : `${selectedGender}'s Perfumes`}
+          </h2>
+
+          {/* Collection Tabs */}
           <div className="flex items-center overflow-x-auto scrollbar-hide py-1 gap-2">
             {collectionList.map((col) => (
               <a
                 key={col.id}
-                href={`/perfume/collection?slug=${col.slug}`}
+                href={buildUrl(col.slug, selectedGender)}
                 className={`shrink-0 h-10 px-6 flex items-center justify-center bg-red-50 font-medium transition-all border-2 rounded-md ${
                   col.slug === (collectionSlug || "all")
-                    ? "border-red-400 text-red-500 "
+                    ? "border-red-400 text-red-500"
                     : "border-transparent text-gray-600 hover:text-gray-900"
                 }`}
               >
                 {col.name}
               </a>
             ))}
-            {/* Scroll Arrow Indicator */}
             <div className="shrink-0 px-2">
               <FiChevronRight className="text-gray-400" />
             </div>
@@ -182,8 +192,8 @@ const CollectionPageContent = () => {
       </div>
 
       {/* Search and Filter Bar */}
-      <div className="bg-gray-900 py-6  top-[57px] z-30 shadow-lg max-w-7xl mx-4 md:mx-auto rounded-xl">
-        <div className="max-w-7xl mx-auto px-4">
+      <div className="bg-gray-900 py-6  top-[57px] z-30 shadow-lg max-w-352 mx-4 md:mx-auto rounded-xl">
+        <div className="max-w-352 mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
             <div className="relative w-full md:w-2/3 lg:w-1/2">
@@ -201,20 +211,21 @@ const CollectionPageContent = () => {
             </div>
 
 
-            {/* Sort Dropdown - Hidden on Mobile */}
-            <div className="hidden md:flex items-center gap-3 text-white">
-              <label className="text-sm font-medium whitespace-nowrap">Sort by:</label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="bg-gray-800 border border-gray-700 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-pointer"
-              >
-                <option value="new-arrivals">Latest</option>
-                <option value="price-low-high">Price: Low to High</option>
-                <option value="price-high-low">Price: High to Low</option>
-                <option value="name-a-z">Name: A to Z</option>
-                <option value="name-z-a">Name: Z to A</option>
-              </select>
+            {/* Gender Filter */}
+            <div className="flex items-center gap-2">
+              {(["All", "Mens", "Womens", "Unisex"] as GenderFilter[]).map((g) => (
+                <button
+                  key={g}
+                  onClick={() => handleGenderChange(g)}
+                  className={`px-4 py-2 rounded-md text-sm font-medium transition-colors border ${
+                    selectedGender === g
+                      ? "bg-red-500 border-red-500 text-white"
+                      : "bg-gray-800 border-gray-700 text-gray-300 hover:border-red-400 hover:text-white"
+                  }`}
+                >
+                  {g}
+                </button>
+              ))}
             </div>
           </div>
 
@@ -222,15 +233,14 @@ const CollectionPageContent = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-352 mx-auto px-4 py-12">
         {filteredPerfumes.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl text-gray-500">No perfumes found matching your filters.</p>
             <button
               onClick={() => {
                 setSearchQuery("");
-                setSelectedGender("all");
-                setSortBy("new-arrivals");
+                handleGenderChange("All");
               }}
               className="mt-4 px-6 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
             >

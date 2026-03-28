@@ -1,10 +1,12 @@
 import { Perfume, DetailedPerfume, PerfumeCollection } from "@/types/perfume";
+import { PerfumeGender } from "@/types/product";
 import axios from "axios";
 const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getPerfumes = async (
   params?: {
-    search?: string;
+    search?: string;    
+    gender?: PerfumeGender;
     collection_slug?: string;
   }
 ): Promise<Perfume[]> => {  
@@ -12,6 +14,7 @@ export const getPerfumes = async (
         const queryParams = new URLSearchParams();
         if (params?.search) queryParams.append("search", params.search);
         if (params?.collection_slug) queryParams.append("collection_slug", params.collection_slug);
+        if (params?.gender) queryParams.append("gender", params.gender);
         const queryString = queryParams.toString();
         const response = await axios.get(`${baseUrl}/product/all-perfumes?${queryString}`);
         return response.data.data as Perfume[];

@@ -98,7 +98,7 @@ export default function Navbar() {
 
   const isHomePage = pathname === "/";
   const isPerfumePage =
-    pathname?.startsWith("/perfume") &&
+    pathname ===  "/perfume" &&
     (typeof window !== "undefined" ? window.innerWidth > 768 : false);
   const shouldUseScrollEffect = isHomePage || isPerfumePage;
 
@@ -229,12 +229,8 @@ export default function Navbar() {
                 <div
                   key={item.name}
                   className="relative"
-                  {...(item.slug?.includes("perfume")
-                    ? {}
-                    : {
-                        onMouseEnter: () => setActiveMenu(item.name),
-                        onMouseLeave: () => setActiveMenu(null),
-                      })}
+                  onMouseEnter={() => setActiveMenu(item.name)}
+                  onMouseLeave={() => setActiveMenu(null)}
                 >
                   {item.slug?.includes("perfume") ? (
                     <Link
@@ -392,32 +388,60 @@ export default function Navbar() {
             onMouseLeave={() => setActiveMenu(null)}
           >
             <div className="max-w-[1920px] mx-auto px-8 py-12">
-              <div className="grid grid-cols-4 gap-12">
-                {menuItems
-                  .find((item) => item.name === activeMenu)
-                  ?.sections.map((section, index) => (
-                    <div key={index}>
-                      <h3 className="text-sm font-semibold mb-4 tracking-wide text-black uppercase border-b border-gray-200 pb-2">
-                        {section.title}
-                      </h3>
-                      <ul className="space-y-2">
-                        {section.subsections.map((subsection, subIndex) => (
-                          <li key={subIndex}>
-                            <Link
-                              href={hrefGenerator(
-                                subsection.type,
-                                subsection.slug || ""
-                              )}
-                              className="text-sm text-gray-600 hover:text-black transition-colors"
-                            >
-                              {subsection.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-              </div>
+              {menuItems.find((item) => item.name === activeMenu)?.slug?.includes("perfume") ? (
+                <div className="grid grid-cols-4 gap-12">
+                  <div>
+                    <h3 className="text-sm font-semibold mb-4 tracking-wide text-black uppercase border-b border-gray-200 pb-2">
+                      Shop By Gender
+                    </h3>
+                    <ul className="space-y-2">
+                      <li>
+                        <Link
+                          href="/perfume/collection?gender=Mens"
+                          className="text-sm text-gray-600 hover:text-black transition-colors"
+                        >
+                          Mens
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/perfume/collection?gender=Womens"
+                          className="text-sm text-gray-600 hover:text-black transition-colors"
+                        >
+                          Womens
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="grid grid-cols-4 gap-12">
+                  {menuItems
+                    .find((item) => item.name === activeMenu)
+                    ?.sections.map((section, index) => (
+                      <div key={index}>
+                        <h3 className="text-sm font-semibold mb-4 tracking-wide text-black uppercase border-b border-gray-200 pb-2">
+                          {section.title}
+                        </h3>
+                        <ul className="space-y-2">
+                          {section.subsections.map((subsection, subIndex) => (
+                            <li key={subIndex}>
+                              <Link
+                                href={hrefGenerator(
+                                  subsection.type,
+                                  subsection.slug || ""
+                                )}
+                                className="text-sm text-gray-600 hover:text-black transition-colors"
+                              >
+                                {subsection.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -515,29 +539,60 @@ export default function Navbar() {
                 className="border-b border-gray-100 last:border-b-0"
               >
                 {item.slug?.includes("perfume") ? (
-                  // Direct link for perfume items (no accordion)
-                  <Link
-                    href="/perfume"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
-                  >
-                    <span className="font-medium text-sm tracking-wider uppercase">
-                      {item.name}
-                    </span>
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                  <>
+                    <button
+                      onClick={() =>
+                        setExpandedMobileMenu(
+                          expandedMobileMenu === item.name ? null : item.name
+                        )
+                      }
+                      className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
+                      <span className="font-medium text-sm tracking-wider uppercase">
+                        {item.name}
+                      </span>
+                      <svg
+                        className={`w-5 h-5 transition-transform duration-200 ${
+                          expandedMobileMenu === item.name ? "rotate-180" : ""
+                        }`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M19 9l-7 7-7-7"
+                        />
+                      </svg>
+                    </button>
+                    {expandedMobileMenu === item.name && (
+                      <div className="pb-4 pl-4 space-y-1">
+                        <Link
+                          href="/perfume"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block text-sm text-gray-500 hover:text-black transition-colors py-2 tracking-wide uppercase font-medium border-b border-gray-100 pb-3 mb-1"
+                        >
+                          View All
+                        </Link>
+                        <Link
+                          href="/perfume/collection?gender=Mens"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block text-sm text-gray-600 hover:text-black transition-colors py-2 tracking-wide"
+                        >
+                          Mens
+                        </Link>
+                        <Link
+                          href="/perfume/collection?gender=Womens"
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="block text-sm text-gray-600 hover:text-black transition-colors py-2 tracking-wide"
+                        >
+                          Womens
+                        </Link>
+                      </div>
+                    )}
+                  </>
                 ) : (
                   // Accordion for other items
                   <>
