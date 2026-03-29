@@ -105,8 +105,8 @@ function BestSellerCard({ item }: BestSellerCardProps) {
     <Link
       href={linkUrl}
       className="group relative overflow-hidden transition-all duration-300 flex flex-col"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      // onMouseEnter={() => setIsHovered(true)}
+      // onMouseLeave={() => setIsHovered(false)}
     >
       {/* Image */}
       <div className="relative w-full aspect-4/5 overflow-hidden flex items-center justify-center rounded-sm">

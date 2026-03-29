@@ -37,11 +37,13 @@ export default function OnePerfumePage() {
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [reviewSortBy, setReviewSortBy] = useState("most_recent");
   const [currentReviewPage, setCurrentReviewPage] = useState(1);
-  const [reviewsData, setReviewsData] = useState<ProductReviewsResponse | null>(null);
+  const [reviewsData, setReviewsData] = useState<ProductReviewsResponse | null>(
+    null,
+  );
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
   const toggleAccordion = (
-    section: "fragranceNotes" | "usageTips" | "brandInfo"
+    section: "fragranceNotes" | "usageTips" | "brandInfo",
   ) => {
     setAccordionOpen((prev) => ({
       ...prev,
@@ -66,7 +68,11 @@ export default function OnePerfumePage() {
     const fetchReviews = async () => {
       if (!slug) return;
       setReviewsLoading(true);
-      const reviewsResponse = await getProductReviews(slug, currentReviewPage, 5);
+      const reviewsResponse = await getProductReviews(
+        slug,
+        currentReviewPage,
+        5,
+      );
       setReviewsData(reviewsResponse);
       setReviewsLoading(false);
     };
@@ -107,7 +113,7 @@ export default function OnePerfumePage() {
       const hasScrollableContent = scrollWidth > clientWidth;
       setCanScrollLeft(hasScrollableContent && scrollLeft > 1);
       setCanScrollRight(
-        hasScrollableContent && scrollLeft < scrollWidth - clientWidth - 1
+        hasScrollableContent && scrollLeft < scrollWidth - clientWidth - 1,
       );
     }
   };
@@ -175,7 +181,7 @@ export default function OnePerfumePage() {
           ? Math.max(0, currentScroll - scrollAmount)
           : Math.min(
               container.scrollWidth - container.clientWidth,
-              currentScroll + scrollAmount
+              currentScroll + scrollAmount,
             );
 
       container.scrollTo({
@@ -235,7 +241,7 @@ export default function OnePerfumePage() {
           })),
         },
         "added",
-        selectedSizeId
+        selectedSizeId,
       );
     }
   };
@@ -615,15 +621,13 @@ export default function OnePerfumePage() {
               <div className="flex items-center justify-between gap-4 pt-2">
                 {/* Left Side - Pricing */}
                 <div className="flex-1">
-                 
-                
                   {/* Current Price */}
                   <div className="mb-1">
                     <span className="text-2xl font-medium tracking-tight text-gray-900">
                       ₹{totalPrice.toFixed(2)}
                     </span>
                   </div>
-                  
+
                   {/* MRP and Taxes */}
                   <div className="flex flex-col gap-0.5">
                     {totalOriginalPrice > totalPrice && (
@@ -826,10 +830,11 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
-          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 "
-          style={{
-            transform:"scale(1.2)",
-          }}
+          <div
+            className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 "
+            style={{
+              transform: "scale(1.2)",
+            }}
           >
             <div className="flex items-center h-full">
               <div className="flex whitespace-nowrap animate-marquee hover:paused">
@@ -978,9 +983,11 @@ export default function OnePerfumePage() {
                   <div className="flex items-center gap-1.5">
                     <span className="text-title text-gray-600">
                       Based on{" "}
-                      {reviewsData && reviewsData.ratingBreakdown.totalReviews >= 1000
+                      {reviewsData &&
+                      reviewsData.ratingBreakdown.totalReviews >= 1000
                         ? `${(reviewsData.ratingBreakdown.totalReviews / 1000).toFixed(1)}K`
-                        : reviewsData?.ratingBreakdown.totalReviews || perfume.rating_count}{" "}
+                        : reviewsData?.ratingBreakdown.totalReviews ||
+                          perfume.rating_count}{" "}
                       reviews
                     </span>
                     <CheckCircle2 size={14} className="text-green-600" />
@@ -999,10 +1006,14 @@ export default function OnePerfumePage() {
                       else if (star === 2) count = ratingBreakdown.twoStar;
                       else if (star === 1) count = ratingBreakdown.oneStar;
                     } else {
-                      count = Math.floor((perfume.rating_count * (6 - star)) / 15);
+                      count = Math.floor(
+                        (perfume.rating_count * (6 - star)) / 15,
+                      );
                     }
-                    const totalReviews = ratingBreakdown?.totalReviews || perfume.rating_count;
-                    const percentage = totalReviews > 0 ? (count / totalReviews) * 100 : 0;
+                    const totalReviews =
+                      ratingBreakdown?.totalReviews || perfume.rating_count;
+                    const percentage =
+                      totalReviews > 0 ? (count / totalReviews) * 100 : 0;
                     return (
                       <div key={star} className="flex items-center gap-2">
                         {/* Visual Stars */}
@@ -1039,40 +1050,46 @@ export default function OnePerfumePage() {
               </div>
 
               {/* Customer Photos & Videos Section */}
-              {reviewsData && reviewsData.data.some(review => review.review_images && review.review_images.length > 0) && (
-                <div className="mb-10 pt-6 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-900 mb-4">
-                    Customer photos & videos
-                  </h3>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-2 flex-1 overflow-x-auto pb-2 scrollbar-hide">
+              {reviewsData &&
+                reviewsData.data.some(
+                  (review) =>
+                    review.review_images && review.review_images.length > 0,
+                ) && (
+                  <div className="mb-10 pt-6 border-t border-gray-200">
+                    <h3 className="text-sm font-medium text-gray-900 mb-4">
+                      Customer photos & videos
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-2 flex-1 overflow-x-auto pb-2 scrollbar-hide">
+                        {reviewsData.data
+                          .flatMap((review) => review.review_images || [])
+                          .filter((img) => img)
+                          .map((img, i) => (
+                            <div
+                              key={i}
+                              className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
+                            >
+                              <img
+                                src={img}
+                                alt={`Customer photo ${i + 1}`}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ))}
+                      </div>
                       {reviewsData.data
-                        .flatMap(review => review.review_images || [])
-                        .filter(img => img)
-                        .map((img, i) => (
-                          <div
-                            key={i}
-                            className="w-20 h-20 bg-gray-100 rounded shrink-0 overflow-hidden"
-                          >
-                            <img
-                              src={img}
-                              alt={`Customer photo ${i + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
+                        .flatMap((review) => review.review_images || [])
+                        .filter((img) => img).length > 8 && (
+                        <a
+                          href="#"
+                          className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
+                        >
+                          See more
+                        </a>
+                      )}
                     </div>
-                    {reviewsData.data.flatMap(review => review.review_images || []).filter(img => img).length > 8 && (
-                      <a
-                        href="#"
-                        className="text-sm text-gray-600 hover:text-gray-900 whitespace-nowrap"
-                      >
-                        See more
-                      </a>
-                    )}
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Sort Dropdown */}
               {/* <div className="flex items-center justify-between mb-6">
@@ -1098,9 +1115,14 @@ export default function OnePerfumePage() {
                   <div className="flex items-center justify-center py-12">
                     <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-gray-900"></div>
                   </div>
-                ) : reviewsData && reviewsData.success && reviewsData.data.length > 0 ? (
+                ) : reviewsData &&
+                  reviewsData.success &&
+                  reviewsData.data.length > 0 ? (
                   reviewsData.data.map((review) => (
-                    <div key={review.id} className="border-b border-gray-100 pb-6">
+                    <div
+                      key={review.id}
+                      className="border-b border-gray-100 pb-6"
+                    >
                       <div className="flex items-start gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
@@ -1123,28 +1145,32 @@ export default function OnePerfumePage() {
                             </div>
                           </div>
                           <p className="text-xs text-gray-500 mb-2">
-                            {new Date(review.created_at).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                            })}
+                            {new Date(review.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              },
+                            )}
                           </p>
-                          {review.review_images && review.review_images.length > 0 && (
-                            <div className="flex gap-2 mb-2">
-                              {review.review_images.map((img, idx) => (
-                                <div
-                                  key={idx}
-                                  className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0"
-                                >
-                                  <img
-                                    src={img}
-                                    alt={`Review image ${idx + 1}`}
-                                    className="w-full h-full object-cover"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          )}
+                          {review.review_images &&
+                            review.review_images.length > 0 && (
+                              <div className="flex gap-2 mb-2">
+                                {review.review_images.map((img, idx) => (
+                                  <div
+                                    key={idx}
+                                    className="w-20 h-20 bg-gray-100 rounded overflow-hidden shrink-0"
+                                  >
+                                    <img
+                                      src={img}
+                                      alt={`Review image ${idx + 1}`}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            )}
                           <p className="text-gray-800 font-normal leading-relaxed my-2">
                             {review.comment}
                           </p>
@@ -1154,7 +1180,9 @@ export default function OnePerfumePage() {
                   ))
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-gray-500">No reviews yet. Be the first to review this product!</p>
+                    <p className="text-gray-500">
+                      No reviews yet. Be the first to review this product!
+                    </p>
                   </div>
                 )}
               </div>
@@ -1162,9 +1190,7 @@ export default function OnePerfumePage() {
               {/* Pagination */}
               <div className="flex items-center justify-center gap-2">
                 <button
-                  onClick={() =>
-                    setCurrentReviewPage(1)
-                  }
+                  onClick={() => setCurrentReviewPage(1)}
                   disabled={currentReviewPage === 1 || reviewsLoading}
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
@@ -1179,28 +1205,40 @@ export default function OnePerfumePage() {
                 >
                   &lt;
                 </button>
-                {reviewsData && Array.from({ length: Math.min(5, reviewsData.totalPages) }, (_, i) => {
-                  const page = i + 1;
-                  return (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentReviewPage(page)}
-                      disabled={reviewsLoading}
-                      className={`px-3 py-1 text-sm ${
-                        currentReviewPage === page
-                          ? "bg-gray-900 text-white"
-                          : "text-gray-600 hover:text-gray-900"
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  );
-                })}
+                {reviewsData &&
+                  Array.from(
+                    { length: Math.min(5, reviewsData.totalPages) },
+                    (_, i) => {
+                      const page = i + 1;
+                      return (
+                        <button
+                          key={page}
+                          onClick={() => setCurrentReviewPage(page)}
+                          disabled={reviewsLoading}
+                          className={`px-3 py-1 text-sm ${
+                            currentReviewPage === page
+                              ? "bg-gray-900 text-white"
+                              : "text-gray-600 hover:text-gray-900"
+                          }`}
+                        >
+                          {page}
+                        </button>
+                      );
+                    },
+                  )}
                 <button
                   onClick={() =>
-                    setCurrentReviewPage(Math.min(reviewsData?.totalPages || 1, currentReviewPage + 1))
+                    setCurrentReviewPage(
+                      Math.min(
+                        reviewsData?.totalPages || 1,
+                        currentReviewPage + 1,
+                      ),
+                    )
                   }
-                  disabled={currentReviewPage === (reviewsData?.totalPages || 1) || reviewsLoading}
+                  disabled={
+                    currentReviewPage === (reviewsData?.totalPages || 1) ||
+                    reviewsLoading
+                  }
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &gt;
@@ -1209,7 +1247,10 @@ export default function OnePerfumePage() {
                   onClick={() =>
                     setCurrentReviewPage(reviewsData?.totalPages || 1)
                   }
-                  disabled={currentReviewPage === (reviewsData?.totalPages || 1) || reviewsLoading}
+                  disabled={
+                    currentReviewPage === (reviewsData?.totalPages || 1) ||
+                    reviewsLoading
+                  }
                   className="px-2 py-1 text-gray-600 disabled:text-gray-300 disabled:cursor-not-allowed hover:text-gray-900"
                 >
                   &gt;&gt;
