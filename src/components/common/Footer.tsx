@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { Shield, Truck, RefreshCw, Instagram, X } from 'lucide-react'
+import { Shield, Truck, RefreshCw, Instagram } from 'lucide-react'
 import { FaFacebook, FaXTwitter, FaYoutube } from 'react-icons/fa6'
 import Link from 'next/link';
 import { subscribeNewsletter } from '@/utils/contact';
@@ -30,6 +30,47 @@ export default function Footer() {
                 return '#'
         }
     }
+
+    const allMenu = menuItems.find((item) => item.name.toLowerCase() === 'all');
+    const apparelsMenu = menuItems.find((item) => item.name.toLowerCase() === 'apparels');
+
+    const allTagMap = new Map(
+        (allMenu?.sections || [])
+            .flatMap((section) => section.subsections || [])
+            .filter((subsection) => subsection?.type === 'tag' && subsection?.slug)
+            .map((subsection) => [subsection.name.toLowerCase(), hrefGenerator('tag', subsection.slug || '')])
+    );
+
+    const apparelsSectionMap = new Map(
+        (apparelsMenu?.sections || [])
+            .filter((section) => section?.slug)
+            .map((section) => [section.title.toLowerCase(), hrefGenerator('category', section.slug || '')])
+    );
+
+    const footerMenuColumns = [
+        {
+            title: 'ALL',
+            links: [
+                { label: 'Best Sellers', href: allTagMap.get('best sellers') || '/t/best-sellers' },
+                { label: 'Featured', href: allTagMap.get('featured') || '/t/featured' },
+                { label: 'New Arrivals', href: allTagMap.get('new arrivals') || '/t/new-arrival' },
+            ],
+        },
+        {
+            title: 'APPARELS',
+            links: [
+                { label: 'Mens', href: apparelsSectionMap.get('men') || '/c/mens' },
+                { label: 'Womens', href: apparelsSectionMap.get('women') || '/c/womens' },
+            ],
+        },
+        {
+            title: 'PERFUME',
+            links: [
+                { label: 'Mens', href: '/perfume/collection?gender=Mens' },
+                { label: 'Womens', href: '/perfume/collection?gender=Womens' },
+            ],
+        },
+    ];
 
     const handleNewsletterSubscribe = async () => {
         if (!email.trim()) {
@@ -132,60 +173,31 @@ export default function Footer() {
             {/* Main Footer Links */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12">
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8">
-                    {/* Dynamic Menu Items - Show first 3 menus */}
-                    {menuItems.length > 0 ? (
-                        menuItems.slice(0, 3).map((menu) => (
-                            <div key={menu.name}>
-                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">{menu.name.toUpperCase()}</h3>
-                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                                    {menu.sections[0]?.subsections && menu.sections[0].subsections.length > 0 ? (
-                                        menu.sections[0].subsections.slice(0, 6).map((subsection, idx) => (
-                                            <li key={idx}>
-                                                <Link 
-                                                    href={hrefGenerator(subsection.type, subsection.slug || '')} 
-                                                    className="hover:text-white transition-colors block"
-                                                >
-                                                    {subsection.name}
-                                                </Link>
-                                            </li>
-                                        ))
-                                    ) : (
-                                        <li className="text-gray-500 italic">Coming Soon</li>
-                                    )}
-                                </ul>
-                            </div>
-                        ))
-                    ) : (
-                        // Fallback when no menu items are loaded
-                        <>
-                            <div>
-                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">MENS</h3>
-                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                                    <li className="text-gray-500 italic">Coming Soon</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">WOMENS</h3>
-                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                                    <li className="text-gray-500 italic">Coming Soon</li>
-                                </ul>
-                            </div>
-                            <div>
-                                <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">KIDS</h3>
-                                <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
-                                    <li className="text-gray-500 italic">Coming Soon</li>
-                                </ul>
-                            </div>
-                        </>
-                    )}
+                    {footerMenuColumns.map((column) => (
+                        <div key={column.title}>
+                            <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">{column.title}</h3>
+                            <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
+                                {column.links.map((link) => (
+                                    <li key={`${column.title}-${link.label}`}>
+                                        <Link
+                                            href={link.href}
+                                            className="hover:text-white transition-colors block"
+                                        >
+                                            {link.label}
+                                        </Link>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
 
                     {/* Useful Links */}
                     <div>
                         <h3 className="font-medium mb-3 sm:mb-4 lg:mb-6 text-sm sm:text-base">USEFUL LINKS</h3>
                         <ul className="space-y-2 sm:space-y-3 text-xs sm:text-sm text-gray-300">
                             <li><Link href="/contact#message" className="hover:text-white transition-colors block">Contact Us</Link></li>
-                            <li><Link href="/contact#faqs" className="hover:text-white transition-colors block">FAQ</Link></li>
                             <li><Link href="/aboutus" className="hover:text-white transition-colors block">About Us</Link></li>
+                            <li><Link href="/contact#faqs" className="hover:text-white transition-colors block">FAQ</Link></li>
                         </ul>
                     </div>
 
@@ -218,7 +230,7 @@ export default function Footer() {
             <div className="border-t border-gray-800">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
                     <div className="flex flex-col md:flex-row justify-between items-center text-xs sm:text-sm text-gray-400 gap-3 sm:gap-4">
-                        <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-1 text-center sm:text-left">
+                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-center sm:text-left sm:flex sm:flex-row sm:items-center sm:gap-1">
                             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
                             <span className="hidden sm:inline">|</span>
                             <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>

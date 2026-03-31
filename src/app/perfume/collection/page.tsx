@@ -170,7 +170,7 @@ const CollectionPageContent = () => {
           </h2>
 
           {/* Collection Tabs */}
-          <div className="flex items-center overflow-x-auto scrollbar-hide py-1 gap-2">
+          {/* <div className="flex items-center overflow-x-auto scrollbar-hide py-1 gap-2">
             {collectionList.map((col) => (
               <a
                 key={col.id}
@@ -187,7 +187,7 @@ const CollectionPageContent = () => {
             <div className="shrink-0 px-2">
               <FiChevronRight className="text-gray-400" />
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 

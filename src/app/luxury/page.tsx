@@ -112,7 +112,7 @@ export default function LuxuryComingSoon() {
           </motion.div>
         </motion.div>
 
-        <motion.div
+        {/* <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
@@ -135,7 +135,7 @@ export default function LuxuryComingSoon() {
               </svg>
             </a>
           </div>
-        </motion.div>
+        </motion.div> */}
       </div>
 
       <div className="absolute inset-0 pointer-events-none">
