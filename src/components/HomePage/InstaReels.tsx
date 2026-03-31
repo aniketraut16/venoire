@@ -1,12 +1,52 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import Script from 'next/script'
 import { Instagram } from 'lucide-react'
 import { siteConfig } from '@/variables/config'
+import { useHomepage } from '@/contexts/HomepageContext'
 
 
 export default function InstaReels() {
+
+  const { instagramReels } = useHomepage()
+  const fallbackReels = useMemo(
+    () => [
+      'https://www.instagram.com/reel/DR1FyJSkgoK/',
+      'https://www.instagram.com/reel/DRep44wknRi/',
+      'https://www.instagram.com/reel/DRU_cOEDTVm/',
+      'https://www.instagram.com/reel/DRQE2_MDfzk/',
+    ],
+    []
+  )
+
+  const reelUrls = useMemo(() => {
+    const backendUrls = [...(instagramReels || [])]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((reel) => reel.instagram_url)
+      .filter(Boolean)
+
+    return backendUrls.length > 0 ? backendUrls : fallbackReels
+  }, [instagramReels, fallbackReels])
+
+  const toEmbedPermalink = (url: string) => {
+    const cleanUrl = url.split('?')[0].replace(/\/+$/, '')
+    return `${cleanUrl}/?utm_source=ig_embed&utm_campaign=loading`
+  }
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const instgrm = (window as any).instgrm
+    if (!instgrm?.Embeds?.process) return
+
+    // Process immediately and once again after paint to avoid intermittent misses.
+    instgrm.Embeds.process()
+    const timer = setTimeout(() => {
+      instgrm.Embeds.process()
+    }, 250)
+
+    return () => clearTimeout(timer)
+  }, [reelUrls])
 
   return (
     <section className="w-full py-12 sm:py-16 md:py-20 bg-white overflow-hidden">
@@ -26,10 +66,14 @@ export default function InstaReels() {
 
         {/* Reels Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 md:mb-12 justify-items-center">
-          <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DR1FyJSkgoK/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
-          <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRep44wknRi/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
-          <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRU_cOEDTVm/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
-          <blockquote className="instagram-media" data-instgrm-permalink="https://www.instagram.com/reel/DRQE2_MDfzk/?utm_source=ig_embed&amp;utm_campaign=loading" data-instgrm-version="14"></blockquote>
+          {reelUrls.slice(0, 4).map((url, index) => (
+            <blockquote
+              key={`${url}-${index}`}
+              className="instagram-media"
+              data-instgrm-permalink={toEmbedPermalink(url)}
+              data-instgrm-version="14"
+            ></blockquote>
+          ))}
         </div>
 
         {/* CTA Button */}
