@@ -1,6 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { flushSync } from "react-dom";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Search,
@@ -12,8 +11,6 @@ import {
   Package,
   ArrowLeft,
   ArrowRight,
-  ChevronRight,
-  ChevronLeft,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 import SearchPopup from "./SearchPopup";
@@ -34,13 +31,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const { user, needsCompleteSetup } = useAuth();
   const { count } = useCart();
-  const [promoidx, setpromoidx] = useState<number>(0);
-  const [prevPromoidx, setPrevPromoidx] = useState<number>(0);
-  const [promoDirection, setPromoDirection] = useState<'left' | 'right' | null>(null);
-  const [isAnimating, setIsAnimating] = useState<boolean>(false);
-  const [animationKey, setAnimationKey] = useState<number>(0);
-  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isAnimatingRef = useRef<boolean>(false);
   const { navbarContent, navbarBanners } = useHomepage();
   
   const promoItems = navbarBanners.length > 0 
@@ -50,58 +40,6 @@ export default function Navbar() {
   const promoLinks = navbarBanners.length > 0
     ? navbarBanners.map(banner => banner.url)
     : ["#", "#", "#", "#"];
-
-  const increasepromoidx = useCallback(() => {
-    if (isAnimatingRef.current) return;
-    if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
-    
-    flushSync(() => {
-      setPromoDirection('left');
-      setIsAnimating(true);
-      setAnimationKey(prev => prev + 1);
-      setpromoidx((currentIdx) => {
-        setPrevPromoidx(currentIdx);
-        return currentIdx === promoItems.length - 1 ? 0 : currentIdx + 1;
-      });
-    });
-    
-    animationTimeoutRef.current = setTimeout(() => setIsAnimating(false), 450);
-  }, [promoItems.length]);
-  
-  const decreasepromoidx = useCallback(() => {
-    if (isAnimatingRef.current) return;
-    if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
-    
-    flushSync(() => {
-      setPromoDirection('right');
-      setIsAnimating(true);
-      setAnimationKey(prev => prev + 1);
-      setpromoidx((currentIdx) => {
-        setPrevPromoidx(currentIdx);
-        return currentIdx <= 0 ? promoItems.length - 1 : currentIdx - 1;
-      });
-    });
-    
-    animationTimeoutRef.current = setTimeout(() => setIsAnimating(false), 450);
-  }, [promoItems.length]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      increasepromoidx();
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [increasepromoidx]);
-
-  useEffect(() => {
-    isAnimatingRef.current = isAnimating;
-  }, [isAnimating]);
-
-  useEffect(() => {
-    return () => {
-      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
-    };
-  }, []);
 
   const menuItems = navbarContent?.menuItems || [];
 
@@ -175,49 +113,34 @@ export default function Navbar() {
       <div
         className={`fixed ${
           scrollPosition > 758 ? "-top-9" : "top-0"
-        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out px-[1%]  lg:px-[10%] overflow-hidden`}
+        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center flex uppercase font-medium tracking-widest transition-all duration-300 ease-in-out px-[1%]  overflow-hidden`}
       >
-        <button onClick={decreasepromoidx} className="z-10" disabled={isAnimating}>
-          <ChevronLeft size={16} />
-        </button>
-        <div className="relative flex-1 h-full flex items-center justify-center overflow-hidden">
-          {/* Previous/Outgoing Item */}
-          {isAnimating && (
-            <a
-              key={`out-${animationKey}`}
-              href={promoLinks[prevPromoidx]}
-              target={promoLinks[prevPromoidx].startsWith("http") ? "_blank" : "_self"}
-              rel={promoLinks[prevPromoidx].startsWith("http") ? "noopener noreferrer" : undefined}
-              className="text-white text-[10px] lg:text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
-              style={{
-                animation: promoDirection === 'left' 
-                  ? 'slideOutLeft 0.4s ease-out forwards'
-                  : 'slideOutRight 0.4s ease-out forwards'
-              }}
-            >
-              {promoItems[prevPromoidx]}
-            </a>
-          )}
-          
-          {/* Current/Incoming Item */}
-          <a
-            key={`in-${animationKey}`}
-            href={promoLinks[promoidx]}
-            target={promoLinks[promoidx].startsWith("http") ? "_blank" : "_self"}
-            rel={promoLinks[promoidx].startsWith("http") ? "noopener noreferrer" : undefined}
-            className="text-white text-[10px] lg:text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
-            style={{
-              animation: isAnimating && promoDirection
-                ? `${promoDirection === 'left' ? 'slideInLeft' : 'slideInRight'} 0.4s ease-out forwards`
-                : 'none'
-            }}
-          >
-            {promoItems[promoidx]}
-          </a>
+        <div className="flex items-center h-full w-full overflow-hidden">
+          <div className="flex whitespace-nowrap animate-marquee hover:paused">
+            {promoItems.map((item, index) => (
+              <a
+                key={`promo-1-${index}`}
+                href={promoLinks[index] || "#"}
+                target={(promoLinks[index] || "#").startsWith("http") ? "_blank" : "_self"}
+                rel={(promoLinks[index] || "#").startsWith("http") ? "noopener noreferrer" : undefined}
+                className="inline-flex items-center px-10 text-[10px] lg:text-xs font-medium tracking-widest text-white hover:underline"
+              >
+                {item}
+              </a>
+            ))}
+            {promoItems.map((item, index) => (
+              <a
+                key={`promo-2-${index}`}
+                href={promoLinks[index] || "#"}
+                target={(promoLinks[index] || "#").startsWith("http") ? "_blank" : "_self"}
+                rel={(promoLinks[index] || "#").startsWith("http") ? "noopener noreferrer" : undefined}
+                className="inline-flex items-center px-10 text-[10px] lg:text-xs font-medium tracking-widest text-white hover:underline"
+              >
+                {item}
+              </a>
+            ))}
+          </div>
         </div>
-        <button onClick={increasepromoidx} className="z-10" disabled={isAnimating}>
-          <ChevronRight size={16} />
-        </button>
       </div>
       <nav
         className={`fixed ${
