@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { flushSync } from "react-dom";
 import Link from "next/link";
 import {
   Search,
@@ -37,6 +38,9 @@ export default function Navbar() {
   const [prevPromoidx, setPrevPromoidx] = useState<number>(0);
   const [promoDirection, setPromoDirection] = useState<'left' | 'right' | null>(null);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [animationKey, setAnimationKey] = useState<number>(0);
+  const animationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isAnimatingRef = useRef<boolean>(false);
   const { navbarContent, navbarBanners } = useHomepage();
   
   const promoItems = navbarBanners.length > 0 
@@ -47,35 +51,39 @@ export default function Navbar() {
     ? navbarBanners.map(banner => banner.url)
     : ["#", "#", "#", "#"];
 
-  const increasepromoidx = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setPrevPromoidx(promoidx);
-    setPromoDirection('left');
-    setTimeout(() => {
-      if (promoidx === promoItems.length - 1) {
-        setpromoidx(0);
-      } else {
-        setpromoidx(promoidx + 1);
-      }
-      setTimeout(() => setIsAnimating(false), 400);
-    }, 0);
-  };
+  const increasepromoidx = useCallback(() => {
+    if (isAnimatingRef.current) return;
+    if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+    
+    flushSync(() => {
+      setPromoDirection('left');
+      setIsAnimating(true);
+      setAnimationKey(prev => prev + 1);
+      setpromoidx((currentIdx) => {
+        setPrevPromoidx(currentIdx);
+        return currentIdx === promoItems.length - 1 ? 0 : currentIdx + 1;
+      });
+    });
+    
+    animationTimeoutRef.current = setTimeout(() => setIsAnimating(false), 450);
+  }, [promoItems.length]);
   
-  const decreasepromoidx = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
-    setPrevPromoidx(promoidx);
-    setPromoDirection('right');
-    setTimeout(() => {
-      if (promoidx <= 0) {
-        setpromoidx(promoItems.length - 1);
-      } else {
-        setpromoidx(promoidx - 1);
-      }
-      setTimeout(() => setIsAnimating(false), 400);
-    }, 0);
-  };
+  const decreasepromoidx = useCallback(() => {
+    if (isAnimatingRef.current) return;
+    if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+    
+    flushSync(() => {
+      setPromoDirection('right');
+      setIsAnimating(true);
+      setAnimationKey(prev => prev + 1);
+      setpromoidx((currentIdx) => {
+        setPrevPromoidx(currentIdx);
+        return currentIdx <= 0 ? promoItems.length - 1 : currentIdx - 1;
+      });
+    });
+    
+    animationTimeoutRef.current = setTimeout(() => setIsAnimating(false), 450);
+  }, [promoItems.length]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -83,7 +91,17 @@ export default function Navbar() {
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [promoidx]);
+  }, [increasepromoidx]);
+
+  useEffect(() => {
+    isAnimatingRef.current = isAnimating;
+  }, [isAnimating]);
+
+  useEffect(() => {
+    return () => {
+      if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
+    };
+  }, []);
 
   const menuItems = navbarContent?.menuItems || [];
 
@@ -157,7 +175,7 @@ export default function Navbar() {
       <div
         className={`fixed ${
           scrollPosition > 758 ? "-top-9" : "top-0"
-        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out px-[10%] overflow-hidden`}
+        } left-0 right-0 z-50 bg-black h-9 text-white text-center items-center justify-between flex uppercase font-medium tracking-widest p-2 transition-all duration-300 ease-in-out px-[1%]  lg:px-[10%] overflow-hidden`}
       >
         <button onClick={decreasepromoidx} className="z-10" disabled={isAnimating}>
           <ChevronLeft size={16} />
@@ -166,10 +184,11 @@ export default function Navbar() {
           {/* Previous/Outgoing Item */}
           {isAnimating && (
             <a
+              key={`out-${animationKey}`}
               href={promoLinks[prevPromoidx]}
               target={promoLinks[prevPromoidx].startsWith("http") ? "_blank" : "_self"}
               rel={promoLinks[prevPromoidx].startsWith("http") ? "noopener noreferrer" : undefined}
-              className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
+              className="text-white text-[10px] lg:text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
               style={{
                 animation: promoDirection === 'left' 
                   ? 'slideOutLeft 0.4s ease-out forwards'
@@ -182,14 +201,14 @@ export default function Navbar() {
           
           {/* Current/Incoming Item */}
           <a
-            key={promoidx}
+            key={`in-${animationKey}`}
             href={promoLinks[promoidx]}
             target={promoLinks[promoidx].startsWith("http") ? "_blank" : "_self"}
             rel={promoLinks[promoidx].startsWith("http") ? "noopener noreferrer" : undefined}
-            className="text-white text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
+            className="text-white text-[10px] lg:text-xs font-medium tracking-widest absolute inset-0 flex items-center justify-center hover:underline"
             style={{
-              animation: promoDirection && isAnimating
-                ? `${promoDirection === 'left' ? 'slideInLeft' : 'slideInRight'} 0.4s ease-out`
+              animation: isAnimating && promoDirection
+                ? `${promoDirection === 'left' ? 'slideInLeft' : 'slideInRight'} 0.4s ease-out forwards`
                 : 'none'
             }}
           >
