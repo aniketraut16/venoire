@@ -4,7 +4,15 @@ import { useParams } from "next/navigation";
 import { getDetailedPerfume } from "@/utils/perfume";
 import { DetailedPerfume } from "@/types/perfume";
 import { FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
-import { Star, CheckCircle2 } from "lucide-react";
+import {
+  Star,
+  CheckCircle2,
+  Info,
+  BookOpenText,
+  Sparkles,
+  Leaf,
+  Building2,
+} from "lucide-react";
 import { useCart } from "@/contexts/cartContext";
 import { getProductReviews } from "@/utils/products";
 import { ProductReviewsResponse } from "@/types/product";
@@ -22,12 +30,16 @@ export default function OnePerfumePage() {
   const [showStickyBar, setShowStickyBar] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [accordionOpen, setAccordionOpen] = useState<{
-    fragranceNotes: boolean;
+    productDescription: boolean;
+    scentStory: boolean;
     usageTips: boolean;
+    ingredients: boolean;
     brandInfo: boolean;
   }>({
-    fragranceNotes: true,
+    productDescription: false,
+    scentStory: false,
     usageTips: false,
+    ingredients: false,
     brandInfo: false,
   });
   const { addToCart } = useCart();
@@ -43,7 +55,12 @@ export default function OnePerfumePage() {
   const [reviewsLoading, setReviewsLoading] = useState(false);
 
   const toggleAccordion = (
-    section: "fragranceNotes" | "usageTips" | "brandInfo",
+    section:
+      | "productDescription"
+      | "scentStory"
+      | "usageTips"
+      | "ingredients"
+      | "brandInfo",
   ) => {
     setAccordionOpen((prev) => ({
       ...prev,
@@ -218,6 +235,13 @@ export default function OnePerfumePage() {
   const selectedPrice = perfume.price[selectedSize];
   const totalPrice = selectedPrice.price * quantity;
   const totalOriginalPrice = selectedPrice.originalPrice * quantity;
+  const formattedReviewCount =
+    perfume.rating_count >= 1000
+      ? `${(perfume.rating_count / 1000).toFixed(1)}K`
+      : perfume.rating_count.toString();
+  const ingredientsText = [perfume.top_notes, perfume.middle_notes, perfume.base_notes]
+    .filter((value) => value && value.trim())
+    .join("\n");
 
   const handleAddToCart = async () => {
     if (!selectedSizeId) return;
@@ -247,195 +271,7 @@ export default function OnePerfumePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0">
-      {/* Hero Section with Product Image as Background */}
-
-      <div className="space-y-1 grow flex md:hidden flex-col mt-30 px-4">
-        {/* Category Label */}
-
-        {/* Product Name with Quantity */}
-        <h3 className="font-medium text-section text-gray-900 tracking-[0.6px]">
-          {perfume.name} - {perfume.price[selectedSize].quantity}ml
-        </h3>
-        <p className="text-[12px] text-gray-700 uppercase tracking-wide">
-          {perfume.concentration}
-        </p>
-
-        {/* Rating */}
-        <div className="flex items-center gap-1 text-[14px] font-medium mt-auto">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            aria-hidden="true"
-            focusable="false"
-            className="icon icon-star"
-            viewBox="0 0 24 24"
-            width="14"
-            height="14"
-          >
-            <path
-              d="M12.0006 18.26L4.94715 22.2082L6.52248 14.2799L0.587891 8.7918L8.61493 7.84006L12.0006 0.5L15.3862 7.84006L23.4132 8.7918L17.4787 14.2799L19.054 22.2082L12.0006 18.26Z"
-              fill="#FFB503"
-            ></path>
-          </svg>
-          <span className=" text-gray-900">
-            {parseFloat(perfume.rating.toString()).toFixed(1)}
-          </span>
-          <span className=" text-gray-400">|</span>
-
-          <svg
-            viewBox="0 0 18 18"
-            className="icon icon-whatsapp-verified"
-            height="14"
-            width="14"
-            preserveAspectRatio="xMidYMid meet"
-            version="1.1"
-            x="0px"
-            y="0px"
-            enableBackground="new 0 0 18 18"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <polygon
-              id="Star-2"
-              fill="#005eff"
-              points="9,16 7.1,16.9 5.8,15.2 3.7,15.1 3.4,13 1.5,12 2.2,9.9 1.1,8.2 2.6,6.7 2.4,4.6 4.5,4 5.3,2 7.4,2.4 9,1.1 10.7,2.4 12.7,2 13.6,4 15.6,4.6 15.5,6.7 17,8.2 15.9,9.9 16.5,12 14.7,13 14.3,15.1 12.2,15.2 10.9,16.9 "
-            ></polygon>
-            <polygon
-              id="Check-Icon"
-              fill="#FFFFFF"
-              points="13.1,7.3 12.2,6.5 8.1,10.6 5.9,8.5 5,9.4 8,12.4 "
-            ></polygon>
-          </svg>
-          <span className=" text-gray-600">
-            (
-            {perfume.rating_count >= 1000
-              ? `${(perfume.rating_count / 1000).toFixed(1)}K`
-              : perfume.rating_count}{" "}
-            Reviews)
-          </span>
-        </div>
-      </div>
-      <div className="relative w-full min-h-[65vh] overflow-hidden hidden md:block">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0">
-          <img
-            src={perfume.bannerImage || perfume.coverImage}
-            alt={perfume.name}
-            className="object-cover w-full h-full"
-          />
-          <div className="absolute inset-0 bg-linear-to-br from-black/20 via-black/10 to-black/5"></div>
-          <div className="absolute inset-0 bg-black/30"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 pt-[20vh] pb-10 h-full relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-            {/* Left Side - Product Info & Controls (40-45% width) */}
-            <div className="max-w-xl lg:max-w-md">
-              <div className="text-white space-y-4">
-                {/* Title & Fragrance */}
-                <div className="space-y-1">
-                  <h1 className="text-4xl md:text-5xl font-light tracking-tight leading-tight">
-                    {perfume.name}
-                  </h1>
-                  <p className="text-sm text-white/60 tracking-wide uppercase font-light">
-                    {perfume.fragrance}
-                  </p>
-                </div>
-
-                {/* Price - Calm & Dominant */}
-                <div className="pt-2">
-                  <div className="flex items-baseline gap-3">
-                    <span className="text-3xl font-light tracking-tight">
-                      Rs. {totalPrice.toFixed(2)}
-                    </span>
-                  </div>
-                  <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-xs text-white/40 line-through font-light">
-                      Rs. {totalOriginalPrice.toFixed(2)}
-                    </span>
-                    <span className="text-xs text-white/50 font-light">
-                      Incl. all taxes
-                    </span>
-                  </div>
-                </div>
-
-                {/* Badge Text - Subtle */}
-                {perfume.badgeText && (
-                  <div className="pt-1">
-                    <span className="inline-block text-xs text-white/70 font-light tracking-wide">
-                      {perfume.badgeText}
-                    </span>
-                  </div>
-                )}
-
-                {/* Size & Quantity */}
-                <div className="flex flex-wrap gap-4 pt-3">
-                  {/* Size Selection */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-light uppercase tracking-widest text-white/70">
-                      Size
-                    </label>
-                    <div className="flex gap-2">
-                      {perfume.price.map((priceOption, index) => (
-                        <button
-                          key={index}
-                          onClick={() => {
-                            setSelectedSize(index);
-                            setSelectedSizeId(perfume.price[index].id);
-                          }}
-                          className={`px-4 py-2.5 text-sm font-light transition-all border ${
-                            selectedSize === index
-                              ? "bg-white text-gray-900 border-white"
-                              : "bg-transparent text-white border-white/30 hover:border-white/60"
-                          }`}
-                        >
-                          {priceOption.quantity}ml
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Quantity Selector */}
-                  <div className="space-y-2">
-                    <label className="text-xs font-light uppercase tracking-widest text-white/70">
-                      Quantity
-                    </label>
-                    <div className="flex items-center border border-white/30 w-fit h-[42px]">
-                      <button
-                        onClick={handleQuantityDecrease}
-                        className="px-3 h-full hover:bg-white/10 transition-colors flex items-center justify-center"
-                      >
-                        <FiMinus className="w-3 h-3" />
-                      </button>
-                      <span className="px-5 text-sm font-light">
-                        {quantity}
-                      </span>
-                      <button
-                        onClick={handleQuantityIncrease}
-                        className="px-3 h-full hover:bg-white/10 transition-colors flex items-center justify-center"
-                      >
-                        <FiPlus className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Add to Cart Button - Luxury Dark */}
-                <div ref={ctaButtonsRef} className="pt-4">
-                  <button
-                    onClick={handleAddToCart}
-                    className="bg-white  text-gray-900  hover:bg-gray-50 font-light py-3 px-12 transition-all duration-300 uppercase text-xs tracking-widest border border-gray-900 hover:border-gray-700"
-                  >
-                    Add to Cart
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {/* Right Side - Image Only */}
-          </div>
-        </div>
-      </div>
-
+    <div className="min-h-screen bg-white pb-20 md:pb-0 mt-30">
       <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative hidden md:block">
         <div className="flex items-center h-full">
           <div className="flex whitespace-nowrap animate-marquee hover:paused">
@@ -489,11 +325,11 @@ export default function OnePerfumePage() {
 
       {/* Product Gallery and Description Section */}
       <div className="bg-white py-4 md:py-16 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 md:gap-12">
+        <div className="max-w-350 mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-20 gap-6 md:gap-12">
             {/* Left Side - Sticky Gallery */}
-            <div className="order-1 lg:col-span-2">
-              <div className="lg:sticky lg:top-24">
+            <div className="order-1 lg:col-span-9">
+              <div className="lg:sticky lg:top-0">
                 {/* Main Image Display */}
                 <div className="bg-gray-50 mb-3 overflow-hidden">
                   <div className="aspect-square relative">
@@ -615,216 +451,213 @@ export default function OnePerfumePage() {
               </div>
             </div>
 
-            {/* Mobile Pricing Section - After Gallery */}
-            <div className="flex flex-col gap-2 md:hidden order-2">
-              {/* Pricing and Quantity Row */}
-              <div className="flex items-center justify-between gap-4 pt-2">
-                {/* Left Side - Pricing */}
-                <div className="flex-1">
-                  {/* Current Price */}
-                  <div className="mb-1">
-                    <span className="text-2xl font-medium tracking-tight text-gray-900">
-                      ₹{totalPrice.toFixed(2)}
-                    </span>
-                  </div>
-
-                  {/* MRP and Taxes */}
-                  <div className="flex flex-col gap-0.5">
-                    {totalOriginalPrice > totalPrice && (
-                      <span className="text-xs text-gray-500 line-through">
-                        MRP: ₹{totalOriginalPrice.toFixed(2)}
-                      </span>
-                    )}
-                    <span className="text-xs text-gray-500">
-                      Inclusive of all taxes
-                    </span>
-                  </div>
-                </div>
-
-                {/* Right Side - Quantity Selector */}
-                <div className="flex items-center bg-gray-100 rounded-lg border border-gray-200 overflow-hidden">
-                  <button
-                    onClick={handleQuantityDecrease}
-                    className="px-4 py-2.5 h-full hover:bg-gray-200 transition-colors flex items-center justify-center text-gray-700"
-                    disabled={quantity <= 1}
-                  >
-                    <FiMinus className="w-4 h-4" />
-                  </button>
-                  <span className="px-5 py-2.5 text-sm font-medium text-gray-900 border-x border-gray-200">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={handleQuantityIncrease}
-                    className="px-4 py-2.5 h-full hover:bg-gray-200 transition-colors flex items-center justify-center text-gray-700"
-                  >
-                    <FiPlus className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Badge Text - Subtle */}
-              {perfume.badgeText && (
-                <div className="pt-1">
-                  <span className="inline-block text-xs text-gray-600 font-light tracking-wide">
-                    {perfume.badgeText}
-                  </span>
-                </div>
-              )}
-            </div>
-
             {/* Right Side - Scrollable Content */}
-            <div className="order-2 lg:col-span-3 space-y-12">
-              {/* Product Description & Scent Story - Merged Flow */}
-              <div className="space-y-10">
-                {/* Product Description */}
-                <div>
-                  <h2 className="text-section uppercase mb-5">
-                    About This Fragrance
-                  </h2>
-                  <div className="mb-8">
-                    <div className="max-w-5xl mx-auto">
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Top Notes */}
-                        <div className="relative bg-linear-to-br from-amber-50 to-orange-50 p-5 border border-amber-200/50">
-                          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-amber-400 to-orange-400"></div>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3">
-                              <svg
-                                className="w-5 h-5 text-amber-600 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1.5}
-                                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                                />
-                              </svg>
-                              <div>
-                                <p className="text-xs uppercase tracking-widest text-amber-900 font-semibold">
-                                  Top Notes
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  First Impression
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
-                              {perfume.top_notes
-                                ?.split("•")
-                                .filter((note) => note.trim())
-                                .map((note, index) => (
-                                  <p key={index}> • {note.trim()}</p>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Heart Notes */}
-                        <div className="relative bg-linear-to-br from-rose-50 to-pink-50 p-5 border border-rose-200/50">
-                          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-rose-400 to-pink-400"></div>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3">
-                              <svg
-                                className="w-5 h-5 text-rose-600 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1.5}
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                />
-                              </svg>
-                              <div>
-                                <p className="text-xs uppercase tracking-widest text-rose-900 font-semibold">
-                                  Heart Notes
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  The Soul
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
-                              {perfume.middle_notes
-                                ?.split("•")
-                                .filter((note) => note.trim())
-                                .map((note, index) => (
-                                  <p key={index}> • {note.trim()}</p>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Base Notes */}
-                        <div className="relative bg-linear-to-br from-slate-50 to-stone-50 p-5 border border-slate-200/50">
-                          <div className="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-slate-600 to-stone-600"></div>
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3">
-                              <svg
-                                className="w-5 h-5 text-slate-700 shrink-0"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={1.5}
-                                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                                />
-                              </svg>
-                              <div>
-                                <p className="text-xs uppercase tracking-widest text-slate-900 font-semibold">
-                                  Base Notes
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Lasting Foundation
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-sm text-gray-800 font-normal leading-relaxed space-y-1">
-                              {perfume.base_notes
-                                ?.split("•")
-                                .filter((note) => note.trim())
-                                .map((note, index) => (
-                                  <p key={index}> • {note.trim()}</p>
-                                ))}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Concentration Info */}
-                      {/* {perfume.concentration && (
-                <div className="mt-8 text-center">
-                  <p className="text-xs uppercase tracking-widest text-gray-500 mb-2">
-                    Concentration
-                  </p>
-                  <p className="text-sm text-gray-800 font-medium">
+            <div className="order-2 lg:col-span-11 space-y-8">
+              <div className=" space-y-5">
+                <div className="md:hidden text-gray-900 space-y-1">
+                  <h1 className="text-2xl font-semibold tracking-tight leading-tight">
+                    {perfume.name}
+                  </h1>
+                  <p className="text-sm uppercase tracking-wide text-gray-600">
                     {perfume.concentration}
                   </p>
-                </div>
-              )} */}
+                  <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <Star
+                          key={i}
+                          size={15}
+                          className={
+                            i < Math.round(Number(perfume.rating))
+                              ? "fill-amber-400 text-amber-400"
+                              : "text-gray-300"
+                          }
+                        />
+                      ))}
                     </div>
+                    <span className="text-sm text-gray-600">({formattedReviewCount})</span>
                   </div>
-                  <p className="text-gray-800 leading-relaxed text-base font-normal whitespace-pre-line">
-                    {perfume.productDescription}
-                  </p>
                 </div>
 
-                {/* Scent Story */}
-                <div className="border-l-2 border-yellow-600 pl-6">
-                  <h2 className="text-sm uppercase tracking-widest text-yellow-600 font-normal mb-5">
-                    The Story
-                  </h2>
-                  <p className="text-gray-700 leading-relaxed text-base font-normal italic whitespace-pre-line">
-                    {perfume.scentStory}
-                  </p>
+                <div className="hidden md:flex flex-wrap items-center gap-2 text-gray-900">
+                  <h1 className="text-xl md:text-3xl font-semibold tracking-tight">
+                    {perfume.name}
+                  </h1>
+                  <span className="text-gray-400">|</span>
+                  <span className="text-base md:text-lg text-gray-600">
+                    {perfume.concentration}
+                  </span>
+                  <div className="flex items-center gap-1 ml-0 md:ml-1">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star
+                        key={i}
+                        size={16}
+                        className={
+                          i < Math.round(Number(perfume.rating))
+                            ? "fill-amber-400 text-amber-400"
+                            : "text-gray-300"
+                        }
+                      />
+                    ))}
+                  </div>
+                  <span className="text-gray-600 text-sm">({formattedReviewCount})</span>
+                </div>
+
+                <div className="flex items-center gap-3 text-sm md:text-base">
+                  <span className="text-gray-700">{perfume.fragrance}</span>
+                  <span className="text-gray-300">|</span>
+                  <span className="inline-flex items-center rounded-md bg-rose-50 px-3 py-1 text-gray-700">
+                    {perfume.gender}
+                  </span>
+                </div>
+
+                <div className="border-t border-gray-200 pt-4">
+                  {perfume.badgeText && (
+                    <p className="text-sm text-gray-700 mb-2">{perfume.badgeText}</p>
+                  )}
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-3xl font-semibold text-orange-600">
+                      Rs. {totalPrice.toFixed(2)}
+                    </span>
+                    {totalOriginalPrice > totalPrice && (
+                      <span className="text-xl text-gray-400 line-through">
+                        {totalOriginalPrice.toFixed(2)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-gray-700 mt-1">Inclusive of all taxes</p>
+                </div>
+
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {perfume.price.map((priceOption, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSelectedSize(index);
+                        setSelectedSizeId(perfume.price[index].id);
+                      }}
+                      className={`min-w-20 px-4 py-2 border rounded-md text-base transition-colors ${
+                        selectedSize === index
+                          ? "bg-zinc-900 text-white border-zinc-900"
+                          : "bg-white text-gray-800 border-gray-300"
+                      }`}
+                    >
+                      {priceOption.quantity} Ml
+                    </button>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-3" ref={ctaButtonsRef}>
+                  <div className="flex items-center h-11 border-2 border-gray-700 rounded-lg overflow-hidden">
+                    <button
+                      onClick={handleQuantityDecrease}
+                      className="w-11 h-full flex items-center justify-center text-lg text-gray-700"
+                      disabled={quantity <= 1}
+                    >
+                      <FiMinus />
+                    </button>
+                    <span className="w-12 text-center text-lg font-medium">{quantity}</span>
+                    <button
+                      onClick={handleQuantityIncrease}
+                      className="w-11 h-full flex items-center justify-center text-lg text-gray-700"
+                    >
+                      <FiPlus />
+                    </button>
+                  </div>
+                  <button
+                    onClick={handleAddToCart}
+                    className="h-11 px-8 md:px-12 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-lg md:text-xl font-medium transition-colors"
+                  >
+                    Add To Cart
+                  </button>
+                </div>
+
+                <div className="border-t border-gray-200 pt-2">
+                  <div className="border-b border-gray-200">
+                    <button
+                      onClick={() => toggleAccordion("productDescription")}
+                      className="w-full flex items-center justify-between py-4 text-left text-lg md:text-[22px] text-gray-900"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <Info size={18} className="text-gray-700" />
+                        Product Description
+                      </span>
+                      <span>{accordionOpen.productDescription ? "−" : "+"}</span>
+                    </button>
+                    {accordionOpen.productDescription && (
+                      <p className="pb-4 text-gray-700 whitespace-pre-line">
+                        {perfume.productDescription}
+                      </p>
+                    )}
+                  </div>
+                  <div className="border-b border-gray-200">
+                    <button
+                      onClick={() => toggleAccordion("scentStory")}
+                      className="w-full flex items-center justify-between py-4 text-left text-lg md:text-[22px] text-gray-900"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <BookOpenText size={18} className="text-gray-700" />
+                        Scent Story
+                      </span>
+                      <span>{accordionOpen.scentStory ? "−" : "+"}</span>
+                    </button>
+                    {accordionOpen.scentStory && (
+                      <p className="pb-4 text-gray-700 whitespace-pre-line">
+                        {perfume.scentStory}
+                      </p>
+                    )}
+                  </div>
+                  <div className="border-b border-gray-200">
+                    <button
+                      onClick={() => toggleAccordion("usageTips")}
+                      className="w-full flex items-center justify-between py-4 text-left text-lg md:text-[22px] text-gray-900"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <Sparkles size={18} className="text-gray-700" />
+                        Usage Tips
+                      </span>
+                      <span>{accordionOpen.usageTips ? "−" : "+"}</span>
+                    </button>
+                    {accordionOpen.usageTips && (
+                      <p className="pb-4 text-gray-700 whitespace-pre-line">
+                        {perfume.usageTips}
+                      </p>
+                    )}
+                  </div>
+                  <div className="border-b border-gray-200">
+                    <button
+                      onClick={() => toggleAccordion("ingredients")}
+                      className="w-full flex items-center justify-between py-4 text-left text-lg md:text-[22px] text-gray-900"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <Leaf size={18} className="text-gray-700" />
+                        Ingredients
+                      </span>
+                      <span>{accordionOpen.ingredients ? "−" : "+"}</span>
+                    </button>
+                    {accordionOpen.ingredients && (
+                      <p className="pb-4 text-gray-700 whitespace-pre-line">
+                        {ingredientsText}
+                      </p>
+                    )}
+                  </div>
+                  <div className="border-b border-gray-200">
+                    <button
+                      onClick={() => toggleAccordion("brandInfo")}
+                      className="w-full flex items-center justify-between py-4 text-left text-lg md:text-[22px] text-gray-900"
+                    >
+                      <span className="inline-flex items-center gap-2">
+                        <Building2 size={18} className="text-gray-700" />
+                        Brand & Manufacturer Info
+                      </span>
+                      <span>{accordionOpen.brandInfo ? "−" : "+"}</span>
+                    </button>
+                    {accordionOpen.brandInfo && (
+                      <p className="pb-4 text-gray-700 whitespace-pre-line">
+                        {perfume.brandAndManufacturerInfo}
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -863,60 +696,6 @@ export default function OnePerfumePage() {
                 <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
                   🌟 New arrivals - Explore our latest collection
                 </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Usage Tips & Brand Info - Minimal Accordion */}
-          <div className="mt-2 md:mt-16 pt-12 border-t border-gray-100">
-            <div className="max-w-4xl mx-auto">
-              {/* Usage Tips */}
-              <div className="border-b border-gray-100">
-                <button
-                  onClick={() => toggleAccordion("usageTips")}
-                  className="w-full flex items-center justify-between py-5 transition-colors text-left"
-                >
-                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
-                    Usage Tips
-                  </h2>
-                  <div className="text-gray-400 text-section font-medium leading-none">
-                    {accordionOpen.usageTips ? "−" : "+"}
-                  </div>
-                </button>
-                {accordionOpen.usageTips && (
-                  <div className="pb-5">
-                    <p className="text-gray-700 leading-relaxed text-body font-normal">
-                      {perfume.usageTips
-                        ?.split("•")
-                        .filter((note) => note.trim())
-                        .map((note, index) => (
-                          <p key={index}> • {note.trim()}</p>
-                        ))}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Brand Information */}
-              <div className="border-b border-gray-100">
-                <button
-                  onClick={() => toggleAccordion("brandInfo")}
-                  className="w-full flex items-center justify-between py-5 transition-colors text-left"
-                >
-                  <h2 className="text-title uppercase tracking-widest text-gray-900 font-medium">
-                    Brand Information
-                  </h2>
-                  <div className="text-gray-400 text-section font-medium leading-none">
-                    {accordionOpen.brandInfo ? "−" : "+"}
-                  </div>
-                </button>
-                {accordionOpen.brandInfo && (
-                  <div className="pb-5">
-                    <p className="text-gray-700 text-body leading-relaxed font-normal">
-                      {perfume.brandAndManufacturerInfo}
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -1327,9 +1106,9 @@ export default function OnePerfumePage() {
           <div className="px-4 py-3">
             <button
               onClick={handleAddToCart}
-              className="w-full bg-black hover:bg-gray-900 text-white font-medium py-3.5 px-6 transition-all duration-300 uppercase text-sm tracking-wider"
+              className="w-full bg-orange-600 hover:bg-orange-700 text-white font-medium py-3 px-6 transition-colors rounded-lg text-base"
             >
-              Add to Cart
+              Add To Cart
             </button>
           </div>
         </div>
@@ -1378,13 +1157,13 @@ export default function OnePerfumePage() {
                         setSelectedSize(index);
                         setSelectedSizeId(perfume.price[index].id);
                       }}
-                      className={`px-3 h-[42px] text-xs font-light transition-all border ${
+                      className={`px-4 h-[40px] text-sm font-medium transition-colors border rounded-md ${
                         selectedSize === index
-                          ? "bg-gray-900 text-white border-gray-900"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
+                          ? "bg-zinc-900 text-white border-zinc-900"
+                          : "bg-white text-gray-800 border-gray-300"
                       }`}
                     >
-                      {priceOption.quantity}ml
+                      {priceOption.quantity} Ml
                     </button>
                   ))}
                 </div>
@@ -1395,19 +1174,19 @@ export default function OnePerfumePage() {
                 <span className="text-xs font-light uppercase tracking-widest text-gray-500">
                   Qty
                 </span>
-                <div className="flex items-center border border-gray-300 h-[42px]">
+                <div className="flex items-center h-11 border-2 border-gray-700 rounded-lg overflow-hidden">
                   <button
                     onClick={handleQuantityDecrease}
-                    className="px-3 h-full hover:bg-gray-50 transition-colors flex items-center justify-center"
+                    className="w-11 h-full flex items-center justify-center text-lg text-gray-700"
                   >
-                    <FiMinus className="w-3 h-3" />
+                    <FiMinus />
                   </button>
-                  <span className="px-4 text-sm font-light">{quantity}</span>
+                  <span className="w-12 text-center text-lg font-medium">{quantity}</span>
                   <button
                     onClick={handleQuantityIncrease}
-                    className="px-3 h-full hover:bg-gray-50 transition-colors flex items-center justify-center"
+                    className="w-11 h-full flex items-center justify-center text-lg text-gray-700"
                   >
-                    <FiPlus className="w-3 h-3" />
+                    <FiPlus />
                   </button>
                 </div>
               </div>
@@ -1415,9 +1194,9 @@ export default function OnePerfumePage() {
               {/* Add to Cart Button */}
               <button
                 onClick={handleAddToCart}
-                className="bg-gray-900 hover:bg-gray-800 text-white font-light h-[42px] px-10 transition-all duration-300 uppercase text-xs tracking-widest"
+                className="h-11 px-10 rounded-lg bg-orange-600 hover:bg-orange-700 text-white text-lg font-medium transition-colors"
               >
-                Add to Cart
+                Add To Cart
               </button>
             </div>
           </div>
