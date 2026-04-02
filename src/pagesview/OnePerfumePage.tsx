@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
-import { getDetailedPerfume } from "@/utils/perfume";
-import { DetailedPerfume } from "@/types/perfume";
+import { getDetailedPerfume, getSimilarPerfumes } from "@/utils/perfume";
+import { DetailedPerfume, Perfume } from "@/types/perfume";
 import { FiMinus, FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import {
   Star,
@@ -16,6 +16,12 @@ import {
 import { useCart } from "@/contexts/cartContext";
 import { getProductReviews } from "@/utils/products";
 import { ProductReviewsResponse } from "@/types/product";
+import OnePerfumecard from "@/components/Perfume/OnePerfumecard";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination, Navigation } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 export default function OnePerfumePage() {
   const params = useParams();
@@ -53,6 +59,7 @@ export default function OnePerfumePage() {
     null,
   );
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [similarPerfumes, setSimilarPerfumes] = useState<Perfume[]>([]);
 
   const toggleAccordion = (
     section:
@@ -75,6 +82,8 @@ export default function OnePerfumePage() {
       if (perfumeData) {
         setPerfume(perfumeData);
         setSelectedSizeId(perfumeData.price[selectedSize].id);
+        const similar = await getSimilarPerfumes(perfumeData.id);
+        setSimilarPerfumes(similar);
       }
       setIsLoading(false);
     };
@@ -271,8 +280,8 @@ export default function OnePerfumePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-20 md:pb-0 mt-30">
-      <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative hidden md:block">
+    <div className="min-h-screen bg-white pb-20 md:pb-0 md:mt-30 mt-25">
+      <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block">
         <div className="flex items-center h-full">
           <div className="flex whitespace-nowrap animate-marquee hover:paused">
             <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
@@ -663,42 +672,7 @@ export default function OnePerfumePage() {
             </div>
           </div>
 
-          <div
-            className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block md:hidden mt-6 "
-            style={{
-              transform: "scale(1.2)",
-            }}
-          >
-            <div className="flex items-center h-full">
-              <div className="flex whitespace-nowrap animate-marquee hover:paused">
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  🎁 Free shipping on orders over $100
-                </span>
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  ✨ Buy 2 Get 15% Off - Limited Time
-                </span>
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  💝 Free gift wrapping with every purchase
-                </span>
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  🌟 New arrivals - Explore our latest collection
-                </span>
-                {/* Duplicate for seamless loop */}
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  🎁 Free shipping on orders over $100
-                </span>
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  ✨ Buy 2 Get 15% Off - Limited Time
-                </span>
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  💝 Free gift wrapping with every purchase
-                </span>
-                <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-                  🌟 New arrivals - Explore our latest collection
-                </span>
-              </div>
-            </div>
-          </div>
+    
 
           {/* Reviews Section */}
           <div className="mt-16 pt-12 border-t border-gray-100">
@@ -1037,6 +1011,45 @@ export default function OnePerfumePage() {
               </div>
             </div>
           </div>
+
+          {/* Similar Perfumes Section */}
+          {similarPerfumes.length > 0 && (
+            <div className="mt-12 md:mt-20 pt-12 border-t border-gray-100">
+              <div className="mb-6 md:mb-8">
+                <h3 className="text-section pt-serif-bold text-gray-900 mb-2 relative inline-block">
+                  Similar Perfumes
+                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-linear-to-r from-gray-900 to-gray-600"></div>
+                </h3>
+                <p className="text-body text-gray-600 mt-4">
+                  Discover more fragrances you might love
+                </p>
+              </div>
+
+              {/* Desktop Grid */}
+              <div className="hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 md:gap-6">
+                {similarPerfumes.map((similarPerfume) => (
+                  <OnePerfumecard key={similarPerfume.id} perfume={similarPerfume} />
+                ))}
+              </div>
+
+              {/* Mobile Carousel */}
+              <div className="block md:hidden">
+                <Swiper
+                  modules={[Pagination, Navigation]}
+                  spaceBetween={16}
+                  slidesPerView={1.5}
+                  pagination={{ clickable: true }}
+                  className="similar-perfumes-swiper pb-8"
+                >
+                  {similarPerfumes.map((similarPerfume) => (
+                    <SwiperSlide key={similarPerfume.id}>
+                      <OnePerfumecard perfume={similarPerfume} />
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+              </div>
+            </div>
+          )}
 
           {/* Additional Offers Section - Only if more than 1 offer */}
           {perfume.offers && perfume.offers.length > 1 && (

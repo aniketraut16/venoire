@@ -228,27 +228,44 @@ export default function Footer() {
 
             {/* Bottom Footer Bar */}
             <div className="border-t border-gray-800">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
-                    <div className="flex flex-col md:flex-row justify-between items-center text-xs sm:text-sm text-gray-400 gap-3 sm:gap-4">
-                        <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-center sm:text-left sm:flex sm:flex-row sm:items-center sm:gap-1">
-                            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-                            <span className="hidden sm:inline">|</span>
-                            <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms & Conditions</Link>
-                            <span className="hidden sm:inline">|</span>
-                            <Link href="/return-policy" className="hover:text-white transition-colors">Return Policy</Link>
-                            <span className="hidden sm:inline">|</span>
-                            <Link href="/refund-policy" className="hover:text-white transition-colors">Refund Policy</Link>
-                            <span className="hidden sm:inline">|</span>
-                            <Link href="/shipping-policy" className="hover:text-white transition-colors">Shipping Policy</Link>
-                            <span className="hidden sm:inline">|</span>
-                            <Link href="/cookie-policy" className="hover:text-white transition-colors">Cookie Policy</Link>
-                        </div>
-                        <div className="text-center">
-                            © 2025 All Rights Reserved. Venoire
-                        </div>
-                    </div>
-                </div>
-            </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+    <div className="flex flex-col md:flex-row justify-between items-center text-xs sm:text-sm text-gray-400 gap-3 sm:gap-4">
+      
+      <div className="grid grid-cols-2 w-full md:w-auto gap-y-2 text-left sm:flex sm:flex-row sm:items-center sm:gap-1">
+        
+        <Link href="/privacy-policy" className="hover:text-white transition-colors justify-self-start">
+          Privacy Policy
+        </Link>
+
+        <Link href="/terms-and-conditions" className="hover:text-white transition-colors justify-self-end">
+          Terms & Conditions
+        </Link>
+
+        <Link href="/return-policy" className="hover:text-white transition-colors justify-self-start">
+          Return Policy
+        </Link>
+
+        <Link href="/refund-policy" className="hover:text-white transition-colors justify-self-end">
+          Refund Policy
+        </Link>
+
+        <Link href="/shipping-policy" className="hover:text-white transition-colors justify-self-start">
+          Shipping Policy
+        </Link>
+
+        <Link href="/cookie-policy" className="hover:text-white transition-colors justify-self-end">
+          Cookie Policy
+        </Link>
+
+      </div>
+
+      <div className="text-center md:text-right w-full md:w-auto">
+        © 2025 All Rights Reserved. Venoire
+      </div>
+
+    </div>
+  </div>
+</div>
         </footer>
     )
 }

@@ -183,7 +183,7 @@ export default function Navbar() {
                           : "hover:text-gray-300"
                       }`}
                     >
-                      {item.name}
+                      Fragrances
                     </Link>
                   ) : (
                     <button
@@ -491,7 +491,7 @@ export default function Navbar() {
                       className="flex items-center justify-between w-full text-left py-4 text-black hover:text-gray-600 transition-colors"
                     >
                       <span className="font-medium text-sm tracking-wider uppercase">
-                        {item.name}
+                      Fragrances
                       </span>
                       <svg
                         className={`w-5 h-5 transition-transform duration-200 ${
