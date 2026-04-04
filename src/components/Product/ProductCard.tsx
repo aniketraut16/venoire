@@ -85,7 +85,7 @@ export default function ProductCard(product: Product) {
               }).map((size) => (
                 <button
                   key={size.id}
-                  className="w-8 h-8 rounded-md text-meta font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
+                  className="w-8 h-8 rounded-md text-meta font-medium transition-all duration-200 bg-white text-gray-700 hover:bg-slate-800 hover:text-white border border-gray-200"
                 >
                   {size.size}
                 </button>

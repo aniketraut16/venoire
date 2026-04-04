@@ -157,8 +157,8 @@ const CollectionPageContent = () => {
       )} */}
 
       {/* Gender Title + Collection Tabs */}
-      <div className="top-0 z-40 max-w-352 mx-auto pt-6 pb-2 px-4">
-        <div className="max-w-352 mx-auto">
+      <div className="top-0 z-40 w-full md:w-[90%] mx-auto pt-6 pb-2 px-4">
+        <div className="w-full mx-auto">
           {/* Gender Label */}
           {selectedGender !== "All" && (
             <p className="text-sm font-semibold uppercase tracking-widest text-red-500 mb-1">
@@ -192,8 +192,8 @@ const CollectionPageContent = () => {
       </div>
 
       {/* Search and Filter Bar */}
-      <div className="bg-gray-900 py-6  top-[57px] z-30 shadow-lg max-w-352 mx-4 md:mx-auto rounded-xl">
-        <div className="max-w-352 mx-auto px-4">
+      <div className="bg-gray-900 py-4  top-[57px] z-30 shadow-lg w-[93%] md:w-[90%] mx-auto rounded-xl">
+        <div className="w-full mx-auto px-3">
           <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Bar */}
             <div className="relative w-full md:w-2/3 lg:w-1/2">
@@ -202,10 +202,10 @@ const CollectionPageContent = () => {
                 placeholder="Search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-white rounded-md pl-12 pr-4 py-3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
+                className="w-full bg-white rounded-md pl-12 pr-4 py-2 text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500"
               />
               <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 text-white rounded-md p-2 transition-colors">
+              <button className="absolute right-1 top-1/2 -translate-y-1/2 bg-red-500 hover:bg-red-600 text-white rounded-md p-2 transition-colors">
                 <FiSearch className="text-lg" />
               </button>
             </div>
@@ -233,7 +233,7 @@ const CollectionPageContent = () => {
       </div>
 
       {/* Products Grid */}
-      <div className="max-w-352 mx-auto px-4 py-12">
+      <div className="w-full md:w-[90%] mx-auto px-4 py-12">
         {filteredPerfumes.length === 0 ? (
           <div className="text-center py-20">
             <p className="text-xl text-gray-500">No perfumes found matching your filters.</p>

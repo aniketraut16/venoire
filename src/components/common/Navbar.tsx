@@ -333,14 +333,14 @@ export default function Navbar() {
               {menuItems.find((item) => item.name === activeMenu)?.slug?.includes("perfume") ? (
                 <div className="grid grid-cols-4 gap-12">
                   <div>
-                    <h3 className="text-sm font-semibold mb-4 tracking-wide text-black uppercase border-b border-gray-200 pb-2">
-                      Shop By Gender
+                    <h3 className="text-sm font-semibold mb-4 tracking-wide text-blue-900 uppercase border-b border-gray-200 pb-2">
+                      Shop By Gender 
                     </h3>
                     <ul className="space-y-2">
                       <li>
                         <Link
                           href="/perfume/collection?gender=Mens"
-                          className="text-sm text-gray-600 hover:text-black transition-colors"
+                          className="text-sm text-gray-600 hover:text-black hover:font-medium transition-colors"
                         >
                           Mens
                         </Link>
@@ -348,7 +348,7 @@ export default function Navbar() {
                       <li>
                         <Link
                           href="/perfume/collection?gender=Womens"
-                          className="text-sm text-gray-600 hover:text-black transition-colors"
+                          className="text-sm text-gray-600 hover:text-black hover:font-medium transition-colors"
                         >
                           Womens
                         </Link>
@@ -362,7 +362,7 @@ export default function Navbar() {
                     .find((item) => item.name === activeMenu)
                     ?.sections.map((section, index) => (
                       <div key={index}>
-                        <h3 className="text-sm font-semibold mb-4 tracking-wide text-black uppercase border-b border-gray-200 pb-2">
+                        <h3 className="text-sm font-semibold mb-4 tracking-wide text-blue-900 uppercase border-b border-gray-200 pb-2">
                           {section.title}
                         </h3>
                         <ul className="space-y-2">
@@ -373,7 +373,7 @@ export default function Navbar() {
                                   subsection.type,
                                   subsection.slug || ""
                                 )}
-                                className="text-sm text-gray-600 hover:text-black transition-colors"
+                                className="text-sm text-gray-600 hover:text-black hover:font-medium transition-colors"
                               >
                                 {subsection.name}
                               </Link>

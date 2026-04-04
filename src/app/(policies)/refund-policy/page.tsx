@@ -57,6 +57,9 @@ export default function RefundPolicyPage() {
                                 <p className="text-gray-700 leading-relaxed">
                                     Once the return request is approved and the returned clothing item successfully clears inspection, the refund will be credited within 7 days to your original payment method.
                                 </p>
+                                <p className="text-gray-700 leading-relaxed">
+                                    We will transfer the money to your account once the product reaches us undamaged, but you have to bear the shipping cost of both sides.
+                                </p>
                             </section>
 
                             <section className="mb-8">

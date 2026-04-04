@@ -308,7 +308,7 @@ export default function BestSellers() {
               className={`cursor-pointer font-light ${currTab === "perfumes" ? "text-[#0f182c]" : "text-gray-400 animate-pulse"}`}
               onClick={() => setcurrTab("perfumes")}
             >
-              PERFUMES
+              FRAGRANCES
             </span>
             <span className="text-gray-400 font-light"> | </span>
             <span
@@ -331,7 +331,7 @@ export default function BestSellers() {
             href={ currTab === "products" ? "/search":"/perfume/collection"}
             className="inline-block text-body bg-white hover:bg-black text-black hover:text-white border border-black py-3 px-8 rounded-md transition-all duration-300 transform hover:scale-105 shadow-lg"
           >
-            View All {currTab === "products" ? "Products" : "Perfumes"}
+            View All {currTab === "products" ? "Apparels" : "Fragrances"}
           </Link>
         </div>
       </div>

@@ -137,7 +137,7 @@ export default function CheckoutPageModal({
             onClick={onClose}
             className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-red-500" />
           </button>
         </div>
 
@@ -147,7 +147,7 @@ export default function CheckoutPageModal({
             {/* Left Column: Account Info */}
             <div>
               <div className="mb-6">
-                <h2 className="text-sm font-bold text-gray-900 tracking-wider mb-3 uppercase">
+                <h2 className="text-sm font-bold text-blue-900 tracking-wider mb-3 uppercase">
                   Account Details
                 </h2>
                 <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-1.5 text-sm">
@@ -163,7 +163,7 @@ export default function CheckoutPageModal({
             {/* Right Column: Delivery Address Display */}
             <div>
               <div className="mb-3">
-                <h2 className="text-sm font-bold text-gray-900 tracking-wider uppercase">
+                <h2 className="text-sm font-bold text-blue-900 tracking-wider uppercase">
                   Delivery Address
                 </h2>
               </div>
@@ -242,14 +242,14 @@ export default function CheckoutPageModal({
         <div className="border-t p-4 bg-gray-50 shrink-0 flex gap-4">
           <button
             onClick={onClose}
-            className="flex-1 py-3.5 px-6 font-semibold text-sm tracking-wide text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition-all uppercase"
+            className="flex-1 py-3.5 px-6 font-semibold text-sm tracking-wide text-red-500 bg-red-50 border border-red-500 cursor-pointer rounded-lg hover:bg-gray-100 transition-all uppercase"
           >
             Cancel
           </button>
           <button
             onClick={handlePay}
             disabled={isProcessingPayment || (pricing && pricing.shipping === -1)}
-            className={`flex-2 py-3.5 px-6 font-bold text-sm tracking-widest text-white transition-all rounded-lg shadow-md uppercase ${
+            className={`flex-2 py-3.5 px-6 font-bold text-sm tracking-widest cursor-pointer text-white transition-all rounded-lg shadow-md uppercase ${
               isProcessingPayment || (pricing && pricing.shipping === -1)
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-black hover:bg-gray-800 active:scale-[0.99] shadow-lg hover:shadow-xl"

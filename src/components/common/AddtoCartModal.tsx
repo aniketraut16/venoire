@@ -117,6 +117,7 @@ export default function AddtoCartModal({
         
           className="bg-white w-full md:max-w-2xl md:rounded-xl shadow-2xl overflow-hidden flex flex-col absolute bottom-0 md:relative md:bottom-auto animate-[slideUp_0.3s_ease-out] md:animate-none rounded-t-2xl md:rounded-b-xl"
           onClick={(e) => e.stopPropagation()}
+           data-lenis-prevent="true"
           style={{
             maxHeight: "calc(100vh - 60px)",
           }}

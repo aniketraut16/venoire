@@ -403,7 +403,7 @@ export default function AllProductsPage(props: {
         </label>
         <select
           id="rating"
-          className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+          className="border border-black px-2 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
           value={rating || ""}
           onChange={(e) => setRating(e.target.value || "")}
@@ -428,7 +428,7 @@ export default function AllProductsPage(props: {
           id="min-price"
           type="number"
           placeholder="Min"
-          className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+          className="border border-black px-2 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
           value={minPrice || ""}
           onChange={(e) => setMinPrice(e.target.value || "")}
@@ -445,7 +445,7 @@ export default function AllProductsPage(props: {
           id="max-price"
           type="number"
           placeholder="Max"
-          className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+          className="border border-black px-2 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
           value={maxPrice || ""}
           onChange={(e) => setMaxPrice(e.target.value || "")}
@@ -464,7 +464,7 @@ export default function AllProductsPage(props: {
         </label>
         <select
           id="sort-by"
-          className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+          className="border border-black px-2 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
           value={sortBy || ""}
           onChange={(e) => setSortBy(e.target.value || "")}
@@ -487,7 +487,7 @@ export default function AllProductsPage(props: {
         </label>
         <select
           id="sort-order"
-          className="border border-black px-4 py-2 text-black bg-white text-sm font-medium w-full"
+          className="border border-black px-2 py-2 text-black bg-white text-sm font-medium w-full"
           style={{ borderRadius: 0 }}
           value={sortOrder || ""}
           onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}

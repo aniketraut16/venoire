@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { useHomepage } from "@/contexts/HomepageContext";
 import { Perfume } from "@/types/perfume";
 import { FaStar } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 export default function FewPerfumes() {
+  const router = useRouter();
   const { featuredPerfumes: perfumes, isLoading: loading } = useHomepage();
   const displayPerfumes = perfumes.slice(0, 4) as unknown as Perfume[];
   return (
@@ -20,7 +22,7 @@ export default function FewPerfumes() {
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
         >
-          Featured Perfumes
+          Featured Fragrances
         </motion.h2>
         <motion.p
           className="text-body text-gray-600 leading-relaxed mb-6 sm:mb-7 md:mb-8 max-w-3xl mx-auto px-2"
@@ -72,8 +74,14 @@ export default function FewPerfumes() {
             onStackComplete={() => console.log("Stack complete")}
           >
             {displayPerfumes.map((perfume) => (
-              <ScrollStackItem key={perfume.id} itemClassName={`bg-white`}>
-                <div className="flex flex-col lg:flex-row items-stretch justify-between h-full gap-4 md:gap-6 lg:gap-8">
+              <ScrollStackItem
+                key={perfume.id}
+                itemClassName={`bg-white cursor-pointer`}
+              >
+                <div
+                  className="flex flex-col lg:flex-row items-stretch justify-between h-full gap-4 md:gap-6 lg:gap-8"
+                  onClick={() => router.push(`/perfume/${perfume.slug}`)}
+                >
                   {/* Left Side - Image with Badge */}
                   <div className="relative shrink-0 w-full lg:w-72 xl:w-80 flex items-center justify-center">
                     {/* Product Image */}
@@ -91,7 +99,7 @@ export default function FewPerfumes() {
                           imageRendering: "-webkit-optimize-contrast",
                           backfaceVisibility: "visible",
                           transform: "translateZ(0)",
-                          WebkitTransform: "translateZ(0)"
+                          WebkitTransform: "translateZ(0)",
                         }}
                       />
                     </div>
@@ -179,7 +187,9 @@ export default function FewPerfumes() {
                             Base Notes:
                           </h4>
                           <p className="text-meta text-gray-600">
-                            {perfume.base_notes?.replace(/\([^)]*\)/g, '').trim() || "N/A"}
+                            {perfume.base_notes
+                              ?.replace(/\([^)]*\)/g, "")
+                              .trim() || "N/A"}
                           </p>
                         </div>
                       </div>

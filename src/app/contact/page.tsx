@@ -142,7 +142,7 @@ export default function ContactPage() {
             case 'message':
                 return (
                     <div className="bg-white border border-gray-200 p-4 md:p-8">
-                        <div className="max-w-2xl">
+                        <div className="">
                             <h2 className="text-xl md:text-2xl font-light tracking-wide mb-6 md:mb-8 uppercase">Get In Touch</h2>
 
 
@@ -158,7 +158,7 @@ export default function ContactPage() {
                                         </p>
                                     </div>
                                 </div>
-                                <div className="w-full flex flex-col">
+                                {/* <div className="w-full flex flex-col">
                                     <h3 className="text-xs md:text-sm font-medium tracking-wider uppercase text-gray-900 mb-3">Registered Office</h3>
                                     <div className="bg-gray-50 p-3 md:p-4 border-l-2 border-black space-y-2 flex-grow">
                                         <p className="text-sm md:text-base text-gray-700 break-words">
@@ -167,7 +167,7 @@ export default function ContactPage() {
                                             <span className="font-medium">Address:</span> {siteConfig.ADDRESS}
                                         </p>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
 
 

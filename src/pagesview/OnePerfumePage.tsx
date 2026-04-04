@@ -1016,9 +1016,9 @@ export default function OnePerfumePage() {
           {similarPerfumes.length > 0 && (
             <div className="mt-12 md:mt-20 pt-12 border-t border-gray-100">
               <div className="mb-6 md:mb-8">
-                <h3 className="text-section pt-serif-bold text-gray-900 mb-2 relative inline-block">
-                  Similar Perfumes
-                  <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-linear-to-r from-gray-900 to-gray-600"></div>
+                <h3 className="text-section text-gray-900 mb-2 relative inline-block">
+                  SIMILAR FRAGRANCES
+                  {/* <div className="absolute -bottom-2 left-0 w-12 md:w-16 h-0.5 md:h-1 bg-linear-to-r from-gray-900 to-gray-600"></div> */}
                 </h3>
                 <p className="text-body text-gray-600 mt-4">
                   Discover more fragrances you might love

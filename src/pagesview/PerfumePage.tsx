@@ -9,7 +9,7 @@ export default function PerfumePage() {
   return (
     <main className="min-h-screen">
       <HeroSlideshow />
-      <PerfumeBanner />
+      {/* <PerfumeBanner /> */}
       <RichText
         titleParts={[
           { text: "VENOIRE", color: "#242424" },

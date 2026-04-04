@@ -237,21 +237,31 @@ export default function Footer() {
           Privacy Policy
         </Link>
 
+        <span className="text-gray-400 hidden md:block">|</span>
+
         <Link href="/terms-and-conditions" className="hover:text-white transition-colors justify-self-end">
           Terms & Conditions
         </Link>
+
+        <span className="text-gray-400 hidden md:block">|</span>
 
         <Link href="/return-policy" className="hover:text-white transition-colors justify-self-start">
           Return Policy
         </Link>
 
+        <span className="text-gray-400 hidden md:block">|</span>
+
         <Link href="/refund-policy" className="hover:text-white transition-colors justify-self-end">
           Refund Policy
         </Link>
 
+        <span className="text-gray-400 hidden md:block">|</span>
+
         <Link href="/shipping-policy" className="hover:text-white transition-colors justify-self-start">
           Shipping Policy
         </Link>
+
+        <span className="text-gray-400 hidden md:block">|</span>
 
         <Link href="/cookie-policy" className="hover:text-white transition-colors justify-self-end">
           Cookie Policy
@@ -260,7 +270,7 @@ export default function Footer() {
       </div>
 
       <div className="text-center md:text-right w-full md:w-auto">
-        © 2025 All Rights Reserved. Venoire
+        © {new Date().getFullYear()} All Rights Reserved
       </div>
 
     </div>
