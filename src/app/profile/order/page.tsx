@@ -30,6 +30,7 @@ import Link from "next/link";
 import CancleOrderModal from "@/components/Order/CancleOrder";
 import ReviewModal from "@/components/Order/ReviewModal";
 import ReturnRefundModal from "@/components/Order/ReturnRefundModal";
+import TrackingUpdatesModal from "@/components/Order/TrackingUpdatesModal";
 
 function OrderPageContent() {
   const urlParams = useSearchParams();
@@ -44,6 +45,7 @@ function OrderPageContent() {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [showReturnModal, setShowReturnModal] = useState(false);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [reviewsMap, setReviewsMap] = useState<
     Record<string, { rating: number; comment: string }>
   >({});
@@ -63,8 +65,7 @@ function OrderPageContent() {
     const response = await getOrder(orderId, token);
     if (response.success && response.data) {
       setOrder(response.data);
-      // Fetch tracking if order can be tracked
-      const canTrack = ["processing", "shipped"].includes(response.data.status);
+      const canTrack = ["processing", "shipped", "delivered"].includes(response.data.status);
       if (canTrack) {
         const trackResponse = await trackOrder(orderId, token);
         if (trackResponse.success && trackResponse.data) {
@@ -567,6 +568,16 @@ function OrderPageContent() {
                 );
               })()}
             </div>
+
+            {trackingData && trackingData.timeline.length > 0 && (
+              <button
+                onClick={() => setShowTrackingModal(true)}
+                className="mt-4 flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-black transition-colors duration-200 group"
+              >
+                <span className="uppercase tracking-wider">See all updates</span>
+                <ChevronRight size={16} className="text-gray-400 group-hover:text-black transition-colors" />
+              </button>
+            )}
           </div>
         )}
 
@@ -699,6 +710,17 @@ function OrderPageContent() {
             </div>
 
             <div className="divide-y divide-gray-200">
+              {/* Tracking Updates Action */}
+              {trackingData && trackingData.timeline.length > 0 && (
+                <button
+                  onClick={() => setShowTrackingModal(true)}
+                  className="w-full py-3 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                >
+                  <span className="text-sm text-gray-900">See All Tracking Updates</span>
+                  <ChevronRight size={16} className="text-gray-400" />
+                </button>
+              )}
+
               {/* Return/Refund Action */}
               {canReturnOrder(order) && (
                 <button
@@ -1174,6 +1196,16 @@ function OrderPageContent() {
           onClose={() => setShowReturnModal(false)}
           order={order}
           onConfirm={handleReturnRefund}
+        />
+      )}
+
+      {/* Tracking Updates Modal */}
+      {trackingData && (
+        <TrackingUpdatesModal
+          isOpen={showTrackingModal}
+          onClose={() => setShowTrackingModal(false)}
+          trackingData={trackingData}
+          orderNumber={order.order_number}
         />
       )}
     </div>

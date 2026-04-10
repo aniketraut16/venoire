@@ -160,6 +160,7 @@ export type TrackOrderResponse = {
         status: "placed" | "processing" | "shipped" | "delivered" | "cancelled" | "refunded";
         timestamp: string;
         message: string;
+        location?: string;
     }[];
 }
 
