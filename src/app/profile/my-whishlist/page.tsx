@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Heart, Trash2, ChevronLeft } from "lucide-react";
+import { Heart, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "@/components/Product/ProductCard";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/cartContext";
@@ -38,17 +38,25 @@ export default function MyWishlist() {
   };
 
   return (
-    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
-      <div className="flex items-center gap-3 mb-6 md:mb-8">
+    <div className="bg-white lg:border lg:border-gray-200">
+      {/* Mobile Header */}
+      <div className="flex md:hidden items-center justify-between bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full -translate-y-[30px] md:translate-y-0">
+        <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
+          My Wishlist
+        </h2>
         <button
-          onClick={() => router.push("/profile")}
-          className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300"
-          aria-label="Back to profile"
+          onClick={() => router.back()}
+          className="flex items-center gap-1 text-yellow-600 hover:text-yellow-500 transition-colors"
         >
-          <ChevronLeft size={20} />
+          <span className="text-sm font-medium">Back</span>
+          <ChevronRight className="w-4 h-4" />
         </button>
-        <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Wishlist</h2>
       </div>
+
+      <div className="p-4 md:p-8 -translate-y-[30px] md:translate-y-0">
+        <div className="items-center gap-3 mb-6 md:mb-8 hidden md:flex">
+          <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Wishlist</h2>
+        </div>
       
       {wishlist.length === 0 ? (
         <div className="text-center py-8 md:py-12">
@@ -84,6 +92,7 @@ export default function MyWishlist() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

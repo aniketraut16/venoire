@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useMemo } from "react";
-import { Search, X, HelpCircle, Package, CreditCard, Truck, ShoppingBag, AlertCircle, FileText, ChevronDown } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, X, HelpCircle, Package, CreditCard, Truck, ShoppingBag, AlertCircle, FileText, ChevronDown, ChevronRight } from "lucide-react";
 
 interface AccordionProps {
   title: string;
@@ -40,6 +41,7 @@ interface FAQItem {
 }
 
 export default function HelpAndSupportPage() {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [openAccordions, setOpenAccordions] = useState<Set<string>>(new Set());
@@ -256,10 +258,17 @@ export default function HelpAndSupportPage() {
   return (
     <div className="bg-white lg:border lg:border-gray-200">
       {/* Mobile Header */}
-      <div className="flex md:hidden items-center gap-3 bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full -translate-y-[30px] md:translate-y-0">
+      <div className="flex md:hidden items-center justify-between bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full -translate-y-[30px] md:translate-y-0">
         <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
           Help & Support
         </h2>
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1 text-yellow-600 hover:text-yellow-500 transition-colors"
+        >
+          <span className="text-sm font-medium">Back</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
       </div>
 
       <div className="max-w-6xl mx-auto pt-0 md:p-8 -translate-y-[30px] md:translate-y-0">

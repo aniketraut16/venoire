@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { MapPin, Plus, Pencil, Trash2, Home, Building, MapPinned, ChevronLeft } from "lucide-react";
+import { MapPin, Plus, Pencil, Trash2, Home, Building, MapPinned, ChevronLeft, ChevronRight } from "lucide-react";
 import { AddressType, CreateAddressArgs } from "@/types/address";
 import { getAddresses, deleteAddress } from "@/utils/address";
 import AddressForm from "@/components/Address/AddressForm";
@@ -75,19 +75,26 @@ export default function MyAddresses() {
   };
 
   return (
-    <div className="bg-white lg:border lg:border-gray-200 p-4 md:p-8">
-      <div className="max-w-5xl">
+    <div className="bg-white lg:border lg:border-gray-200">
+      {/* Mobile Header */}
+      <div className="flex md:hidden items-center justify-between bg-[#142241] text-yellow-600 py-4 px-4 pt-8 w-full -translate-y-[30px] md:translate-y-0">
+        <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">
+          My Addresses
+        </h2>
+        <button
+          onClick={() => router.back()}
+          className="flex items-center gap-1 text-yellow-600 hover:text-yellow-500 transition-colors"
+        >
+          <span className="text-sm font-medium">Back</span>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+
+      <div className="max-w-5xl p-4 md:p-8 -translate-y-[30px] md:translate-y-0">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-6 md:mb-8">
           <div className="flex items-start gap-3 flex-1">
-            <button
-              onClick={() => router.push("/profile")}
-              className="lg:hidden p-2 hover:bg-gray-100 transition-colors duration-200 border border-gray-300 mt-0.5 shrink-0"
-              aria-label="Back to profile"
-            >
-              <ChevronLeft size={20} />
-            </button>
             <div>
-              <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase">My Addresses</h2>
+              <h2 className="text-xl md:text-2xl font-light tracking-wide uppercase hidden md:block">My Addresses</h2>
               <p className="text-xs md:text-sm text-gray-600 mt-1">Manage your delivery addresses</p>
             </div>
           </div>
