@@ -150,7 +150,7 @@ export default function CheckoutPageModal({
                 <h2 className="text-sm font-bold text-blue-900 tracking-wider mb-3 uppercase">
                   Account Details
                 </h2>
-                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100 space-y-1.5 text-sm">
+                <div className="bg-gray-50 space-y-1.5 text-sm p-4 rounded-lg border border-gray-200">
                   <p className="font-medium text-gray-900">{userName}</p>
                   <p className="text-gray-600">{userEmail}</p>
                   {userPhone !== "—" && (
@@ -169,7 +169,7 @@ export default function CheckoutPageModal({
               </div>
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-gray-600 mt-0.5 shrink-0" />
+                 
                   <div className="text-sm space-y-1">
                     <p className="font-semibold text-gray-900">
                       {selectedAddress.address_line1}
