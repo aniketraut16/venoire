@@ -37,7 +37,7 @@ export default function HeroSlideshow() {
           className="h-full flex-1 hidden lg:block animate-[slideToBottom_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${previousImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "0% 0",
           }}
@@ -47,9 +47,9 @@ export default function HeroSlideshow() {
           className="h-full flex-1 animate-[slideToTop_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${previousImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "33.333% 0",
+            backgroundPosition: "25% 0",
           }}
         ></div>
         <div
@@ -57,9 +57,9 @@ export default function HeroSlideshow() {
           className="h-full flex-1 animate-[slideToBottom_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${previousImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "66.666% 0",
+            backgroundPosition: "50% 0",
           }}
         ></div>
         <div
@@ -67,7 +67,17 @@ export default function HeroSlideshow() {
           className="h-full flex-1 hidden md:block animate-[slideToTop_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${previousImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "75% 0",
+          }}
+        ></div>
+        <div
+          key={`${prevIndex}-prev-4`}
+          className="h-full flex-1 hidden lg:block animate-[slideToBottom_1s_ease-out_forwards]"
+          style={{
+            backgroundImage: `url(${previousImage})`,
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "100% 0",
           }}
@@ -81,7 +91,7 @@ export default function HeroSlideshow() {
           className="h-full flex-1 hidden lg:block animate-[slideFromTop_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${currentImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "0% 0",
           }}
@@ -91,9 +101,9 @@ export default function HeroSlideshow() {
           className="h-full flex-1 animate-[slideFromBottom_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${currentImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "33.333% 0",
+            backgroundPosition: "25% 0",
           }}
         ></div>
         <div
@@ -101,9 +111,9 @@ export default function HeroSlideshow() {
           className="h-full flex-1 animate-[slideFromTop_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${currentImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
-            backgroundPosition: "66.666% 0",
+            backgroundPosition: "50% 0",
           }}
         ></div>
         <div
@@ -111,7 +121,17 @@ export default function HeroSlideshow() {
           className="h-full flex-1 hidden md:block animate-[slideFromBottom_1s_ease-out_forwards]"
           style={{
             backgroundImage: `url(${currentImage})`,
-            backgroundSize: "400% 100%",
+            backgroundSize: "500% 100%",
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "75% 0",
+          }}
+        ></div>
+        <div
+          key={`${currentIndex}-4`}
+          className="h-full flex-1 hidden lg:block animate-[slideFromTop_1s_ease-out_forwards]"
+          style={{
+            backgroundImage: `url(${currentImage})`,
+            backgroundSize: "500% 100%",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "100% 0",
           }}
