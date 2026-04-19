@@ -325,7 +325,7 @@ export default function Navbar() {
         {/* Dropdown Submenu - Desktop Only */}
         {activeMenu && (
           <div
-            className="hidden md:block absolute top-16 left-0 right-0 bg-white border-t border-gray-200 shadow-lg"
+            className="hidden md:block absolute top-16 left-0 right-0 bg-white border-t border-amber-600 shadow-lg"
             onMouseEnter={() => setActiveMenu(activeMenu)}
             onMouseLeave={() => setActiveMenu(null)}
           >
@@ -340,7 +340,7 @@ export default function Navbar() {
                       <li>
                         <Link
                           href="/perfume/collection?gender=Mens"
-                          className="text-sm text-gray-600 hover:text-black hover:font-medium transition-colors"
+                          className="text-sm text-black font-medium hover:font-bold transition-colors"
                         >
                           Mens
                         </Link>
@@ -348,7 +348,7 @@ export default function Navbar() {
                       <li>
                         <Link
                           href="/perfume/collection?gender=Womens"
-                          className="text-sm text-gray-600 hover:text-black hover:font-medium transition-colors"
+                          className="text-sm text-black font-medium hover:font-bold transition-colors"
                         >
                           Womens
                         </Link>
@@ -373,7 +373,7 @@ export default function Navbar() {
                                   subsection.type,
                                   subsection.slug || ""
                                 )}
-                                className="text-sm text-gray-600 hover:text-black hover:font-medium transition-colors"
+                                className="text-sm text-black font-medium hover:font-bold transition-colors"
                               >
                                 {subsection.name}
                               </Link>
