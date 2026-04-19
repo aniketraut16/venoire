@@ -50,7 +50,7 @@ export default function ProductCard(product: Product) {
         />
 
         <span
-          className={`absolute md:top-3 md:left-3 bottom-2 left-2 inline-flex items-center justify-center shrink-0 h-auto max-h-7 px-1.5 py-0.5 md:px-3 md:py-1.5 rounded-full text-meta md:text-xs font-semibold border border-black bg-white whitespace-nowrap leading-none
+          className={`absolute md:top-2 md:left-2 bottom-2 left-2 inline-flex items-center justify-center shrink-0 h-auto max-h-7 px-2 py-1 md:px-2 md:py-1 rounded-full  text-[12px] md:text-[12px]  border border-black bg-white whitespace-nowrap leading-none
                     ${getTextColor("text-black", "text-black")}`}
         >
           {product.catalog}

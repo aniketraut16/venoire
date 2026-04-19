@@ -325,7 +325,7 @@ export default function Navbar() {
         {/* Dropdown Submenu - Desktop Only */}
         {activeMenu && (
           <div
-            className="hidden md:block absolute top-16 left-0 right-0 bg-white border-t border-amber-600 shadow-lg"
+            className="hidden md:block absolute top-16 left-0 right-0 bg-white border-t border-gray-200 shadow-lg"
             onMouseEnter={() => setActiveMenu(activeMenu)}
             onMouseLeave={() => setActiveMenu(null)}
           >
