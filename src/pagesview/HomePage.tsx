@@ -12,6 +12,7 @@ import InstaReels from "@/components/HomePage/InstaReels";
 import BestSellers from "@/components/HomePage/BestSellers";
 import { useHomepage } from "@/contexts/HomepageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import FewCasuals from "@/components/HomePage/FewCasuals";
 
 export default function HomePage() {
   const { collectionsAndCategories, isLoading } = useHomepage();
@@ -29,6 +30,7 @@ export default function HomePage() {
       <Divider />
       <Categories categories={categories} />
       <BrowseCollections collections={collections} />
+      <FewCasuals />
       <FewPerfumes />
       <FewProducts />
       <Explore />

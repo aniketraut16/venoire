@@ -258,7 +258,7 @@ export default function ContactPage() {
                                 All orders are typically processed and dispatched within 1 working day after confirmation. Once dispatched, your order will generally reach you within 3 to 5 working days, depending on your delivery location within India. We currently ship only within India and do not deliver internationally.
                             </Accordion>
                             <Accordion title="What is your return policy?">
-                                At Venoire, only clothing items are eligible for return. All other product categories are not eligible for return or exchange. Clothing items must be unused, unwashed, in original condition with all tags and packaging intact. You must inform us within 24 hours of delivery to initiate a return. Once approved and the item passes quality inspection, refunds are processed within 3-5 business days.
+                                At Venoire, only clothing items are eligible for return. All other product categories are not eligible for return or exchange. Clothing items must be unused, unwashed, in original condition with all tags and packaging intact. You must inform us within 48 hours of delivery to initiate a return. Once approved and the item passes quality inspection, refunds are processed within 3-5 business days.
                             </Accordion>
                             <Accordion title="Do you offer international shipping?">
                                 No, we currently ship only within India and do not deliver internationally. We offer free shipping on all orders above ₹999. For orders below ₹999, a standard shipping fee will be applied at checkout.
@@ -279,7 +279,13 @@ export default function ContactPage() {
                         <h2 className="text-xl md:text-2xl font-light tracking-wide mb-6 md:mb-8 uppercase">Order Support</h2>
                         <div className="max-w-3xl">
                             <Accordion title="I need to cancel or modify my order">
-                                Orders can be cancelled or modified within 2 hours of placement. After this time, orders enter our fulfillment process and cannot be changed. Please contact us immediately if you need to make changes to your order.
+                                Orders can be <b>cancelled</b> within 2 hours of placement, but <b>cannot be modified</b>. If you need to make any changes, you'll need to cancel your order and place a new one. 
+                                <br />
+                                <br />
+                                <b>Note:</b> In case of cancellation, the shipping cost will be deducted from your refund amount.
+                                <br />
+                                <br />
+                                After 2 hours, orders enter our fulfillment process and cannot be cancelled or changed. Please contact us immediately if you need to cancel your order.
                             </Accordion>
                             <Accordion title="My order arrived damaged or incorrect">
                                 We sincerely apologize for any issues with your order. You must contact us within 24 hours of delivery. To process your claim, please provide a mandatory unboxing video, clear photos of the product, and images of the outer packaging. Email all required proof to care.itsvenoire@gmail.com, and our team will assist you promptly.
@@ -295,6 +301,7 @@ export default function ContactPage() {
                             </Accordion>
                         </div>
                     </div>
+               
                 );
 
             case 'other-queries':

@@ -669,7 +669,16 @@ export default function AllProductsPage(props: {
           
           {/* Products Grid */}
           <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12 pb-20 lg:pb-12">
-            {products.length === 0 ? (
+            {
+              slug_type === "category" && slug === "t-shirts" ? (
+                <div className="flex justify-center items-center py-12">
+                  <p className="text-lg text-gray-600">
+                    Coming soon.
+                  </p>
+                </div>
+              )
+              :
+              products.length === 0 ? (
               <div className="flex justify-center items-center py-12">
                 <div className="text-lg text-gray-600">
                   No products found matching your criteria.

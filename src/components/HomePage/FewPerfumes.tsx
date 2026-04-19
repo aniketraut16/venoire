@@ -111,7 +111,7 @@ export default function FewPerfumes() {
                     <div className="flex-1 space-y-3">
                       {/* Title and Gender */}
                       <div>
-                        <h3 className="text-display tracking-tight text-gray-900">
+                        <h3 className="text-section md:text-display tracking-tight text-gray-900">
                           {perfume.name}
                         </h3>
                         <p className="text-meta text-gray-600 uppercase tracking-wide">
