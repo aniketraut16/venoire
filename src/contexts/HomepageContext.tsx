@@ -18,6 +18,8 @@ interface HomepageContextType {
   featuredPerfumes: Perfume[];
   featuredClothing: Product[];
   bestSellers: BestSellers[];
+  casualProducts: Product[];
+  perfumeCarousel: HeroCarouselItem[];
   instagramReels: InstagramReel[];
   navbarContent: NavbarContentData | null;
   collectionsAndCategories: CollectionsAndCategories | null;
@@ -39,6 +41,10 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
   const [featuredPerfumes, setFeaturedPerfumes] = useState<Perfume[]>([]);
   const [featuredClothing, setFeaturedClothing] = useState<Product[]>([]);
   const [bestSellers, setBestSellers] = useState<BestSellers[]>([]);
+  const [casualProducts, setCasualProducts] = useState<Product[]>([]);
+
+  const [perfumeCarousel, setPerfumeCarousel] = useState<HeroCarouselItem[]>([]);
+  
   const [instagramReels, setInstagramReels] = useState<InstagramReel[]>([]);
   const [navbarContent, setNavbarContent] = useState<NavbarContentData | null>(null);
   const [collectionsAndCategories, setCollectionsAndCategories] = useState<CollectionsAndCategories | null>(null);
@@ -63,6 +69,8 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
         setFeaturedPerfumes(homepageResponse.data.featured_perfumes || []);
         setFeaturedClothing(homepageResponse.data.featured_clothing || []);
         setBestSellers(homepageResponse.data.best_sellers || []);
+        setCasualProducts(homepageResponse.data.casual_products || []);
+        setPerfumeCarousel(homepageResponse.data.perfume_carousel || []);
         setInstagramReels(homepageResponse.data.instagram_reels || []);
         setNavbarContent(homepageResponse.data.navbar_content || null);
         setCollectionsAndCategories(homepageResponse.data.collections_and_categories || null);
@@ -98,6 +106,8 @@ export const HomepageProvider: React.FC<HomepageProviderProps> = ({ children }) 
     featuredPerfumes,
     featuredClothing,
     bestSellers,
+    casualProducts,
+    perfumeCarousel,
     instagramReels,
     navbarContent,
     collectionsAndCategories,

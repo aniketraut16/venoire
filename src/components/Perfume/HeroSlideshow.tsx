@@ -1,177 +1,91 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import { Navigation, Pagination, Mousewheel, Keyboard, Autoplay } from "swiper/modules";
+import type { Swiper as SwiperType } from "swiper";
+import { useHomepage } from "@/contexts/HomepageContext";
 
 export default function HeroSlideshow() {
-  const heroImages = [
-    "/perfume/orange.png",
-    "/perfume/pink.png",
-    "/perfume/cyan.png",
-  ];
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [prevIndex, setPrevIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(true);
+  const swiperRef = useRef<SwiperType | null>(null);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const [scrollScale, setScrollScale] = useState(1);
+  const { perfumeCarousel } = useHomepage();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setTimeout(() => {
-        setPrevIndex(currentIndex);
-        setCurrentIndex((prev) => (prev + 1) % heroImages.length);
-        setIsAnimating(true);
-      }, 1500);
-    }, 1000);
+    const handleScroll = () => {
+      if (heroRef.current) {
+        const rect = heroRef.current.getBoundingClientRect();
+        const elementTop = rect.top;
+        const elementHeight = rect.height;
+        const windowHeight = window.innerHeight;
 
-    return () => clearTimeout(timer);
-  }, [currentIndex, heroImages.length]);
+        const scrollProgress = Math.max(
+          0,
+          Math.min(1, (windowHeight - elementTop) / (windowHeight + elementHeight))
+        );
 
-  const currentImage = heroImages[currentIndex];
-  const previousImage = heroImages[prevIndex];
+        const scale = 1 + scrollProgress * 0.8;
+        setScrollScale(scale);
+      }
+    };
+
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const imageStyle = {
+    transform: `scale(${scrollScale})`,
+    transformOrigin: "center center",
+  };
 
   return (
-    <div className="relative w-full h-screen overflow-hidden bg-black">
-      {/* Previous Image Layer - slides out */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          key={`${prevIndex}-prev-0`}
-          className="h-full flex-1 hidden lg:block animate-[slideToBottom_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${previousImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "0% 0",
+    <div ref={heroRef} className="relative w-full h-screen md:h-screen overflow-hidden">
+      {perfumeCarousel.length <= 1 ? (
+        <div className="relative w-full h-full overflow-hidden cursor-pointer">
+          {perfumeCarousel[0] && (
+            <>
+              <img
+                src={perfumeCarousel[0].image_url}
+                alt="Perfume hero"
+                className="w-full h-full object-cover transition-transform duration-100 ease-out"
+                style={imageStyle}
+              />
+              <div className="absolute inset-0 bg-black/20"></div>
+            </>
+          )}
+        </div>
+      ) : (
+        <Swiper
+          cssMode={true}
+          keyboard={true}
+          modules={[Navigation, Pagination, Mousewheel, Keyboard, Autoplay]}
+          autoplay={{
+            delay: 5000,
+            disableOnInteraction: false,
           }}
-        ></div>
-        <div
-          key={`${prevIndex}-prev-1`}
-          className="h-full flex-1 animate-[slideToTop_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${previousImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "25% 0",
-          }}
-        ></div>
-        <div
-          key={`${prevIndex}-prev-2`}
-          className="h-full flex-1 animate-[slideToBottom_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${previousImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "50% 0",
-          }}
-        ></div>
-        <div
-          key={`${prevIndex}-prev-3`}
-          className="h-full flex-1 hidden md:block animate-[slideToTop_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${previousImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "75% 0",
-          }}
-        ></div>
-        <div
-          key={`${prevIndex}-prev-4`}
-          className="h-full flex-1 hidden lg:block animate-[slideToBottom_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${previousImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "100% 0",
-          }}
-        ></div>
-      </div>
-
-      {/* Current Image Layer - slides in */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          key={`${currentIndex}-0`}
-          className="h-full flex-1 hidden lg:block animate-[slideFromTop_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${currentImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "0% 0",
-          }}
-        ></div>
-        <div
-          key={`${currentIndex}-1`}
-          className="h-full flex-1 animate-[slideFromBottom_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${currentImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "25% 0",
-          }}
-        ></div>
-        <div
-          key={`${currentIndex}-2`}
-          className="h-full flex-1 animate-[slideFromTop_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${currentImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "50% 0",
-          }}
-        ></div>
-        <div
-          key={`${currentIndex}-3`}
-          className="h-full flex-1 hidden md:block animate-[slideFromBottom_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${currentImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "75% 0",
-          }}
-        ></div>
-        <div
-          key={`${currentIndex}-4`}
-          className="h-full flex-1 hidden lg:block animate-[slideFromTop_1s_ease-out_forwards]"
-          style={{
-            backgroundImage: `url(${currentImage})`,
-            backgroundSize: "500% 100%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "100% 0",
-          }}
-        ></div>
-      </div>
-
-      <style jsx>{`
-        @keyframes slideFromTop {
-          from {
-            transform: translateY(-100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideFromBottom {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideToTop {
-          from {
-            transform: translateY(0);
-          }
-          to {
-            transform: translateY(-100%);
-          }
-        }
-        @keyframes slideToBottom {
-          from {
-            transform: translateY(0);
-          }
-          to {
-            transform: translateY(100%);
-          }
-        }
-      `}</style>
+          loop={true}
+          className="w-full h-full"
+          onSwiper={(swiper) => (swiperRef.current = swiper)}
+        >
+          {perfumeCarousel.map((item, index) => (
+            <SwiperSlide key={index}>
+              <div className="relative w-full h-full overflow-hidden cursor-pointer">
+                <img
+                  src={item.image_url}
+                  alt={`Perfume hero slide ${index + 1}`}
+                  className="w-full h-full object-cover transition-transform duration-100 ease-out"
+                  style={imageStyle}
+                />
+                <div className="absolute inset-0 bg-black/20"></div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+      )}
     </div>
   );
 }

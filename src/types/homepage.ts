@@ -62,6 +62,8 @@ export interface HomepageData {
   featured_perfumes: Perfume[];
   featured_clothing: Product[];
   best_sellers: BestSellers[];
+  casual_products: Product[];
+  perfume_carousel:HeroCarouselItem[];
   instagram_reels: InstagramReel[];
   navbar_content: NavbarContentData;
   collections_and_categories: CollectionsAndCategories;

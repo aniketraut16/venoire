@@ -12,208 +12,7 @@ export default function FewCasuals() {
   const [isMobile, setIsMobile] = useState(false)
   const [shouldAnimate, setShouldAnimate] = useState(false)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const featuredClothing:Product[] = [
-    {
-        "id": "b0699bdc-f26a-4906-ab17-89487ab8f95f",
-        "slug": "olive-linen-shirt",
-        "name": "Olive Linen Shirt",
-        "category": "Casual Shirts",
-        "catalog": "General",
-        "price": 2200,
-        "originalPrice": 2500,
-        "badgeText": "",
-        "discount": 21,
-        "size": [
-            {
-                "id": "97ace1f3-b855-442c-9df8-ac53b5c6148e",
-                "size": "44",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "c5a80e97-0666-4420-9e46-18c736c7d928",
-                "size": "40",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "c0a63fc8-e718-43cb-89e0-255a008dbb79",
-                "size": "46",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "0ee5e7e1-fa1e-4081-89b7-f9a46e4fe69b",
-                "size": "38",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "b8edfce9-503d-4c56-ae47-7ae5a79a0a93",
-                "size": "42",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            }
-        ],
-        "thumbnail": "https://venoire-dev2.s3.ap-south-1.amazonaws.com/products/thumbnail/product-thumbnail-1776608011326-c851e1.webp",
-        "availabilityStatus": "in_stock"
-    },
-    {
-        "id": "f9310986-19e9-4a59-bb91-45893ae5d760",
-        "slug": "core-green-linen-shirt",
-        "name": "Core Green Linen Shirt",
-        "category": "Casual Shirts",
-        "catalog": "General",
-        "price": 2200,
-        "originalPrice": 2500,
-        "badgeText": "",
-        "discount": 15,
-        "size": [
-            {
-                "id": "9bef22ca-5ed0-4f1f-9a0f-bb56d2c17d3f",
-                "size": "44",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "d5506183-3845-481e-a687-d28543bee141",
-                "size": "46",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "0b0a51fa-e59f-402f-ab51-3d2bd92a811b",
-                "size": "42",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "dc9c3429-909c-4a67-83c8-a6290435ab75",
-                "size": "40",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "9e581211-196e-4ca4-b0d6-1689c76b5234",
-                "size": "38",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            }
-        ],
-        "thumbnail": "https://venoire-dev2.s3.ap-south-1.amazonaws.com/products/thumbnail/product-thumbnail-1776607517219-b8f1de.webp",
-        "availabilityStatus": "in_stock"
-    },
-    {
-        "id": "03145d73-12b8-4631-a8fc-8238dd8d3a5f",
-        "slug": "dark-grey-charcoal-edge-linen-shirt",
-        "name": "Dark Grey Charcoal Edge Linen Shirt",
-        "category": "Casual Shirts",
-        "catalog": "General",
-        "price": 2200,
-        "originalPrice": 2500,
-        "badgeText": "",
-        "discount": 17,
-        "size": [
-            {
-                "id": "b1b76cab-8b4a-4cd0-a260-57ea86943d0e",
-                "size": "40",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "445d6d2d-1a94-4855-9017-b16415444825",
-                "size": "38",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "dcd0010e-7ce3-4942-a143-f9369161e97a",
-                "size": "42",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "e86cf98e-0558-4146-87a1-75fc7b9d133d",
-                "size": "44",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "429805ca-edbd-4a0f-a0c4-a82aa5a24dba",
-                "size": "46",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            }
-        ],
-        "thumbnail": "https://venoire-dev2.s3.ap-south-1.amazonaws.com/products/thumbnail/product-thumbnail-1776606116343-0909a4.webp",
-        "availabilityStatus": "in_stock"
-    },
-    {
-        "id": "3f597399-96eb-40bb-b281-7944d76a265c",
-        "slug": "light-blue-linen-shirt",
-        "name": "Light Blue Linen Shirt",
-        "category": "Casual Shirts",
-        "catalog": "General",
-        "price": 2200,
-        "originalPrice": 2500,
-        "badgeText": "",
-        "discount": 15,
-        "size": [
-            {
-                "id": "241a43b5-0f12-43dd-940e-1f1d16f06bcb",
-                "size": "44",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "fa3c4c53-7dd4-4a6b-b990-d4cea29db3e7",
-                "size": "38",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "3bda99cf-4df1-4be8-aa45-badaa177b040",
-                "size": "46",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "9a3662ef-e48a-427c-8423-7fee9fb79aac",
-                "size": "42",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            },
-            {
-                "id": "5bedf5af-a168-4e4e-a93b-a1df31ebd52a",
-                "size": "40",
-                "price": 2200,
-                "originalPrice": 2500,
-                "badgeText": ""
-            }
-        ],
-        "thumbnail": "https://venoire-dev2.s3.ap-south-1.amazonaws.com/products/thumbnail/product-thumbnail-1776605348745-92724a.webp",
-        "availabilityStatus": "in_stock"
-    }
-]
+  const { casualProducts } = useHomepage()
 
   useEffect(() => {
     const checkMobile = () => {
@@ -248,7 +47,7 @@ export default function FewCasuals() {
       }
       window.removeEventListener('resize', handleScroll)
     }
-  }, [featuredClothing])
+  }, [casualProducts])
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -318,7 +117,7 @@ export default function FewCasuals() {
               overscrollBehaviorX: 'contain',
             }}
           >
-            {featuredClothing.map((product, index) => (
+            {casualProducts.map((product, index) => (
               <motion.div 
                 key={product.id} 
                 className="flex-none w-[75vw] sm:w-[45vw] md:w-[350px] lg:w-80 relative snap-start"
