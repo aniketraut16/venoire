@@ -14,9 +14,11 @@ import {
   Building2,
 } from "lucide-react";
 import { useCart } from "@/contexts/cartContext";
+import { useHomepage } from "@/contexts/HomepageContext";
 import { getProductReviews } from "@/utils/products";
 import { ProductReviewsResponse } from "@/types/product";
 import OnePerfumecard from "@/components/Perfume/OnePerfumecard";
+import Link from "next/link";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
@@ -49,6 +51,7 @@ export default function OnePerfumePage() {
     brandInfo: false,
   });
   const { addToCart } = useCart();
+  const { perfumeBanners } = useHomepage();
   const ctaButtonsRef = useRef<HTMLDivElement>(null);
   const thumbnailScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -281,37 +284,29 @@ export default function OnePerfumePage() {
 
   return (
     <div className="min-h-screen bg-white pb-20 md:pb-0 md:mt-30 mt-25">
-      <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block">
-        <div className="flex items-center h-full">
-          <div className="flex whitespace-nowrap animate-marquee hover:paused">
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              🎁 Free shipping on orders over $100
-            </span>
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              ✨ Buy 2 Get 15% Off - Limited Time
-            </span>
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              💝 Free gift wrapping with every purchase
-            </span>
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              🌟 New arrivals - Explore our latest collection
-            </span>
-            {/* Duplicate for seamless loop */}
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              🎁 Free shipping on orders over $100
-            </span>
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              ✨ Buy 2 Get 15% Off - Limited Time
-            </span>
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              💝 Free gift wrapping with every purchase
-            </span>
-            <span className="inline-flex items-center px-8 text-sm font-light text-gray-900">
-              🌟 New arrivals - Explore our latest collection
-            </span>
+      {perfumeBanners.length > 0 && (() => {
+        const marqueeMultiplier = Math.max(2, Math.ceil(10 / perfumeBanners.length));
+        const marqueeItems = Array.from({ length: marqueeMultiplier }).flatMap(() => perfumeBanners);
+        return (
+          <div className="w-full h-10 bg-yellow-300/60 overflow-hidden relative block">
+            <div className="flex items-center h-full">
+              <div className="flex whitespace-nowrap animate-marquee hover:paused">
+                {marqueeItems.map((banner, index) => (
+                  <Link
+                    key={`${banner.id}-${index}`}
+                    href={banner.url || "#"}
+                    target={banner.url?.startsWith("http") ? "_blank" : "_self"}
+                    rel={banner.url?.startsWith("http") ? "noopener noreferrer" : undefined}
+                    className="inline-flex items-center px-8 text-sm font-light text-gray-900 hover:text-gray-700 transition-colors"
+                  >
+                    {banner.text}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* Special Offer - Inline Ribbon */}
       {/* {perfume.offers && perfume.offers.length > 0 && (
