@@ -5,7 +5,9 @@ const baseUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export const getHomepageContent = async (): Promise<HomepageContentResponse> => {
   try {
-    const response = await axios.get(`${baseUrl}/home/content`);
+    const width = window.innerWidth;
+    const device = width > 768 ? "desktop" : "phone";
+    const response = await axios.get(`${baseUrl}/home/content?device=${device}`);
     return response.data as HomepageContentResponse;
   } catch (error) {
     console.error("Error fetching homepage content:", error);
