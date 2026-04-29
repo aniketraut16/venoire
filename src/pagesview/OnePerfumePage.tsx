@@ -63,6 +63,7 @@ export default function OnePerfumePage() {
   );
   const [reviewsLoading, setReviewsLoading] = useState(false);
   const [similarPerfumes, setSimilarPerfumes] = useState<Perfume[]>([]);
+  const [isGalleryPaused, setIsGalleryPaused] = useState(false);
 
   const toggleAccordion = (
     section:
@@ -107,6 +108,22 @@ export default function OnePerfumePage() {
     };
     fetchReviews();
   }, [slug, currentReviewPage]);
+
+  useEffect(() => {
+    if (!perfume || isGalleryPaused) return;
+    
+    const allImages = [perfume.coverImage, ...perfume.images].filter(Boolean);
+    if (allImages.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setSelectedImageIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
+        return nextIndex >= allImages.length ? 0 : nextIndex;
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [perfume, isGalleryPaused]);
 
   // Scroll handler for sticky bar
   useEffect(() => {
@@ -254,6 +271,8 @@ export default function OnePerfumePage() {
   const ingredientsText = [perfume.top_notes, perfume.middle_notes, perfume.base_notes]
     .filter((value) => value && value.trim())
     .join("\n");
+  
+  const allImages = [perfume.coverImage, ...perfume.images].filter(Boolean);
 
   const handleAddToCart = async () => {
     if (!selectedSizeId) return;
@@ -335,11 +354,15 @@ export default function OnePerfumePage() {
             <div className="order-1 lg:col-span-9">
               <div className="lg:sticky lg:top-0">
                 {/* Main Image Display */}
-                <div className="bg-gray-50 mb-3 overflow-hidden">
+                <div 
+                  className="bg-gray-50 mb-3 overflow-hidden"
+                  onMouseEnter={() => setIsGalleryPaused(true)}
+                  onMouseLeave={() => setIsGalleryPaused(false)}
+                >
                   <div className="aspect-square relative">
                     <img
                       src={
-                        perfume.images[selectedImageIndex] || perfume.coverImage
+                        allImages[selectedImageIndex] || perfume.coverImage
                       }
                       alt={perfume.name}
                       className="w-full h-full object-contain transition-all duration-500 rounded-md"
@@ -377,19 +400,22 @@ export default function OnePerfumePage() {
                       width: "calc(6 * 4.5rem + 5 * 0.5rem)",
                       maxWidth: "100%",
                     }}
+                    onMouseEnter={() => setIsGalleryPaused(true)}
+                    onMouseLeave={() => setIsGalleryPaused(false)}
                   >
                     <div
                       className="flex gap-2"
                       style={{ width: "max-content" }}
                     >
-                      {Array.from({ length: 1 }, (_, i) => {
-                        const originalIndex =
-                          i % perfume.images.slice(0, 4).length;
-                        const image = perfume.images.slice(0, 4)[originalIndex];
+                      {allImages.map((image, i) => {
                         return (
                           <button
                             key={i}
-                            onClick={() => setSelectedImageIndex(i)}
+                            onClick={() => {
+                              setSelectedImageIndex(i);
+                              setIsGalleryPaused(true);
+                              setTimeout(() => setIsGalleryPaused(false), 5000);
+                            }}
                             className={`group shrink-0 w-18 h-18 relative bg-gray-50 overflow-hidden transition-all duration-300 cursor-pointer rounded-md border-2 ${
                               selectedImageIndex === i
                                 ? "border-gray-900 opacity-100"
