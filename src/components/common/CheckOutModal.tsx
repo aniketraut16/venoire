@@ -207,6 +207,12 @@ export default function CheckoutPageModal({
                       <span>-₹{discount.toFixed(2)}</span>
                     </div>
                   )}
+                  {pricing.couponDiscount && pricing.couponDiscount > 0 && (
+                    <div className="flex justify-between text-green-600 font-medium">
+                      <span>Coupon Discount {appliedCoupon && `(${appliedCoupon})`}</span>
+                      <span>-₹{pricing.couponDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   {pricing.gst > 0 && (
                      <div className="flex justify-between">
                       <span>GST</span>

@@ -23,6 +23,7 @@ import CheckoutPageModal from "@/components/common/CheckOutModal";
 import { getAddresses, deleteAddress } from "@/utils/address";
 import { AddressType, CreateAddressArgs } from "@/types/address";
 import AddressForm from "@/components/Address/AddressForm";
+import CouponInput from "@/components/cart/CouponInput";
 
 function ShoppingCartPage() {
   const {
@@ -34,6 +35,10 @@ function ShoppingCartPage() {
     isCartLoading,
     cartId,
     fetchCart,
+    appliedCouponCode,
+    isCouponApplying,
+    applyCoupon,
+    removeCoupon,
   } = useCart();
   const [selectedSizes, setSelectedSizes] = useState<{ [key: string]: string }>(
     {}
@@ -645,6 +650,16 @@ function ShoppingCartPage() {
               </div>
             )}
 
+            {/* Mobile: Coupon Input */}
+            <div className="mt-6">
+              <CouponInput
+                appliedCouponCode={appliedCouponCode}
+                isCouponApplying={isCouponApplying}
+                onApplyCoupon={applyCoupon}
+                onRemoveCoupon={removeCoupon}
+              />
+            </div>
+
             {/* Mobile: Order Summary */}
             <div className="bg-gray-100 rounded-lg p-4 mt-6">
               <div className="flex items-center gap-2 mb-4">
@@ -668,6 +683,16 @@ function ShoppingCartPage() {
                     <span className="font-medium text-green-600">
                       - ₹ {discount.toLocaleString()}{" "}
                       {pricing?.appliedOffer && `(${pricing.appliedOffer})`}
+                    </span>
+                  </div>
+                )}
+
+                {pricing?.couponDiscount && pricing.couponDiscount > 0 && (
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-gray-700">Coupon Discount:</span>
+                    <span className="font-medium text-green-600">
+                      - ₹ {pricing.couponDiscount.toLocaleString()}{" "}
+                      {pricing?.appliedCoupon && `(${pricing.appliedCoupon})`}
                     </span>
                   </div>
                 )}
@@ -1115,6 +1140,16 @@ function ShoppingCartPage() {
                   </div>
                 )}
 
+                {/* Desktop: Coupon Input */}
+                <div className="mb-6">
+                  <CouponInput
+                    appliedCouponCode={appliedCouponCode}
+                    isCouponApplying={isCouponApplying}
+                    onApplyCoupon={applyCoupon}
+                    onRemoveCoupon={removeCoupon}
+                  />
+                </div>
+
                 <div className="bg-white shadow-sm ">
                   {/* Header */}
                   <div className="flex items-center gap-3 p-6 border-b">
@@ -1143,6 +1178,17 @@ function ShoppingCartPage() {
                             - ₹ {pricing.discount.toLocaleString()}{" "}
                             {pricing?.appliedOffer &&
                               `(${pricing.appliedOffer})`}
+                          </span>
+                        </div>
+                      )}
+
+                      {pricing?.couponDiscount && pricing.couponDiscount > 0 && (
+                        <div className="flex justify-between items-center text-sm gap-4">
+                          <span className="text-gray-700">Coupon Discount:</span>
+                          <span className="font-medium text-green-600 whitespace-nowrap">
+                            - ₹ {pricing.couponDiscount.toLocaleString()}{" "}
+                            {pricing?.appliedCoupon &&
+                              `(${pricing.appliedCoupon})`}
                           </span>
                         </div>
                       )}
@@ -1284,7 +1330,7 @@ function ShoppingCartPage() {
           }}
           pricing={pricing}
           cartId={cartId}
-          appliedCoupon={null}
+          appliedCoupon={appliedCouponCode}
           selectedAddress={addresses.find(addr => addr.id === selectedAddressId) || null}
         />
       )}

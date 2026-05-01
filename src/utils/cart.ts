@@ -69,7 +69,8 @@ export const getCartCount = async (
 
 export const getCart = async (
   token: string | null = null,
-  pinCode: string | null = null
+  pinCode: string | null = null,
+  couponCode: string | null = null
 ): Promise<CartApiResponse> => {
   try {
     let sessionId = null;
@@ -84,7 +85,13 @@ export const getCart = async (
       : sessionId
         ? { headers: { "x-session-id": sessionId } }
         : {};
-    const response = await axios.get(`${baseUrl}/cart?pincode=${pinCode}`, headers);
+    
+    const params = new URLSearchParams();
+    if (pinCode) params.append('pincode', pinCode);
+    if (couponCode) params.append('coupon', couponCode);
+    const queryString = params.toString();
+    
+    const response = await axios.get(`${baseUrl}/cart${queryString ? `?${queryString}` : ''}`, headers);
     const data = response.data || {};
 
     // Support both old and new response shapes if backend differs
@@ -103,6 +110,51 @@ export const getCart = async (
     const errorMessage =
       error?.response?.data?.message || error?.message || "Failed to fetch cart";
     return { success: false, message: errorMessage, cartId: "", cartItems: [], pricing: { subtotal: 0, gst: 0, shipping: 0, discount: 0, total: 0, appliedOffer: null, isFreeShipping: false } };
+  }
+};
+
+export const validateCoupon = async (
+  couponCode: string,
+  token: string | null = null,
+  pinCode: string | null = null
+): Promise<{
+  success: boolean;
+  message: string;
+  pricing?: Pricing;
+}> => {
+  try {
+    let sessionId = null;
+    if (!token) {
+      sessionId = getCookie("sessionId");
+      if (!sessionId) {
+        return { success: false, message: "Session ID is required" };
+      }
+    }
+    const headers = token
+      ? { headers: { Authorization: `Bearer ${token}` } }
+      : sessionId
+        ? { headers: { "x-session-id": sessionId } }
+        : {};
+    
+    const params = new URLSearchParams();
+    if (pinCode) params.append('pincode', pinCode);
+    params.append('coupon', couponCode);
+    const queryString = params.toString();
+    
+    const response = await axios.get(`${baseUrl}/cart${queryString ? `?${queryString}` : ''}`, headers);
+    const data = response.data || {};
+    const pricing = (data.pricing ?? { subtotal: 0, gst: 0, shipping: 0, discount: 0, total: 0 }) as Pricing;
+    
+    return {
+      success: true,
+      message: "Coupon applied successfully",
+      pricing,
+    };
+  } catch (error: any) {
+    console.error("Error validating coupon:", error);
+    const errorMessage =
+      error?.response?.data?.message || error?.message || "Failed to apply coupon";
+    return { success: false, message: errorMessage };
   }
 };
 

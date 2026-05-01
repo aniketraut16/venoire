@@ -47,6 +47,8 @@ export type Pricing = {
   discount: number; // cart-level discount
   total: number; // final amount to pay
   appliedOffer: string | null;
+  couponDiscount?: number; // coupon discount amount
+  appliedCoupon?: string | null; // applied coupon code
 };
 
 export type CartApiResponse = {

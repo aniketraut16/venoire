@@ -23,6 +23,7 @@ import {
   updateCartItem as updateCartItemApi,
   mergeCartAfterLogin as mergeCartAfterLoginApi,
   getCart,
+  validateCoupon,
 } from "@/utils/cart";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLoading } from "./LoadingContext";
@@ -35,13 +36,17 @@ type CartContextType = {
   cartItems: CartItem[];
   pricing: Pricing | null;
   isCartLoading: boolean;
-  fetchCart: (pinCode?: string | null) => Promise<void>;
+  appliedCouponCode: string | null;
+  isCouponApplying: boolean;
+  fetchCart: (pinCode?: string | null, couponCode?: string | null) => Promise<void>;
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
   removeFromCart: (itemId: string) => Promise<boolean>;
   updateCartItem: (itemId: string, args: AddToCartArgs) => Promise<boolean>;
   moveToWishlist: (item: CartItem) => Promise<void>;
   removeFromWishlist: (productId: string) => Promise<void>;
   addToWishlist: (productId: string) => Promise<void>;
+  applyCoupon: (couponCode: string) => Promise<{ success: boolean; message: string }>;
+  removeCoupon: () => Promise<void>;
   openAddToCartModal: (
     params: AddTOCartModalParams,
     mode?: "add" | "added",
@@ -69,6 +74,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
   >(undefined);
   const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
   const [lastPinCode, setLastPinCode] = useState<string | null>(null);
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+  const [isCouponApplying, setIsCouponApplying] = useState<boolean>(false);
   const prevTokenRef = useRef<string | null>(null);
   const hasMergedRef = useRef<boolean>(false);
   const { startLoading, stopLoading } = useLoading();
@@ -94,11 +101,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setPreSelectedVariantId(undefined);
   }, []);
 
-  const fetchCart = useCallback(async (pinCode?: string | null) => {
+  const fetchCart = useCallback(async (pinCode?: string | null, couponCode?: string | null) => {
     setIsCartLoading(true);
     try {
       const pinCodeToUse = pinCode !== undefined ? pinCode : lastPinCode;
-      const fetched: CartApiResponse = await getCart(token ?? null, pinCodeToUse);
+      const couponCodeToUse = couponCode !== undefined ? couponCode : appliedCouponCode;
+      const fetched: CartApiResponse = await getCart(token ?? null, pinCodeToUse, couponCodeToUse);
       if (fetched.success) {
         setCartItems(fetched.cartItems);
         setPricing(fetched.pricing);
@@ -111,6 +119,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         if (pinCode !== undefined) {
           setLastPinCode(pinCode);
         }
+        if (couponCode !== undefined) {
+          setAppliedCouponCode(couponCode);
+        }
       } else {
         setCartItems([]);
         setPricing(null);
@@ -120,7 +131,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsCartLoading(false);
     }
-  }, [token, lastPinCode]);
+  }, [token, lastPinCode, appliedCouponCode]);
 
   const addToCart = useCallback(
     async (args: AddToCartArgs): Promise<boolean> => {
@@ -221,6 +232,42 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [token, fetchCart]
   );
 
+  const applyCoupon = useCallback(
+    async (couponCode: string): Promise<{ success: boolean; message: string }> => {
+      if (!couponCode || couponCode.trim() === "") {
+        return { success: false, message: "Please enter a coupon code" };
+      }
+      
+      setIsCouponApplying(true);
+      try {
+        const result = await validateCoupon(couponCode.trim().toUpperCase(), token ?? null, lastPinCode);
+        if (result.success) {
+          setAppliedCouponCode(couponCode.trim().toUpperCase());
+          await fetchCart(undefined, couponCode.trim().toUpperCase());
+          toast.success("Coupon applied successfully!");
+          return { success: true, message: "Coupon applied successfully" };
+        } else {
+          return { success: false, message: result.message };
+        }
+      } catch (error: any) {
+        const errorMessage = error?.message || "Failed to apply coupon";
+        return { success: false, message: errorMessage };
+      } finally {
+        setIsCouponApplying(false);
+      }
+    },
+    [token, lastPinCode, fetchCart]
+  );
+
+  const removeCoupon = useCallback(
+    async (): Promise<void> => {
+      setAppliedCouponCode(null);
+      await fetchCart(undefined, null);
+      toast.success("Coupon removed");
+    },
+    [fetchCart]
+  );
+
   useEffect(() => {
     const initializeCart = async () => {
       const userJustBecameAvailable = token && dbUser && !hasMergedRef.current;
@@ -259,6 +306,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       cartItems,
       pricing,
       isCartLoading,
+      appliedCouponCode,
+      isCouponApplying,
       fetchCart,
       addToCart,
       removeFromCart,
@@ -266,6 +315,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       moveToWishlist,
       removeFromWishlist,
       addToWishlist,
+      applyCoupon,
+      removeCoupon,
       openAddToCartModal,
       closeAddToCartModal,
     }),
@@ -275,6 +326,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       cartItems,
       pricing,
       isCartLoading,
+      appliedCouponCode,
+      isCouponApplying,
       fetchCart,
       addToCart,
       removeFromCart,
@@ -282,6 +335,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
       moveToWishlist,
       removeFromWishlist,
       addToWishlist,
+      applyCoupon,
+      removeCoupon,
     ]
   );
 
