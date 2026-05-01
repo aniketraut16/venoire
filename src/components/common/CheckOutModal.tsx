@@ -103,6 +103,16 @@ export default function CheckoutPageModal({
         notes: "",
       };
 
+      console.log('[CheckoutModal] Initiating order with data:', {
+        ...orderData,
+        appliedCoupon,
+        pricing: pricing ? {
+          total: pricing.total,
+          couponDiscount: pricing.couponDiscount,
+          appliedCoupon: pricing.appliedCoupon
+        } : null
+      });
+
       const result = await intiateOrder(orderData, token);
 
       if (result.success && result.checkoutPageUrl) {
