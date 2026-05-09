@@ -174,7 +174,8 @@ export default function OneProductPage() {
             })) ?? [],
         },
         "added",
-        variantId
+        variantId,
+        quantity
       );
     }
   };

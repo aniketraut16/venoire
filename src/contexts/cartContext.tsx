@@ -50,7 +50,8 @@ type CartContextType = {
   openAddToCartModal: (
     params: AddTOCartModalParams,
     mode?: "add" | "added",
-    preSelectedVariantId?: string
+    preSelectedVariantId?: string,
+    preSelectedQuantity?: number
   ) => void;
   closeAddToCartModal: () => void;
 };
@@ -72,6 +73,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [preSelectedVariantId, setPreSelectedVariantId] = useState<
     string | undefined
   >(undefined);
+  const [preSelectedQuantity, setPreSelectedQuantity] = useState<number>(1);
   const [isCartLoading, setIsCartLoading] = useState<boolean>(false);
   const [lastPinCode, setLastPinCode] = useState<string | null>(null);
   const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
@@ -84,10 +86,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     (
       params: AddTOCartModalParams,
       mode?: "add" | "added",
-      preSelectedVariantId?: string
+      preSelectedVariantId?: string,
+      preSelectedQuantity?: number
     ) => {
       setModalMode(mode || "add");
       setPreSelectedVariantId(preSelectedVariantId);
+      setPreSelectedQuantity(preSelectedQuantity || 1);
       setModalParams(params);
       setIsAddToCartModalOpen(true);
     },
@@ -99,6 +103,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setIsAddToCartModalOpen(false);
     setModalMode("add");
     setPreSelectedVariantId(undefined);
+    setPreSelectedQuantity(1);
   }, []);
 
   const fetchCart = useCallback(async (pinCode?: string | null, couponCode?: string | null) => {
@@ -349,6 +354,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         onClose={closeAddToCartModal}
         mode={modalMode}
         preSelectedVariantId={preSelectedVariantId}
+        preSelectedQuantity={preSelectedQuantity}
       />
       {children}
     </CartContext.Provider>

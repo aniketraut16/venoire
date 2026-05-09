@@ -297,6 +297,7 @@ export default function OnePerfumePage() {
         },
         "added",
         selectedSizeId,
+        quantity
       );
     }
   };

@@ -15,6 +15,7 @@ export default function AddtoCartModal({
   onClose,
   mode,
   preSelectedVariantId,
+  preSelectedQuantity,
 }: {
   modalParams: AddTOCartModalParams | null;
   addToCart: (args: AddToCartArgs) => Promise<boolean>;
@@ -22,6 +23,7 @@ export default function AddtoCartModal({
   onClose: () => void;
   mode?: "add" | "added";
   preSelectedVariantId?: string;
+  preSelectedQuantity?: number;
 }) {
   const [selectedVariantId, setSelectedVariantId] = useState<string>("");
   const [quantity, setQuantity] = useState<number>(1);
@@ -34,11 +36,11 @@ export default function AddtoCartModal({
   useEffect(() => {
     if (isOpen && modalParams?.productVariants.length) {
       setSelectedVariantId(preSelectedVariantId || modalParams.productVariants[0].id);
-      setQuantity(1);
+      setQuantity(preSelectedQuantity || 1);
       setShowSuccess(false);
       setSimilarProducts([]);
     }
-  }, [isOpen, modalParams, preSelectedVariantId]);
+  }, [isOpen, modalParams, preSelectedVariantId, preSelectedQuantity]);
 
   useEffect(() => {
     if (mode === "added" && isOpen && modalParams) {
