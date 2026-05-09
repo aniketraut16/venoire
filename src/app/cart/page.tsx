@@ -687,7 +687,7 @@ function ShoppingCartPage() {
                   </div>
                 )}
 
-                {pricing?.couponDiscount && pricing.couponDiscount > 0 && (
+                {pricing?.couponDiscount && pricing.couponDiscount > 0 ? (
                   <div className="flex justify-between items-center text-sm">
                     <span className="text-gray-700">Coupon Discount:</span>
                     <span className="font-medium text-green-600">
@@ -695,7 +695,7 @@ function ShoppingCartPage() {
                       {pricing?.appliedCoupon && `(${pricing.appliedCoupon})`}
                     </span>
                   </div>
-                )}
+                ) : null}
 
                 {tax > 0 && (
                   <div className="flex justify-between items-center text-sm">
@@ -842,9 +842,7 @@ function ShoppingCartPage() {
                             )}
 
                             {/* Original Price - Tertiary */}
-                            {item.originalPrice &&
-                              Number(item.originalPrice) >
-                                Number(item.price) && (
+                            {Number(item.originalPrice) > Number(item.price) && (
                                 <p className="text-xs text-gray-400 line-through mb-1">
                                   ₹{" "}
                                   {Number(item.originalPrice).toLocaleString()}
@@ -1182,7 +1180,7 @@ function ShoppingCartPage() {
                         </div>
                       )}
 
-                      {pricing?.couponDiscount && pricing.couponDiscount > 0 && (
+                      {pricing?.couponDiscount && pricing.couponDiscount > 0 ? (
                         <div className="flex justify-between items-center text-sm gap-4">
                           <span className="text-gray-700">Coupon Discount:</span>
                           <span className="font-medium text-green-600 whitespace-nowrap">
@@ -1191,7 +1189,7 @@ function ShoppingCartPage() {
                               `(${pricing.appliedCoupon})`}
                           </span>
                         </div>
-                      )}
+                      ) : null}
 
                       <div className="flex justify-between items-center text-sm gap-4">
                         <span className="text-gray-700">GST:</span>
