@@ -669,6 +669,15 @@ function ShoppingCartPage() {
                 </h2>
               </div>
 
+              {!isFreeShipping && bagTotal > 0 && bagTotal < 1500 && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded flex items-start gap-2">
+                  <Truck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-blue-800 leading-snug">
+                    Add items worth <span className="font-bold">₹{(1500 - bagTotal).toLocaleString()}</span> more to get <span className="font-bold">FREE Shipping!</span>
+                  </p>
+                </div>
+              )}
+
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between items-center text-sm">
                   <span className="text-gray-700">Bag Total ({count})</span>
@@ -1157,6 +1166,15 @@ function ShoppingCartPage() {
 
                   {/* Summary Details */}
                   <div className="p-6">
+                    {!isFreeShipping && bagTotal > 0 && bagTotal < 1500 && (
+                      <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-start gap-3">
+                        <Truck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                        <p className="text-sm text-blue-800 leading-snug">
+                          Add items worth <span className="font-bold">₹{(1500 - bagTotal).toLocaleString()}</span> more to get <span className="font-bold">FREE Shipping!</span>
+                        </p>
+                      </div>
+                    )}
+
                     <div className="space-y-4 mb-6">
                       <div className="flex justify-between items-center text-sm gap-4">
                         <span className="text-gray-700">
